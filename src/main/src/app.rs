@@ -98,10 +98,29 @@ impl Widget for &App {
             .title(instructions.alignment(Alignment::Center).position(Position::Bottom))
             .borders(Borders::ALL)
             .border_set(border::THICK);
+        let center = centered_rect(9, 6, block.inner(area));
+        let card = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
+        Paragraph::new("Q♦".red()).block(card).render(center, buf);
 
         let counter_text =
             Text::from(vec![Line::from(vec!["Value: ".into(), self.counter.to_string().yellow()])]);
 
         Paragraph::new(counter_text).centered().block(block).render(area, buf);
     }
+}
+
+/// helper function to create a centered rect using up certain percentage of the
+/// available rect `r`
+fn centered_rect(length_x: u16, length_y: u16, r: Rect) -> Rect {
+    // Cut the given rectangle into three vertical pieces
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Fill(1), Constraint::Length(length_y), Constraint::Fill(1)])
+        .split(r);
+
+    // Then cut the middle vertical piece into three width-wise pieces
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Fill(1), Constraint::Length(length_x), Constraint::Fill(1)])
+        .split(popup_layout[1])[1] // Return the middle chunk
 }

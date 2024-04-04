@@ -1,0 +1,14 @@
+[package]
+name = "rules"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+
+[dependencies]
+data = { path = "../data", version = "0.0.0" }
+
+enum-iterator = "2.0.0"
+rand = "0.8.5"

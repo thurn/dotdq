@@ -12,6 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod auction_data;
-pub mod play_data;
-pub mod primitives;
+use crate::primitives::{PlayerName, Suit};
+
+/// A bid for a number of tricks a player has committed to winning with a given
+/// trump suit
+#[derive(Debug, Clone)]
+pub struct Contract {
+    /// Player who bid for this contract value
+    pub declarer: PlayerName,
+    /// Trump suit for this contract, or None if the contract is for no trump.
+    pub trump: Option<Suit>,
+    /// Number of tricks the declarer has committed to winning
+    pub bid: u32,
+}

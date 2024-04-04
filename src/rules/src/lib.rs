@@ -12,6 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod auction_data;
-pub mod play_data;
-pub mod primitives;
+pub mod auction;

@@ -16,18 +16,27 @@ use color_eyre::eyre::{bail, WrapErr};
 use color_eyre::Result;
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
+use data::play_data::PlayPhaseData;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::block::{Position, Title};
 use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui::Frame;
+use rules::auction;
 
 use crate::tui::Tui;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct App {
+    _data: PlayPhaseData,
     counter: u8,
     exit: bool,
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self { _data: auction::new_game(&mut rand::thread_rng()), counter: 0, exit: false }
+    }
 }
 
 impl App {

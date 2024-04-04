@@ -1,0 +1,11 @@
+[package]
+name = "data"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+
+[dependencies]
+enum-iterator = "2.0.0"

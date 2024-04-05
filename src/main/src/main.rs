@@ -31,7 +31,7 @@ fn main() -> Result<()> {
     let mut tui = tui::enter()?;
     let commit = env!("VERGEN_GIT_SHA");
     info!(commit, "Starting game");
-    App::default().run(&mut tui)?;
+    App::run(&mut tui)?;
     tui::exit()?;
     Ok(())
 }

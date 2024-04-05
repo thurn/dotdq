@@ -12,102 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use color_eyre::eyre::{bail, WrapErr};
+use std::time::Duration;
+
 use color_eyre::Result;
 use crossterm::event;
-use crossterm::event::{
-    Event, KeyCode, KeyEvent, KeyEventKind, MouseButton, MouseEvent, MouseEventKind,
-};
-use data::play_data::PlayPhaseData;
+use data::primitives::{Card, Rank, Suit};
 use display::card_view::CardView;
+use display::render_context::RenderContext;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::block::{Position, Title};
 use ratatui::widgets::{Block, Borders, Paragraph};
-use ratatui::Frame;
 use rules::auction;
 
 use crate::tui::Tui;
 
-#[derive(Debug)]
-pub struct App {
-    _data: PlayPhaseData,
-    counter: u8,
-    exit: bool,
-    last_click: Option<MouseEvent>,
-}
-
-impl Default for App {
-    fn default() -> Self {
-        Self {
-            _data: auction::new_game(&mut rand::thread_rng()),
-            counter: 0,
-            exit: false,
-            last_click: None,
-        }
-    }
-}
+pub struct App;
 
 impl App {
     /// runs the application's main loop until the user quits
-    pub fn run(&mut self, tui: &mut Tui) -> Result<()> {
-        while !self.exit {
-            tui.draw(|frame| self.render_frame(frame))?;
-            self.handle_events().wrap_err("handle events failed")?;
+    pub fn run(tui: &mut Tui) -> Result<()> {
+        let mut context = RenderContext::new(auction::new_game(&mut rand::thread_rng()));
+        while !context.should_exit() {
+            context.set_last_event(if event::poll(Duration::from_millis(16))? {
+                Some(event::read()?)
+            } else {
+                None
+            });
+            tui.draw(|frame| frame.render_stateful_widget(App, frame.size(), &mut context))?;
         }
         Ok(())
     }
 
-    fn render_frame(&mut self, frame: &mut Frame) {
-        frame.render_widget(self, frame.size());
-    }
-
-    /// updates the application's state based on user input
-    fn handle_events(&mut self) -> Result<()> {
-        match event::read()? {
-            Event::Key(key_event) if key_event.kind == KeyEventKind::Press => self
-                .handle_key_event(key_event)
-                .wrap_err_with(|| format!("handling key event failed:\n{key_event:#?}")),
-            Event::Mouse(mouse_event)
-                if mouse_event.kind == MouseEventKind::Up(MouseButton::Left) =>
-            {
-                self.last_click = Some(mouse_event);
-                Ok(())
-            }
-            _ => Ok(()),
-        }
-    }
-
-    fn handle_key_event(&mut self, key_event: KeyEvent) -> Result<()> {
-        match key_event.code {
-            KeyCode::Char('q') => self.exit(),
-            KeyCode::Left => self.decrement_counter()?,
-            KeyCode::Right => self.increment_counter()?,
-            _ => {}
-        }
-        Ok(())
-    }
-
-    fn exit(&mut self) {
-        self.exit = true;
-    }
-
-    fn decrement_counter(&mut self) -> Result<()> {
-        self.counter -= 1;
-        Ok(())
-    }
-
-    fn increment_counter(&mut self) -> Result<()> {
-        self.counter += 1;
-        if self.counter > 2 {
-            bail!("counter overflow");
-        }
-        Ok(())
-    }
+    // fn handle_key_event(&mut self, key_event: KeyEvent) -> Result<()> {
+    //     match key_event.code {
+    //         KeyCode::Char('q') => self.exit(),
+    //         KeyCode::Left => self.decrement_counter()?,
+    //         KeyCode::Right => self.increment_counter()?,
+    //         _ => {}
+    //     }
+    //     Ok(())
+    // }
 }
 
-impl Widget for &mut App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+impl StatefulWidget for App {
+    type State = RenderContext;
+
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
         let title = Title::from(" Counter App Tutorial ".bold());
         let instructions = Title::from(Line::from(vec![
             " Decrement ".into(),
@@ -122,9 +73,13 @@ impl Widget for &mut App {
             .title(instructions.alignment(Alignment::Center).position(Position::Bottom))
             .borders(Borders::ALL)
             .border_set(border::THICK);
-        CardView { last_click: self.last_click }.render(block.inner(area), buf);
+        CardView { card: Card::new(Suit::Diamonds, Rank::Queen) }.render(
+            block.inner(area),
+            buf,
+            context,
+        );
         let counter_text =
-            Text::from(vec![Line::from(vec!["Value: ".into(), self.counter.to_string().yellow()])]);
+            Text::from(vec![Line::from(vec!["Value: ".into(), "12".to_string().yellow()])]);
 
         Paragraph::new(counter_text).centered().block(block).render(area, buf);
     }

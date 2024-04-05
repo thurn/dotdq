@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod card_view;
-pub mod render_context;
-mod widget_id;
+use data::primitives::Card;
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum WidgetId {
+    CardView(Card),
+}

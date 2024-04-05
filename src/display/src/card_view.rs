@@ -12,25 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crossterm::event::MouseEvent;
-use ratatui::layout::Position;
+use data::primitives::Card;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
+use crate::render_context::RenderContext;
+use crate::widget_id::WidgetId;
+
 pub struct CardView {
-    pub last_click: Option<MouseEvent>,
+    pub card: Card,
 }
 
-impl Widget for CardView {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+impl CardView {
+    pub fn id(&self) -> WidgetId {
+        WidgetId::CardView(self.card)
+    }
+}
+
+impl StatefulWidget for CardView {
+    type State = RenderContext;
+
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
         let center = centered_rect(9, 6, area);
-        let mut card = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
-        if let Some(click) = self.last_click {
-            let pos = Position::new(click.column, click.row);
-            if card.inner(center).contains(pos) {
-                card = card.on_red();
-            }
+        let card = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
+        if context.hovered(self.id(), center) {
+            Block::default().on_blue().render(card.inner(center), buf);
         }
         Paragraph::new("Q♦".red()).block(card).render(center, buf);
     }

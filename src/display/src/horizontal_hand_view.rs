@@ -17,7 +17,7 @@ use std::iter;
 
 use data::primitives::Card;
 use itertools::Itertools;
-use ratatui::layout::Flex;
+use ratatui::layout::{Flex, Offset};
 use ratatui::prelude::*;
 
 use crate::card_view::CardView;
@@ -31,13 +31,46 @@ impl<'a> StatefulWidget for HorizontalHandView<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        Layout::default()
+        let [card_rect] = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints(iter::repeat(Constraint::Length(5)).take(self.hand.len()))
-            .flex(Flex::Center)
-            .split(area)
-            .iter()
-            .zip(self.hand.iter().copied().sorted())
-            .for_each(|(&rect, card)| CardView { card }.render(rect, buf, context));
+            .constraints([Constraint::Percentage(12)])
+            .areas(area);
+        let suits = self.hand.iter().copied().sorted().group_by(|card| card.suit);
+
+        let mut offset = 0;
+        for (_, group) in &suits {
+            for card in group {
+                CardView { card }.render(
+                    card_rect.offset(Offset { x: offset, y: 0 }),
+                    buf,
+                    context,
+                );
+                offset += (card_rect.width as f32 * 0.4).round() as i32;
+            }
+
+            offset += i32::from(card_rect.width);
+        }
+    }
+}
+
+pub struct HorizontalSuitView<'a> {
+    pub cards: &'a Vec<Card>,
+}
+
+impl<'a> StatefulWidget for HorizontalSuitView<'a> {
+    type State = RenderContext;
+
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        let [card_rect] = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(40)])
+            .areas(area);
+        for (i, card) in self.cards.iter().enumerate() {
+            CardView { card: *card }.render(
+                card_rect.offset(Offset { x: (i * 3) as i32, y: 0 }),
+                buf,
+                context,
+            )
+        }
     }
 }

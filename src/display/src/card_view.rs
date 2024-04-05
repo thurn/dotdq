@@ -15,7 +15,7 @@
 use data::primitives::{Card, Suit};
 use ratatui::prelude::*;
 use ratatui::symbols::border;
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
 use crate::render_context::RenderContext;
 use crate::widget_id::WidgetId;
@@ -34,6 +34,7 @@ impl StatefulWidget for CardView {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        Clear.render(area, buf);
         let card = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
         if context.hovered(self.id(), area) {
             Block::default().on_blue().render(card.inner(area), buf);

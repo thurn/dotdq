@@ -15,8 +15,11 @@
 use color_eyre::eyre::{bail, WrapErr};
 use color_eyre::Result;
 use crossterm::event;
-use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
+use crossterm::event::{
+    Event, KeyCode, KeyEvent, KeyEventKind, MouseButton, MouseEvent, MouseEventKind,
+};
 use data::play_data::PlayPhaseData;
+use display::card_view::CardView;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::block::{Position, Title};
@@ -31,11 +34,17 @@ pub struct App {
     _data: PlayPhaseData,
     counter: u8,
     exit: bool,
+    last_click: Option<MouseEvent>,
 }
 
 impl Default for App {
     fn default() -> Self {
-        Self { _data: auction::new_game(&mut rand::thread_rng()), counter: 0, exit: false }
+        Self {
+            _data: auction::new_game(&mut rand::thread_rng()),
+            counter: 0,
+            exit: false,
+            last_click: None,
+        }
     }
 }
 
@@ -49,7 +58,7 @@ impl App {
         Ok(())
     }
 
-    fn render_frame(&self, frame: &mut Frame) {
+    fn render_frame(&mut self, frame: &mut Frame) {
         frame.render_widget(self, frame.size());
     }
 
@@ -59,6 +68,12 @@ impl App {
             Event::Key(key_event) if key_event.kind == KeyEventKind::Press => self
                 .handle_key_event(key_event)
                 .wrap_err_with(|| format!("handling key event failed:\n{key_event:#?}")),
+            Event::Mouse(mouse_event)
+                if mouse_event.kind == MouseEventKind::Up(MouseButton::Left) =>
+            {
+                self.last_click = Some(mouse_event);
+                Ok(())
+            }
             _ => Ok(()),
         }
     }
@@ -91,7 +106,7 @@ impl App {
     }
 }
 
-impl Widget for &App {
+impl Widget for &mut App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Title::from(" Counter App Tutorial ".bold());
         let instructions = Title::from(Line::from(vec![
@@ -107,29 +122,10 @@ impl Widget for &App {
             .title(instructions.alignment(Alignment::Center).position(Position::Bottom))
             .borders(Borders::ALL)
             .border_set(border::THICK);
-        let center = centered_rect(9, 6, block.inner(area));
-        let card = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
-        Paragraph::new("Q♦".red()).block(card).render(center, buf);
-
+        CardView { last_click: self.last_click }.render(block.inner(area), buf);
         let counter_text =
             Text::from(vec![Line::from(vec!["Value: ".into(), self.counter.to_string().yellow()])]);
 
         Paragraph::new(counter_text).centered().block(block).render(area, buf);
     }
-}
-
-/// helper function to create a centered rect using up certain percentage of the
-/// available rect `r`
-fn centered_rect(length_x: u16, length_y: u16, r: Rect) -> Rect {
-    // Cut the given rectangle into three vertical pieces
-    let popup_layout = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([Constraint::Fill(1), Constraint::Length(length_y), Constraint::Fill(1)])
-        .split(r);
-
-    // Then cut the middle vertical piece into three width-wise pieces
-    Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Fill(1), Constraint::Length(length_x), Constraint::Fill(1)])
-        .split(popup_layout[1])[1] // Return the middle chunk
 }

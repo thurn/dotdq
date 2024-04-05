@@ -13,12 +13,11 @@
 // limitations under the License.
 
 use data::primitives::Card;
-use itertools::Itertools;
-use ratatui::layout::{Offset, Size};
-use ratatui::prelude::*;
+use ratatui::buffer::Buffer;
+use ratatui::layout::{Offset, Rect, Size};
 
-use crate::card_view;
 use crate::render_context::RenderContext;
+use crate::{card_view, layout};
 
 pub fn render(
     hand: impl Iterator<Item = Card>,
@@ -27,23 +26,22 @@ pub fn render(
     buf: &mut Buffer,
     context: &mut RenderContext,
 ) {
-    let card_offset = (card_size.width as f32 * 0.4).round();
-    let card_rect = Rect { x: area.x, y: area.y, width: card_size.width, height: card_size.height };
-    let suits = hand.sorted().group_by(|card| card.suit);
+    let card_offset = 1;
+    let count = 13;
+    let target = layout::centered_rect(
+        Size::new(card_size.width, count as u16 * card_offset + card_size.height),
+        area,
+    );
+    let card_rect =
+        Rect { x: target.x, y: target.y, width: card_size.width, height: card_size.height };
 
-    let mut offset = 0;
-    for (_, group) in &suits {
-        for card in group {
-            card_view::render(
-                card,
-                true,
-                card_rect.offset(Offset { x: offset, y: 0 }),
-                buf,
-                context,
-            );
-            offset += card_offset as i32;
-        }
-
-        offset += i32::from(card_rect.width);
+    for (i, card) in hand.enumerate() {
+        card_view::render(
+            card,
+            false,
+            card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
+            buf,
+            context,
+        );
     }
 }

@@ -16,11 +16,11 @@ use data::play_data::PlayPhaseData;
 use data::primitives::HandIdentifier;
 use ratatui::prelude::*;
 
-use crate::horizontal_hand_view;
 use crate::render_context::RenderContext;
+use crate::{horizontal_hand_view, vertical_hand_view};
 
 pub fn render(data: &PlayPhaseData, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-    let [_west, center, _east] = Layout::default()
+    let [west, center, east] = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
             Constraint::Percentage(20),
@@ -38,6 +38,14 @@ pub fn render(data: &PlayPhaseData, area: Rect, buf: &mut Buffer, context: &mut 
         ])
         .areas(center);
 
-    horizontal_hand_view::render(data.hand(HandIdentifier::North), north, buf, context);
-    horizontal_hand_view::render(data.hand(HandIdentifier::South), south, buf, context);
+    let card_size = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(12)])
+        .split(south)[0]
+        .as_size();
+
+    horizontal_hand_view::render(data.hand(HandIdentifier::North), card_size, north, buf, context);
+    vertical_hand_view::render(data.hand(HandIdentifier::East), card_size, east, buf, context);
+    horizontal_hand_view::render(data.hand(HandIdentifier::South), card_size, south, buf, context);
+    vertical_hand_view::render(data.hand(HandIdentifier::West), card_size, west, buf, context);
 }

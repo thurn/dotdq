@@ -20,12 +20,36 @@ use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use crate::render_context::RenderContext;
 use crate::widget_id::WidgetId;
 
-pub fn render(card: Card, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+pub fn render(
+    card: Card,
+    visible: bool,
+    area: Rect,
+    buf: &mut Buffer,
+    context: &mut RenderContext,
+) {
     Clear.render(area, buf);
     let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
-    if context.hovered(WidgetId::CardView(card), area) {
-        Block::default().on_blue().render(block.inner(area), buf);
+    let hovered = context.hovered(WidgetId::CardView(card), area);
+    if visible {
+        let text = if area.width <= 8 {
+            let mut rank = card.rank.to_string();
+            if area.width <= 6 {
+                rank = rank.replace("10", "T");
+            };
+            vec![
+                Line::from(text_style(rank, card, hovered)),
+                Line::from(text_style(card.suit.to_string(), card, hovered)),
+            ]
+        } else {
+            vec![Line::from(text_style(card.to_string(), card, hovered))]
+        };
+        Paragraph::new(text).block(block).render(area, buf);
+    } else {
+        block.render(area, buf);
     }
+}
+
+fn text_style<'a>(text: String, card: Card, hovered: bool) -> Span<'a> {
     let color = match card.suit {
         Suit::Clubs => "#597dce".parse::<Color>().unwrap(),
         Suit::Diamonds => "#d2aa99".parse::<Color>().unwrap(),
@@ -33,14 +57,10 @@ pub fn render(card: Card, area: Rect, buf: &mut Buffer, context: &mut RenderCont
         Suit::Spades => "#6dc2ca".parse::<Color>().unwrap(),
     };
 
-    let text = if area.width <= 8 {
-        let mut rank = card.rank.to_string();
-        if area.width <= 6 {
-            rank = rank.replace("10", "T");
-        };
-        vec![Line::from(rank.fg(color)), Line::from(card.suit.to_string().fg(color))]
+    let result = text.fg(color);
+    if hovered {
+        result.underlined()
     } else {
-        vec![Line::from(card.to_string().fg(color))]
-    };
-    Paragraph::new(text).block(block).render(area, buf);
+        result
+    }
 }

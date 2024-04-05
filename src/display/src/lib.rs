@@ -13,5 +13,7 @@
 // limitations under the License.
 
 pub mod card_view;
+pub mod horizontal_hand_view;
+pub mod play_phase_view;
 pub mod render_context;
-mod widget_id;
+pub mod widget_id;

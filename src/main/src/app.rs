@@ -16,46 +16,41 @@ use std::time::Duration;
 
 use color_eyre::Result;
 use crossterm::event;
-use data::primitives::{Card, Rank, Suit};
-use display::card_view::CardView;
+use data::play_data::PlayPhaseData;
+use display::play_phase_view::PlayPhaseView;
 use display::render_context::RenderContext;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::block::{Position, Title};
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders};
 use rules::auction;
 
 use crate::tui::Tui;
 
-pub struct App;
+pub struct App<'a> {
+    pub data: &'a PlayPhaseData,
+}
 
-impl App {
+impl<'a> App<'a> {
     /// runs the application's main loop until the user quits
     pub fn run(tui: &mut Tui) -> Result<()> {
-        let mut context = RenderContext::new(auction::new_game(&mut rand::thread_rng()));
+        let data = auction::new_game(&mut rand::thread_rng());
+        let mut context = RenderContext::default();
         while !context.should_exit() {
             context.set_last_event(if event::poll(Duration::from_millis(16))? {
                 Some(event::read()?)
             } else {
                 None
             });
-            tui.draw(|frame| frame.render_stateful_widget(App, frame.size(), &mut context))?;
+            tui.draw(|frame| {
+                frame.render_stateful_widget(App { data: &data }, frame.size(), &mut context)
+            })?;
         }
         Ok(())
     }
-
-    // fn handle_key_event(&mut self, key_event: KeyEvent) -> Result<()> {
-    //     match key_event.code {
-    //         KeyCode::Char('q') => self.exit(),
-    //         KeyCode::Left => self.decrement_counter()?,
-    //         KeyCode::Right => self.increment_counter()?,
-    //         _ => {}
-    //     }
-    //     Ok(())
-    // }
 }
 
-impl StatefulWidget for App {
+impl<'a> StatefulWidget for App<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -73,14 +68,7 @@ impl StatefulWidget for App {
             .title(instructions.alignment(Alignment::Center).position(Position::Bottom))
             .borders(Borders::ALL)
             .border_set(border::THICK);
-        CardView { card: Card::new(Suit::Diamonds, Rank::Queen) }.render(
-            block.inner(area),
-            buf,
-            context,
-        );
-        let counter_text =
-            Text::from(vec![Line::from(vec!["Value: ".into(), "12".to_string().yellow()])]);
 
-        Paragraph::new(counter_text).centered().block(block).render(area, buf);
+        PlayPhaseView { data: self.data }.render(block.inner(area), buf, context);
     }
 }

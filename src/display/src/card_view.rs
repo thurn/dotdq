@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::primitives::Card;
+use data::primitives::{Card, Suit};
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Paragraph};
@@ -34,27 +34,16 @@ impl StatefulWidget for CardView {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        let center = centered_rect(9, 6, area);
         let card = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
-        if context.hovered(self.id(), center) {
-            Block::default().on_blue().render(card.inner(center), buf);
+        if context.hovered(self.id(), area) {
+            Block::default().on_blue().render(card.inner(area), buf);
         }
-        Paragraph::new("Q♦".red()).block(card).render(center, buf);
+        let color = match self.card.suit {
+            Suit::Clubs => "#597dce".parse::<Color>().unwrap(),
+            Suit::Diamonds => "#d2aa99".parse::<Color>().unwrap(),
+            Suit::Hearts => "#d04648".parse::<Color>().unwrap(),
+            Suit::Spades => "#6dc2ca".parse::<Color>().unwrap(),
+        };
+        Paragraph::new(self.card.to_string().fg(color)).block(card).render(area, buf);
     }
-}
-
-/// helper function to create a centered rect using up certain percentage of the
-/// available rect `r`
-fn centered_rect(length_x: u16, length_y: u16, r: Rect) -> Rect {
-    // Cut the given rectangle into three vertical pieces
-    let popup_layout = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([Constraint::Fill(1), Constraint::Length(length_y), Constraint::Fill(1)])
-        .split(r);
-
-    // Then cut the middle vertical piece into three width-wise pieces
-    Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Fill(1), Constraint::Length(length_x), Constraint::Fill(1)])
-        .split(popup_layout[1])[1] // Return the middle chunk
 }

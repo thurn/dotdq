@@ -13,14 +13,13 @@
 // limitations under the License.
 
 use crossterm::event::{Event, KeyCode, KeyEventKind, MouseEventKind};
-use data::play_data::PlayPhaseData;
 use ratatui::layout::Position;
 use ratatui::prelude::*;
 
 use crate::widget_id::WidgetId;
 
+#[derive(Default)]
 pub struct RenderContext {
-    _data: PlayPhaseData,
     event: Option<Event>,
     last_hover: Option<WidgetId>,
     _last_mouse_down: Option<WidgetId>,
@@ -28,10 +27,6 @@ pub struct RenderContext {
 }
 
 impl RenderContext {
-    pub fn new(data: PlayPhaseData) -> Self {
-        Self { _data: data, event: None, last_hover: None, _last_mouse_down: None, exit: false }
-    }
-
     pub fn set_last_event(&mut self, event: Option<Event>) {
         if let Some(Event::Key(e)) = event {
             if e.kind == KeyEventKind::Press && e.code == KeyCode::Char('q') {

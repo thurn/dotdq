@@ -17,7 +17,7 @@ use std::time::Duration;
 use color_eyre::Result;
 use crossterm::event;
 use data::play_data::PlayPhaseData;
-use display::play_phase_view::PlayPhaseView;
+use display::play_phase_view;
 use display::render_context::RenderContext;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
@@ -69,6 +69,6 @@ impl<'a> StatefulWidget for App<'a> {
             .borders(Borders::ALL)
             .border_set(border::THICK);
 
-        PlayPhaseView { data: self.data }.render(block.inner(area), buf, context);
+        play_phase_view::render(self.data, block.inner(area), buf, context);
     }
 }

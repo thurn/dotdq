@@ -20,31 +20,27 @@ use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use crate::render_context::RenderContext;
 use crate::widget_id::WidgetId;
 
-pub struct CardView {
-    pub card: Card,
-}
-
-impl CardView {
-    pub fn id(&self) -> WidgetId {
-        WidgetId::CardView(self.card)
+pub fn render(card: Card, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+    Clear.render(area, buf);
+    let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
+    if context.hovered(WidgetId::CardView(card), area) {
+        Block::default().on_blue().render(block.inner(area), buf);
     }
-}
+    let color = match card.suit {
+        Suit::Clubs => "#597dce".parse::<Color>().unwrap(),
+        Suit::Diamonds => "#d2aa99".parse::<Color>().unwrap(),
+        Suit::Hearts => "#d04648".parse::<Color>().unwrap(),
+        Suit::Spades => "#6dc2ca".parse::<Color>().unwrap(),
+    };
 
-impl StatefulWidget for CardView {
-    type State = RenderContext;
-
-    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        Clear.render(area, buf);
-        let card = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
-        if context.hovered(self.id(), area) {
-            Block::default().on_blue().render(card.inner(area), buf);
-        }
-        let color = match self.card.suit {
-            Suit::Clubs => "#597dce".parse::<Color>().unwrap(),
-            Suit::Diamonds => "#d2aa99".parse::<Color>().unwrap(),
-            Suit::Hearts => "#d04648".parse::<Color>().unwrap(),
-            Suit::Spades => "#6dc2ca".parse::<Color>().unwrap(),
+    let text = if area.width <= 8 {
+        let mut rank = card.rank.to_string();
+        if area.width <= 6 {
+            rank = rank.replace("10", "T");
         };
-        Paragraph::new(self.card.to_string().fg(color)).block(card).render(area, buf);
-    }
+        vec![Line::from(rank.fg(color)), Line::from(card.suit.to_string().fg(color))]
+    } else {
+        vec![Line::from(card.to_string().fg(color))]
+    };
+    Paragraph::new(text).block(block).render(area, buf);
 }

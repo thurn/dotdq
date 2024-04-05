@@ -12,42 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashSet;
-
 use data::play_data::PlayPhaseData;
 use data::primitives::HandIdentifier;
 use ratatui::prelude::*;
 
-use crate::horizontal_hand_view::HorizontalHandView;
+use crate::horizontal_hand_view;
 use crate::render_context::RenderContext;
 
-pub struct PlayPhaseView<'a> {
-    pub data: &'a PlayPhaseData,
-}
+pub fn render(data: &PlayPhaseData, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+    let [_west, center, _east] = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(20),
+            Constraint::Percentage(80),
+            Constraint::Percentage(20),
+        ])
+        .areas(area);
 
-impl<'a> StatefulWidget for PlayPhaseView<'a> {
-    type State = RenderContext;
+    let [north, _middle, south] = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(20),
+            Constraint::Percentage(80),
+            Constraint::Percentage(20),
+        ])
+        .areas(center);
 
-    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        let [_west, center, _east] = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([
-                Constraint::Percentage(20),
-                Constraint::Percentage(80),
-                Constraint::Percentage(20),
-            ])
-            .areas(area);
-
-        let [_north, _middle, south] = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Percentage(20),
-                Constraint::Percentage(80),
-                Constraint::Percentage(20),
-            ])
-            .areas(center);
-
-        HorizontalHandView { hand: &self.data.hand(HandIdentifier::South).collect::<HashSet<_>>() }
-            .render(south, buf, context)
-    }
+    horizontal_hand_view::render(data.hand(HandIdentifier::North), north, buf, context);
+    horizontal_hand_view::render(data.hand(HandIdentifier::South), south, buf, context);
 }

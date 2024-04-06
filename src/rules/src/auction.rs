@@ -16,7 +16,7 @@ use std::collections::{HashMap, HashSet};
 use std::slice::ChunksExact;
 
 use data::auction_data::Contract;
-use data::play_data::{PlayPhaseData, Trick};
+use data::play_phase_data::{PlayPhaseData, Trick};
 use data::primitives::{Card, HandIdentifier, PlayerName, Rank, Suit};
 use rand::prelude::SliceRandom;
 use rand::Rng;

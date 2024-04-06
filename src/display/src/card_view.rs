@@ -13,12 +13,12 @@
 // limitations under the License.
 
 use data::primitives::{Card, Suit};
+use data::widget_id::WidgetId;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
 use crate::render_context::RenderContext;
-use crate::widget_id::WidgetId;
 
 pub fn render(
     card: Card,
@@ -30,6 +30,7 @@ pub fn render(
     Clear.render(area, buf);
     let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
     let hovered = context.hovered(WidgetId::CardView(card), area);
+
     if visible {
         let text = if area.width <= 8 {
             let mut rank = card.rank.to_string();
@@ -59,7 +60,7 @@ fn text_style<'a>(text: String, card: Card, hovered: bool) -> Span<'a> {
 
     let result = text.fg(color);
     if hovered {
-        result.underlined()
+        result.bg("#4e4a4e".parse().unwrap())
     } else {
         result
     }

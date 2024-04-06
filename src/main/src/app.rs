@@ -16,14 +16,15 @@ use std::time::Duration;
 
 use color_eyre::Result;
 use crossterm::event;
-use data::play_data::PlayPhaseData;
+use data::game_action::GameAction;
+use data::play_phase_data::PlayPhaseData;
 use display::play_phase_view;
 use display::render_context::RenderContext;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::block::{Position, Title};
 use ratatui::widgets::{Block, Borders};
-use rules::auction;
+use rules::{auction, play_phase_actions};
 
 use crate::tui::Tui;
 
@@ -34,7 +35,7 @@ pub struct App<'a> {
 impl<'a> App<'a> {
     /// runs the application's main loop until the user quits
     pub fn run(tui: &mut Tui) -> Result<()> {
-        let data = auction::new_game(&mut rand::thread_rng());
+        let mut data = auction::new_game(&mut rand::thread_rng());
         let mut context = RenderContext::default();
         while !context.should_exit() {
             context.set_last_event(if event::poll(Duration::from_millis(16))? {
@@ -42,8 +43,24 @@ impl<'a> App<'a> {
             } else {
                 None
             });
-            tui.draw(|frame| {
-                frame.render_stateful_widget(App { data: &data }, frame.size(), &mut context)
+            tui.draw(|frame| loop {
+                frame.render_stateful_widget(App { data: &data }, frame.size(), &mut context);
+                if let Some(action) = context.pop_render() {
+                    match action {
+                        GameAction::Redraw => {}
+                        GameAction::PlayPhaseAction(a) => {
+                            play_phase_actions::handle_action(&mut data, a)
+                        }
+                        GameAction::SetHover(id) => {
+                            context.set_current_hover(Some(id));
+                        }
+                        GameAction::ClearHover => {
+                            context.set_current_hover(None);
+                        }
+                    };
+                } else {
+                    break;
+                }
             })?;
         }
         Ok(())

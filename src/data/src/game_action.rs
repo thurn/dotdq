@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::primitives::Card;
+use crate::play_phase_data::PlayPhaseAction;
+use crate::widget_id::WidgetId;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum WidgetId {
-    CardView(Card),
+#[derive(Debug, Clone, Copy)]
+pub enum GameAction {
+    Redraw,
+    SetHover(WidgetId),
+    ClearHover,
+    PlayPhaseAction(PlayPhaseAction),
 }

@@ -14,15 +14,17 @@
 
 use std::time::Duration;
 
+use ai::ai_agent_action;
 use color_eyre::Result;
 use crossterm::event;
 use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseData;
+use data::primitives::PlayerName;
 use display::play_phase_view::PlayPhaseView;
 use display::render_context::RenderContext;
 use ratatui::prelude::*;
-use ratatui::widgets::Paragraph;
-use rules::{auction, play_phase_actions};
+use ratatui::widgets::{Paragraph, Wrap};
+use rules::{auction, play_phase_actions, play_phase_queries};
 use tracing::info;
 
 use crate::tui::Tui;
@@ -51,7 +53,11 @@ impl<'a> App<'a> {
                 match action {
                     GameAction::PlayPhaseAction(a) => {
                         info!(?a, "Handling PlayPhaseAction");
-                        play_phase_actions::handle_action(&mut data, a)
+                        play_phase_actions::handle_action(&mut data, a);
+                        while play_phase_queries::current_turn(&data) == PlayerName::Opponent {
+                            let ai_action = ai_agent_action::select(&data);
+                            play_phase_actions::handle_action(&mut data, ai_action);
+                        }
                     }
                     GameAction::SetHover(id) => {
                         context.set_current_hover(id);
@@ -71,9 +77,14 @@ impl<'a> StatefulWidget for App<'a> {
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
         if area.width < 80 || area.height < 24 {
-            Paragraph::new(
-                "Error: The minimum terminal size for this game is 80 columns by 24 rows!",
-            )
+            Paragraph::new(vec![
+                Line::from(
+                    "Error: The minimum terminal size for this game is 80 columns by 24 rows!",
+                ),
+                Line::from(format!("Your terminal is {} by {}.", area.width, area.height)),
+                Line::from("Press 'q' to quit."),
+            ])
+            .wrap(Wrap { trim: false })
             .alignment(Alignment::Center)
             .render(area, buf);
         } else {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fmt;
+use std::{fmt, iter};
 
 use enum_iterator::Sequence;
 
@@ -155,6 +155,18 @@ impl PlayerName {
         match self {
             PlayerName::User => HandIdentifier::South,
             PlayerName::Opponent => HandIdentifier::West,
+        }
+    }
+
+    /// Returns an iterator over hand identifiers for hands owned by this player
+    pub fn owned_hands(&self) -> impl Iterator<Item = HandIdentifier> {
+        match self {
+            PlayerName::User => {
+                iter::once(HandIdentifier::South).chain(iter::once(HandIdentifier::North))
+            }
+            PlayerName::Opponent => {
+                iter::once(HandIdentifier::East).chain(iter::once(HandIdentifier::West))
+            }
         }
     }
 

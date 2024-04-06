@@ -1,5 +1,5 @@
 [package]
-name = "rules"
+name = "ai"
 version = "0.0.0"
 edition = "2021"
 
@@ -9,7 +9,4 @@ doctest = false
 
 [dependencies]
 data = { path = "../data", version = "0.0.0" }
-
-enum-iterator = "2.0.0"
-itertools = "0.12.1"
-rand = "0.8.5"
+rules = { path = "../rules", version = "0.0.0" }

@@ -6,6 +6,7 @@ description = "Dungeon of the Diamond Queen"
 build = "build.rs"
 
 [dependencies]
+ai = { path = "../ai", version = "0.0.0" }
 data = { path = "../data", version = "0.0.0" }
 display = { path = "../display", version = "0.0.0" }
 rules = { path = "../rules", version = "0.0.0" }

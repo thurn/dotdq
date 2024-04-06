@@ -50,6 +50,9 @@ impl StatefulWidget for CardView {
             );
         }
 
+        let inner = block.inner(area);
+        block.render(area, buf);
+
         if self.visible {
             let text = if area.width <= 8 {
                 let mut rank = self.card.rank.to_string();
@@ -63,9 +66,15 @@ impl StatefulWidget for CardView {
             } else {
                 vec![Line::from(text_style(self.card.to_string(), self.card, hovered, pressed))]
             };
-            Paragraph::new(text).block(block).render(area, buf);
-        } else {
-            block.render(area, buf);
+            let [_, bottom] = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([Constraint::Fill(1), Constraint::Length(text.len() as u16)])
+                .areas(inner);
+
+            let mut reversed = text.clone();
+            reversed.reverse();
+            Paragraph::new(text).render(inner, buf);
+            Paragraph::new(reversed).alignment(Alignment::Right).render(bottom, buf);
         }
     }
 }

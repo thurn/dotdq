@@ -38,15 +38,18 @@ impl<'a> TrickView<'a> {
         context: &mut RenderContext,
     ) {
         let center = layout::centered_rect(self.card_size, parent_area);
+        let offset = 0.65;
         let target = match card.played_by {
-            HandIdentifier::North => center
-                .offset(Offset { x: 0, y: (self.card_size.height as f64 * -0.5).round() as i32 }),
+            HandIdentifier::North => center.offset(Offset {
+                x: 0,
+                y: (self.card_size.height as f64 * -offset).round() as i32,
+            }),
             HandIdentifier::East => center
-                .offset(Offset { x: (self.card_size.width as f64 * 0.5).round() as i32, y: 0 }),
+                .offset(Offset { x: (self.card_size.width as f64 * offset).round() as i32, y: 0 }),
             HandIdentifier::South => center
-                .offset(Offset { x: 0, y: (self.card_size.height as f64 * 0.5).round() as i32 }),
+                .offset(Offset { x: 0, y: (self.card_size.height as f64 * offset).round() as i32 }),
             HandIdentifier::West => center
-                .offset(Offset { x: (self.card_size.width as f64 * -0.5).round() as i32, y: 0 }),
+                .offset(Offset { x: (self.card_size.width as f64 * -offset).round() as i32, y: 0 }),
         };
         CardView::new().card(card.card).visible(true).build().render(target, buf, context);
     }

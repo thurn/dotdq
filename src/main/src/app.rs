@@ -21,9 +21,7 @@ use data::play_phase_data::PlayPhaseData;
 use display::play_phase_view::PlayPhaseView;
 use display::render_context::RenderContext;
 use ratatui::prelude::*;
-use ratatui::symbols::border;
-use ratatui::widgets::block::{Position, Title};
-use ratatui::widgets::{Block, Borders};
+use ratatui::widgets::Paragraph;
 use rules::{auction, play_phase_actions};
 use tracing::info;
 
@@ -72,21 +70,14 @@ impl<'a> StatefulWidget for App<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        let title = Title::from(" Counter App Tutorial ".bold());
-        let instructions = Title::from(Line::from(vec![
-            " Decrement ".into(),
-            "<Left>".blue().bold(),
-            " Increment ".into(),
-            "<Right>".blue().bold(),
-            " Quit ".into(),
-            "<Q> ".blue().bold(),
-        ]));
-        let block = Block::default()
-            .title(title.alignment(Alignment::Center))
-            .title(instructions.alignment(Alignment::Center).position(Position::Bottom))
-            .borders(Borders::ALL)
-            .border_set(border::THICK);
-
-        PlayPhaseView::new().data(self.data).build().render(block.inner(area), buf, context);
+        if area.width < 80 || area.height < 24 {
+            Paragraph::new(
+                "Error: The minimum terminal size for this game is 80 columns by 24 rows!",
+            )
+            .alignment(Alignment::Center)
+            .render(area, buf);
+        } else {
+            PlayPhaseView::new().data(self.data).build().render(area, buf, context);
+        }
     }
 }

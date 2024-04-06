@@ -63,7 +63,8 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
             .build()
             .render(north, buf, context);
         VerticalHandView::new()
-            .hand(self.data.hand(HandIdentifier::East))
+            .data(self.data)
+            .hand(HandIdentifier::East)
             .card_size(card_size)
             .build()
             .render(east, buf, context);
@@ -74,7 +75,8 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
             .build()
             .render(south, buf, context);
         VerticalHandView::new()
-            .hand(self.data.hand(HandIdentifier::West))
+            .data(self.data)
+            .hand(HandIdentifier::West)
             .card_size(card_size)
             .build()
             .render(west, buf, context);

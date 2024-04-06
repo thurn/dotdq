@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::primitives::Card;
+use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
+use data::primitives::HandIdentifier;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Offset, Rect, Size};
 use ratatui::prelude::*;
+use rules::play_phase_queries;
 use typed_builder::TypedBuilder;
 
 use crate::card_view::CardView;
@@ -24,15 +26,13 @@ use crate::render_context::RenderContext;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct VerticalHandView<TIterator>
-where
-    TIterator: Iterator<Item = Card>,
-{
-    hand: TIterator,
+pub struct VerticalHandView<'a> {
+    data: &'a PlayPhaseData,
+    hand: HandIdentifier,
     card_size: Size,
 }
 
-impl<TIterator: Iterator<Item = Card>> StatefulWidget for VerticalHandView<TIterator> {
+impl<'a> StatefulWidget for VerticalHandView<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -49,12 +49,20 @@ impl<TIterator: Iterator<Item = Card>> StatefulWidget for VerticalHandView<TIter
             height: self.card_size.height,
         };
 
-        for (i, card) in self.hand.enumerate() {
-            CardView::new().card(card).visible(true).build().render(
-                card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
-                buf,
-                context,
-            );
+        for (i, card) in self.data.hand(self.hand).enumerate() {
+            let action = PlayPhaseAction::PlayCard(self.hand.owner(), self.hand, card);
+            CardView::new()
+                .card(card)
+                .visible(true)
+                .on_click(
+                    play_phase_queries::can_perform_action(self.data, action).then_some(action),
+                )
+                .build()
+                .render(
+                    card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
+                    buf,
+                    context,
+                );
         }
     }
 }

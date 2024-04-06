@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod ai_agent_action;
-pub mod core;
-pub mod monte_carlo;
-pub mod nim;
-pub mod tree_search;
+pub mod nim_agents;
+pub mod nim_game;
+pub mod run_nim_impl;

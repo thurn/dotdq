@@ -25,7 +25,7 @@ pub enum GameStatus<TPlayer: Eq> {
 /// A generic game state used by an AI algorithm.
 ///
 /// Keeping the AI search algorithm implementation generic when possible is
-/// useful for testing. We use a much simpler game with a known-optimal
+/// useful for nim. We use a much simpler game with a known-optimal
 /// strategy (the game of Nim) to sanity-check that the AI implementations are
 /// doing broadly correct things.
 pub trait GameStateNode {

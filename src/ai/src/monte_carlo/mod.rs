@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod ai_agent_action;
-pub mod core;
-pub mod monte_carlo;
-pub mod tree_search;
+pub mod child_score;
+pub mod monte_carlo_search;
+pub mod uct1;

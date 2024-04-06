@@ -18,7 +18,7 @@ use color_eyre::Result;
 use crossterm::event;
 use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseData;
-use display::play_phase_view;
+use display::play_phase_view::PlayPhaseView;
 use display::render_context::RenderContext;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
@@ -86,6 +86,6 @@ impl<'a> StatefulWidget for App<'a> {
             .borders(Borders::ALL)
             .border_set(border::THICK);
 
-        play_phase_view::render(self.data, block.inner(area), buf, context);
+        PlayPhaseView::new().data(self.data).build().render(block.inner(area), buf, context);
     }
 }

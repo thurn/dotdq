@@ -14,3 +14,4 @@ crossterm = { version = "0.27.0", features = ["serde", "event-stream"] }
 itertools = "0.12.1"
 ratatui = { version = "0.26.0", features = ["serde", "macros"] }
 tracing = "0.1.37"
+typed-builder = "0.18.1"

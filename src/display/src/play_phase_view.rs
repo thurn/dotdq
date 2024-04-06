@@ -15,37 +15,65 @@
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::HandIdentifier;
 use ratatui::prelude::*;
+use typed_builder::TypedBuilder;
 
+use crate::horizontal_hand_view::HorizontalHandView;
 use crate::render_context::RenderContext;
-use crate::{horizontal_hand_view, vertical_hand_view};
+use crate::vertical_hand_view::VerticalHandView;
 
-pub fn render(data: &PlayPhaseData, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-    let [west, center, east] = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([
-            Constraint::Percentage(20),
-            Constraint::Percentage(80),
-            Constraint::Percentage(20),
-        ])
-        .areas(area);
+#[derive(TypedBuilder)]
+#[builder(builder_method(name = new))]
+pub struct PlayPhaseView<'a> {
+    data: &'a PlayPhaseData,
+}
 
-    let [north, _middle, south] = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([
-            Constraint::Percentage(20),
-            Constraint::Percentage(80),
-            Constraint::Percentage(20),
-        ])
-        .areas(center);
+impl<'a> StatefulWidget for PlayPhaseView<'a> {
+    type State = RenderContext;
 
-    let card_size = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(12)])
-        .split(south)[0]
-        .as_size();
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        let [west, center, east] = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Percentage(20),
+                Constraint::Percentage(80),
+                Constraint::Percentage(20),
+            ])
+            .areas(area);
 
-    horizontal_hand_view::render(data.hand(HandIdentifier::North), card_size, north, buf, context);
-    vertical_hand_view::render(data.hand(HandIdentifier::East), card_size, east, buf, context);
-    horizontal_hand_view::render(data.hand(HandIdentifier::South), card_size, south, buf, context);
-    vertical_hand_view::render(data.hand(HandIdentifier::West), card_size, west, buf, context);
+        let [north, _middle, south] = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Percentage(20),
+                Constraint::Percentage(80),
+                Constraint::Percentage(20),
+            ])
+            .areas(center);
+
+        let card_size = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(12)])
+            .split(south)[0]
+            .as_size();
+
+        HorizontalHandView::new()
+            .hand(self.data.hand(HandIdentifier::North))
+            .card_size(card_size)
+            .build()
+            .render(north, buf, context);
+        VerticalHandView::new()
+            .hand(self.data.hand(HandIdentifier::East))
+            .card_size(card_size)
+            .build()
+            .render(east, buf, context);
+        HorizontalHandView::new()
+            .hand(self.data.hand(HandIdentifier::South))
+            .card_size(card_size)
+            .build()
+            .render(south, buf, context);
+        VerticalHandView::new()
+            .hand(self.data.hand(HandIdentifier::West))
+            .card_size(card_size)
+            .build()
+            .render(west, buf, context);
+    }
 }

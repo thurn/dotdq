@@ -16,34 +16,46 @@ use data::primitives::Card;
 use itertools::Itertools;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
+use typed_builder::TypedBuilder;
 
-use crate::card_view;
+use crate::card_view::CardView;
 use crate::render_context::RenderContext;
 
-pub fn render(
-    hand: impl Iterator<Item = Card>,
+#[derive(TypedBuilder)]
+#[builder(builder_method(name = new))]
+pub struct HorizontalHandView<TIterator>
+where
+    TIterator: Iterator<Item = Card>,
+{
+    hand: TIterator,
     card_size: Size,
-    area: Rect,
-    buf: &mut Buffer,
-    context: &mut RenderContext,
-) {
-    let card_offset = (card_size.width as f32 * 0.4).round();
-    let card_rect = Rect { x: area.x, y: area.y, width: card_size.width, height: card_size.height };
-    let suits = hand.sorted().group_by(|card| card.suit);
+}
 
-    let mut offset = 0;
-    for (_, group) in &suits {
-        for card in group {
-            card_view::render(
-                card,
-                true,
-                card_rect.offset(Offset { x: offset, y: 0 }),
-                buf,
-                context,
-            );
-            offset += card_offset as i32;
+impl<TIterator: Iterator<Item = Card>> StatefulWidget for HorizontalHandView<TIterator> {
+    type State = RenderContext;
+
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        let card_offset = (self.card_size.width as f32 * 0.4).round();
+        let card_rect = Rect {
+            x: area.x,
+            y: area.y,
+            width: self.card_size.width,
+            height: self.card_size.height,
+        };
+        let suits = self.hand.sorted().group_by(|card| card.suit);
+
+        let mut offset = 0;
+        for (_, group) in &suits {
+            for card in group {
+                CardView::new().card(card).visible(true).build().render(
+                    card_rect.offset(Offset { x: offset, y: 0 }),
+                    buf,
+                    context,
+                );
+                offset += card_offset as i32;
+            }
+
+            offset += i32::from(card_rect.width);
         }
-
-        offset += i32::from(card_rect.width);
     }
 }

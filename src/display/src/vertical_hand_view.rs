@@ -15,33 +15,46 @@
 use data::primitives::Card;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Offset, Rect, Size};
+use ratatui::prelude::*;
+use typed_builder::TypedBuilder;
 
+use crate::card_view::CardView;
+use crate::layout;
 use crate::render_context::RenderContext;
-use crate::{card_view, layout};
 
-pub fn render(
-    hand: impl Iterator<Item = Card>,
+#[derive(TypedBuilder)]
+#[builder(builder_method(name = new))]
+pub struct VerticalHandView<TIterator>
+where
+    TIterator: Iterator<Item = Card>,
+{
+    hand: TIterator,
     card_size: Size,
-    area: Rect,
-    buf: &mut Buffer,
-    context: &mut RenderContext,
-) {
-    let card_offset = 1;
-    let count = 13;
-    let target = layout::centered_rect(
-        Size::new(card_size.width, count as u16 * card_offset + card_size.height),
-        area,
-    );
-    let card_rect =
-        Rect { x: target.x, y: target.y, width: card_size.width, height: card_size.height };
+}
 
-    for (i, card) in hand.enumerate() {
-        card_view::render(
-            card,
-            false,
-            card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
-            buf,
-            context,
+impl<TIterator: Iterator<Item = Card>> StatefulWidget for VerticalHandView<TIterator> {
+    type State = RenderContext;
+
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        let card_offset = 1;
+        let count = 13;
+        let target = layout::centered_rect(
+            Size::new(self.card_size.width, count as u16 * card_offset + self.card_size.height),
+            area,
         );
+        let card_rect = Rect {
+            x: target.x,
+            y: target.y,
+            width: self.card_size.width,
+            height: self.card_size.height,
+        };
+
+        for (i, card) in self.hand.enumerate() {
+            CardView::new().card(card).visible(false).build().render(
+                card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
+                buf,
+                context,
+            );
+        }
     }
 }

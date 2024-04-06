@@ -17,37 +17,43 @@ use data::widget_id::WidgetId;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
+use typed_builder::TypedBuilder;
 
 use crate::render_context::RenderContext;
 
-pub fn render(
+#[derive(TypedBuilder)]
+#[builder(builder_method(name = new))]
+pub struct CardView {
     card: Card,
     visible: bool,
-    area: Rect,
-    buf: &mut Buffer,
-    context: &mut RenderContext,
-) {
-    Clear.render(area, buf);
-    let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
-    let hovered = context.hovered(WidgetId::CardView(card), area);
-    let pressed = context.mouse_down(WidgetId::CardView(card), area);
+}
 
-    if visible {
-        let text = if area.width <= 8 {
-            let mut rank = card.rank.to_string();
-            if area.width <= 6 {
-                rank = rank.replace("10", "T");
+impl StatefulWidget for CardView {
+    type State = RenderContext;
+
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        Clear.render(area, buf);
+        let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
+        let hovered = context.hovered(WidgetId::CardView(self.card), area);
+        let pressed = context.mouse_down(WidgetId::CardView(self.card), area);
+
+        if self.visible {
+            let text = if area.width <= 8 {
+                let mut rank = self.card.rank.to_string();
+                if area.width <= 6 {
+                    rank = rank.replace("10", "T");
+                };
+                vec![
+                    Line::from(text_style(rank, self.card, hovered, pressed)),
+                    Line::from(text_style(self.card.suit.to_string(), self.card, hovered, pressed)),
+                ]
+            } else {
+                vec![Line::from(text_style(self.card.to_string(), self.card, hovered, pressed))]
             };
-            vec![
-                Line::from(text_style(rank, card, hovered, pressed)),
-                Line::from(text_style(card.suit.to_string(), card, hovered, pressed)),
-            ]
+            Paragraph::new(text).block(block).render(area, buf);
         } else {
-            vec![Line::from(text_style(card.to_string(), card, hovered, pressed))]
-        };
-        Paragraph::new(text).block(block).render(area, buf);
-    } else {
-        block.render(area, buf);
+            block.render(area, buf);
+        }
     }
 }
 

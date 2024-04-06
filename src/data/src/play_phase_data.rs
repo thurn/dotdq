@@ -46,7 +46,7 @@ pub struct Trick {
 }
 
 /// Represents a card played to a trick
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct PlayedCard {
     /// Player who played this card
     pub played_by: HandIdentifier,

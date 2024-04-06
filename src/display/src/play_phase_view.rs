@@ -19,6 +19,7 @@ use typed_builder::TypedBuilder;
 
 use crate::horizontal_hand_view::HorizontalHandView;
 use crate::render_context::RenderContext;
+use crate::trick_view::TrickView;
 use crate::vertical_hand_view::VerticalHandView;
 
 #[derive(TypedBuilder)]
@@ -40,7 +41,7 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
             ])
             .areas(area);
 
-        let [north, _middle, south] = Layout::default()
+        let [north, tricks, south] = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
                 Constraint::Percentage(20),
@@ -77,5 +78,7 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
             .card_size(card_size)
             .build()
             .render(west, buf, context);
+
+        TrickView::new().data(self.data).card_size(card_size).build().render(tricks, buf, context);
     }
 }

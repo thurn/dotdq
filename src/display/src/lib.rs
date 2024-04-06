@@ -17,4 +17,5 @@ pub mod horizontal_hand_view;
 pub mod layout;
 pub mod play_phase_view;
 pub mod render_context;
+pub mod trick_view;
 pub mod vertical_hand_view;

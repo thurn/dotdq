@@ -536,7 +536,9 @@ dependencies = [
  "crossterm",
  "data",
  "itertools",
+ "log",
  "ratatui",
+ "rules",
  "tracing",
  "typed-builder",
 ]

@@ -50,7 +50,7 @@ impl<TIterator: Iterator<Item = Card>> StatefulWidget for VerticalHandView<TIter
         };
 
         for (i, card) in self.hand.enumerate() {
-            CardView::new().card(card).visible(false).build().render(
+            CardView::new().card(card).visible(true).build().render(
                 card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
                 buf,
                 context,

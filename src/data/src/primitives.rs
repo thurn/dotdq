@@ -130,7 +130,7 @@ impl HandIdentifier {
         }
     }
 
-    pub fn player_name(&self) -> PlayerName {
+    pub fn owner(&self) -> PlayerName {
         match self {
             Self::South | Self::North => PlayerName::User,
             Self::East | Self::West => PlayerName::Opponent,
@@ -156,5 +156,10 @@ impl PlayerName {
             PlayerName::User => HandIdentifier::South,
             PlayerName::Opponent => HandIdentifier::West,
         }
+    }
+
+    /// Returns true if this player owns the indicated `hand`.
+    pub fn owns_hand(&self, hand: HandIdentifier) -> bool {
+        &hand.owner() == self
     }
 }

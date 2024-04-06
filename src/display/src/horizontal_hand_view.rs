@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::primitives::Card;
+use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
+use data::primitives::HandIdentifier;
 use itertools::Itertools;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
+use rules::play_phase_queries;
 use typed_builder::TypedBuilder;
 
 use crate::card_view::CardView;
@@ -23,15 +25,13 @@ use crate::render_context::RenderContext;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct HorizontalHandView<TIterator>
-where
-    TIterator: Iterator<Item = Card>,
-{
-    hand: TIterator,
+pub struct HorizontalHandView<'a> {
+    data: &'a PlayPhaseData,
+    hand: HandIdentifier,
     card_size: Size,
 }
 
-impl<TIterator: Iterator<Item = Card>> StatefulWidget for HorizontalHandView<TIterator> {
+impl<'a> StatefulWidget for HorizontalHandView<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -42,16 +42,20 @@ impl<TIterator: Iterator<Item = Card>> StatefulWidget for HorizontalHandView<TIt
             width: self.card_size.width,
             height: self.card_size.height,
         };
-        let suits = self.hand.sorted().group_by(|card| card.suit);
+        let suits = self.data.hand(self.hand).sorted().group_by(|card| card.suit);
 
         let mut offset = 0;
         for (_, group) in &suits {
             for card in group {
-                CardView::new().card(card).visible(true).build().render(
-                    card_rect.offset(Offset { x: offset, y: 0 }),
-                    buf,
-                    context,
-                );
+                let action = PlayPhaseAction::PlayCard(self.hand.owner(), self.hand, card);
+                CardView::new()
+                    .card(card)
+                    .visible(true)
+                    .on_click(
+                        play_phase_queries::can_perform_action(self.data, action).then_some(action),
+                    )
+                    .build()
+                    .render(card_rect.offset(Offset { x: offset, y: 0 }), buf, context);
                 offset += card_offset as i32;
             }
 

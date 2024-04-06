@@ -25,6 +25,7 @@ use ratatui::symbols::border;
 use ratatui::widgets::block::{Position, Title};
 use ratatui::widgets::{Block, Borders};
 use rules::{auction, play_phase_actions};
+use tracing::info;
 
 use crate::tui::Tui;
 
@@ -45,22 +46,22 @@ impl<'a> App<'a> {
             });
             tui.draw(|frame| loop {
                 frame.render_stateful_widget(App { data: &data }, frame.size(), &mut context);
-                if let Some(action) = context.pop_render() {
-                    match action {
-                        GameAction::Redraw => {}
-                        GameAction::PlayPhaseAction(a) => {
-                            play_phase_actions::handle_action(&mut data, a)
-                        }
-                        GameAction::SetHover(id) => {
-                            context.set_current_hover(id);
-                        }
-                        GameAction::SetMouseDown(id) => {
-                            context.set_current_mouse_down(id);
-                        }
-                    };
-                } else {
+                let Some(action) = context.finish_render() else {
                     break;
-                }
+                };
+                info!(?action, "Got action");
+                match action {
+                    GameAction::PlayPhaseAction(a) => {
+                        info!(?a, "Handling PlayPhaseAction");
+                        play_phase_actions::handle_action(&mut data, a)
+                    }
+                    GameAction::SetHover(id) => {
+                        context.set_current_hover(id);
+                    }
+                    GameAction::SetMouseDown(id) => {
+                        context.set_current_mouse_down(id);
+                    }
+                };
             })?;
         }
         Ok(())

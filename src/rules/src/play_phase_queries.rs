@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::{PlayPhaseData, Trick};
-use data::primitives::{Card, HandIdentifier};
+use data::play_phase_data::{PlayPhaseAction, PlayPhaseData, Trick};
+use data::primitives::HandIdentifier;
 
 /// Returns the [HandIdentifier] to next play a card during a round.
 pub fn next_to_play(data: &PlayPhaseData) -> HandIdentifier {
@@ -38,9 +38,13 @@ pub fn trick_winner(trick: &Trick) -> HandIdentifier {
     cards.last().unwrap().played_by
 }
 
-pub fn can_play_card(data: &PlayPhaseData, hand: HandIdentifier, card: Card) -> bool {
-    if next_to_play(data) != hand {
-        return false;
+pub fn can_perform_action(data: &PlayPhaseData, action: PlayPhaseAction) -> bool {
+    match action {
+        PlayPhaseAction::PlayCard(player, hand, card) => {
+            if next_to_play(data) != hand {
+                return false;
+            }
+            player.owns_hand(hand) && data.hands.get(&hand).unwrap().contains(&card)
+        }
     }
-    data.hands.get(&hand).unwrap().contains(&card)
 }

@@ -21,7 +21,7 @@ doc:
     cargo doc
 
 logs:
-  cat "$HOME/Library/Application Support/com.dotdq.dotdq/dotdq.log"
+  tail -f "$HOME/Library/Application Support/com.dotdq.dotdq/dotdq.log"
 
 clippy:
     cargo clippy --workspace -- -D warnings -D clippy::all

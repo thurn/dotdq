@@ -17,6 +17,7 @@ use data::game_action::GameAction;
 use data::widget_id::WidgetId;
 use ratatui::layout::Position;
 use ratatui::prelude::*;
+use tracing::info;
 
 #[derive(Default)]
 pub struct RenderContext {
@@ -50,9 +51,17 @@ impl RenderContext {
         self.exit
     }
 
-    pub fn pop_render(&mut self) -> Option<GameAction> {
+    pub fn finish_render(&mut self) -> Option<GameAction> {
         let action = self.action;
         self.action = None;
+
+        if matches!(self.event, Some(Event::Mouse(e))
+            if e.kind == MouseEventKind::Up(MouseButton::Left))
+        {
+            // Stop press event states on mouse up
+            self.current_mouse_down = None;
+        }
+
         self.event = None;
         action
     }
@@ -88,15 +97,17 @@ impl RenderContext {
             }
         }
 
-        if e.kind == MouseEventKind::Up(MouseButton::Left) {
-            self.current_mouse_down = None;
-        }
-
         current
     }
 
-    pub fn clicked(&self, area: Rect) -> bool {
-        matches!(self.event, Some(Event::Mouse(e)) if e.kind == MouseEventKind::Up(MouseButton::Left)
-                    && area.contains(Position::new(e.column, e.row)))
+    pub fn clicked(&mut self, id: WidgetId, area: Rect, action: GameAction) {
+        if matches!(self.event, Some(Event::Mouse(e))
+            if e.kind == MouseEventKind::Up(MouseButton::Left)
+               && area.contains(Position::new(e.column, e.row))
+               && self.current_mouse_down == Some(id))
+        {
+            info!(?id, "Widget clicked");
+            self.action = Some(action);
+        }
     }
 }

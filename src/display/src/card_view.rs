@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::game_action::GameAction;
+use data::play_phase_data::PlayPhaseAction;
 use data::primitives::{Card, Suit};
 use data::widget_id::WidgetId;
 use ratatui::prelude::*;
@@ -26,6 +28,8 @@ use crate::render_context::RenderContext;
 pub struct CardView {
     card: Card,
     visible: bool,
+    #[builder(default)]
+    on_click: Option<PlayPhaseAction>,
 }
 
 impl StatefulWidget for CardView {
@@ -34,8 +38,17 @@ impl StatefulWidget for CardView {
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
         Clear.render(area, buf);
         let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
-        let hovered = context.hovered(WidgetId::CardView(self.card), area);
-        let pressed = context.mouse_down(WidgetId::CardView(self.card), area);
+        let hovered =
+            self.on_click.is_some() && context.hovered(WidgetId::CardView(self.card), area);
+        let pressed =
+            self.on_click.is_some() && context.mouse_down(WidgetId::CardView(self.card), area);
+        if let Some(action) = self.on_click {
+            context.clicked(
+                WidgetId::CardView(self.card),
+                area,
+                GameAction::PlayPhaseAction(action),
+            );
+        }
 
         if self.visible {
             let text = if area.width <= 8 {

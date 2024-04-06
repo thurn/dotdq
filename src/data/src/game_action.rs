@@ -17,7 +17,6 @@ use crate::widget_id::WidgetId;
 
 #[derive(Debug, Clone, Copy)]
 pub enum GameAction {
-    Redraw,
     SetHover(Option<WidgetId>),
     SetMouseDown(Option<WidgetId>),
     PlayPhaseAction(PlayPhaseAction),

@@ -52,10 +52,10 @@ impl<'a> App<'a> {
                             play_phase_actions::handle_action(&mut data, a)
                         }
                         GameAction::SetHover(id) => {
-                            context.set_current_hover(Some(id));
+                            context.set_current_hover(id);
                         }
-                        GameAction::ClearHover => {
-                            context.set_current_hover(None);
+                        GameAction::SetMouseDown(id) => {
+                            context.set_current_mouse_down(id);
                         }
                     };
                 } else {

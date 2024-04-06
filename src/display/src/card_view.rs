@@ -30,6 +30,7 @@ pub fn render(
     Clear.render(area, buf);
     let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
     let hovered = context.hovered(WidgetId::CardView(card), area);
+    let pressed = context.mouse_down(WidgetId::CardView(card), area);
 
     if visible {
         let text = if area.width <= 8 {
@@ -38,11 +39,11 @@ pub fn render(
                 rank = rank.replace("10", "T");
             };
             vec![
-                Line::from(text_style(rank, card, hovered)),
-                Line::from(text_style(card.suit.to_string(), card, hovered)),
+                Line::from(text_style(rank, card, hovered, pressed)),
+                Line::from(text_style(card.suit.to_string(), card, hovered, pressed)),
             ]
         } else {
-            vec![Line::from(text_style(card.to_string(), card, hovered))]
+            vec![Line::from(text_style(card.to_string(), card, hovered, pressed))]
         };
         Paragraph::new(text).block(block).render(area, buf);
     } else {
@@ -50,7 +51,7 @@ pub fn render(
     }
 }
 
-fn text_style<'a>(text: String, card: Card, hovered: bool) -> Span<'a> {
+fn text_style<'a>(text: String, card: Card, hovered: bool, pressed: bool) -> Span<'a> {
     let color = match card.suit {
         Suit::Clubs => "#597dce".parse::<Color>().unwrap(),
         Suit::Diamonds => "#d2aa99".parse::<Color>().unwrap(),
@@ -58,7 +59,9 @@ fn text_style<'a>(text: String, card: Card, hovered: bool) -> Span<'a> {
         Suit::Spades => "#6dc2ca".parse::<Color>().unwrap(),
     };
 
-    let result = text.fg(color);
+    let mut result = text.fg(color);
+    result = if pressed { result.underlined() } else { result };
+
     if hovered {
         result.bg("#4e4a4e".parse().unwrap())
     } else {

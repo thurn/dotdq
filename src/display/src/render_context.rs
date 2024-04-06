@@ -22,7 +22,7 @@ use ratatui::prelude::*;
 pub struct RenderContext {
     event: Option<Event>,
     current_hover: Option<WidgetId>,
-    _last_mouse_down: Option<WidgetId>,
+    current_mouse_down: Option<WidgetId>,
     exit: bool,
     action: Option<GameAction>,
 }
@@ -40,6 +40,10 @@ impl RenderContext {
 
     pub fn set_current_hover(&mut self, current: Option<WidgetId>) {
         self.current_hover = current;
+    }
+
+    pub fn set_current_mouse_down(&mut self, current: Option<WidgetId>) {
+        self.current_mouse_down = current;
     }
 
     pub fn should_exit(&self) -> bool {
@@ -61,18 +65,34 @@ impl RenderContext {
 
         if e.kind == MouseEventKind::Moved {
             if area.contains(Position::new(e.column, e.row)) {
-                self.action = Some(GameAction::SetHover(id));
-            } else if current {
-                self.action = Some(GameAction::ClearHover);
+                self.action = Some(GameAction::SetHover(Some(id)));
+            } else if current && self.action.is_none() {
+                self.action = Some(GameAction::SetHover(None));
             }
         }
 
         current
     }
 
-    pub fn mouse_down(&self, area: Rect) -> bool {
-        matches!(self.event, Some(Event::Mouse(e)) if e.kind == MouseEventKind::Down(MouseButton::Left)
-                    && area.contains(Position::new(e.column, e.row)))
+    pub fn mouse_down(&mut self, id: WidgetId, area: Rect) -> bool {
+        let current = self.current_mouse_down == Some(id);
+        let Some(Event::Mouse(e)) = self.event else {
+            return current;
+        };
+
+        if e.kind == MouseEventKind::Down(MouseButton::Left) {
+            if area.contains(Position::new(e.column, e.row)) {
+                self.action = Some(GameAction::SetMouseDown(Some(id)));
+            } else if current && self.action.is_none() {
+                self.action = Some(GameAction::SetHover(None));
+            }
+        }
+
+        if e.kind == MouseEventKind::Up(MouseButton::Left) {
+            self.current_mouse_down = None;
+        }
+
+        current
     }
 
     pub fn clicked(&self, area: Rect) -> bool {

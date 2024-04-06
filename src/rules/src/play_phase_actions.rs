@@ -31,5 +31,8 @@ pub fn handle_action(data: &mut PlayPhaseData, action: PlayPhaseAction) {
 /// it is currently legal to do so.
 fn play_card(data: &mut PlayPhaseData, _: PlayerName, hand: HandIdentifier, card: Card) {
     data.hands.get_mut(&hand).unwrap().remove(&card);
+    if data.current_trick.cards.len() >= 4 {
+        data.current_trick.cards.clear();
+    }
     data.current_trick.cards.push(PlayedCard { played_by: hand, card });
 }

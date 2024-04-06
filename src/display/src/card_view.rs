@@ -37,7 +37,14 @@ impl StatefulWidget for CardView {
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
         Clear.render(area, buf);
-        let block = Block::default().borders(Borders::ALL).border_set(border::ROUNDED);
+        let block = Block::default()
+            .borders(Borders::ALL)
+            .border_set(border::ROUNDED)
+            .border_style(Style::new().fg(if self.on_click.is_some() {
+                "#dad45e".parse().unwrap()
+            } else {
+                Color::White
+            }));
         let hovered =
             self.on_click.is_some() && context.hovered(WidgetId::CardView(self.card), area);
         let pressed =
@@ -71,10 +78,8 @@ impl StatefulWidget for CardView {
                 .constraints([Constraint::Fill(1), Constraint::Length(text.len() as u16)])
                 .areas(inner);
 
-            let mut reversed = text.clone();
-            reversed.reverse();
-            Paragraph::new(text).render(inner, buf);
-            Paragraph::new(reversed).alignment(Alignment::Right).render(bottom, buf);
+            Paragraph::new(text.clone()).render(inner, buf);
+            Paragraph::new(text).alignment(Alignment::Right).render(bottom, buf);
         }
     }
 }

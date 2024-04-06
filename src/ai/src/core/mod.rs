@@ -12,5 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod ai_agent_action;
-pub mod core;
+pub mod agent;
+pub mod compound_evaluator;
+pub mod game_state_node;
+pub mod selection_algorithm;
+pub mod state_combiner;
+pub mod state_evaluator;
+pub mod state_predictor;

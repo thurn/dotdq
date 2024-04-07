@@ -19,6 +19,7 @@
 //! Computational Intelligence and AI in Games, Vol. 4, No. 1, March 2012.
 
 use std::collections::HashSet;
+use std::marker::PhantomData;
 use std::time::Instant;
 
 use petgraph::prelude::{EdgeRef, NodeIndex};
@@ -31,7 +32,8 @@ use crate::core::selection_algorithm::SelectionAlgorithm;
 use crate::core::state_evaluator::StateEvaluator;
 use crate::monte_carlo::child_score::{ChildScoreAlgorithm, SelectionMode};
 
-/// Plays out a game using random moves until a terminal state is reached.
+/// Plays out a game using random moves until a terminal state is reached, then
+/// evaluates the result using the provided state evaluator.
 ///
 /// Pseudocode:
 /// ```text
@@ -41,15 +43,21 @@ use crate::monte_carlo::child_score::{ChildScoreAlgorithm, SelectionMode};
 ///     s ← f(s,𝒂)
 ///   𝐫𝐞𝐭𝐮𝐫𝐧 reward for state s
 /// ```
-pub struct RandomPlayoutEvaluator {}
+pub struct RandomPlayoutEvaluator<TState: GameStateNode + Send, TEvaluator: StateEvaluator<TState>>
+{
+    pub evaluator: TEvaluator,
+    pub phantom_data: PhantomData<TState>,
+}
 
-impl<TState: GameStateNode> StateEvaluator<TState> for RandomPlayoutEvaluator {
+impl<TState: GameStateNode + Send, TEvaluator: StateEvaluator<TState>> StateEvaluator<TState>
+    for RandomPlayoutEvaluator<TState, TEvaluator>
+{
     fn evaluate(&self, input: &TState, player: TState::PlayerName) -> i32 {
         let mut game = input.make_copy();
         loop {
             match game.status() {
-                GameStatus::Completed { winner } => {
-                    return if winner == player { 1 } else { -1 };
+                GameStatus::Completed { .. } => {
+                    return self.evaluator.evaluate(&game, player);
                 }
                 GameStatus::InProgress { current_turn } => {
                     let action = game

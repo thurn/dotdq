@@ -31,13 +31,7 @@ impl GameStateNode for PlayPhaseData {
             GameStatus::InProgress { current_turn: p }
         } else {
             GameStatus::Completed {
-                winner: if self
-                    .completed_tricks
-                    .iter()
-                    .filter(|t| t.winner.owner() == PlayerName::User)
-                    .count()
-                    > 6
-                {
+                winner: if play_phase_queries::tricks_won(self, PlayerName::User) > 6 {
                     PlayerName::User
                 } else {
                     PlayerName::Opponent

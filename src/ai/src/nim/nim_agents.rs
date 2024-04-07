@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::marker::PhantomData;
+
 use crate::core::agent::AgentData;
+use crate::core::win_loss_evaluator::WinLossEvaluator;
 use crate::monte_carlo::monte_carlo_search::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use crate::monte_carlo::uct1::Uct1;
 use crate::nim::nim_game::{NimPerfectEvaluator, NimState, NimWinLossEvaluator};
@@ -34,9 +37,12 @@ pub const NIM_ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, NimWinLossEvaluato
         NimWinLossEvaluator {},
     );
 
-pub const NIM_UCT1_AGENT: AgentData<MonteCarloAlgorithm<Uct1>, RandomPlayoutEvaluator, NimState> =
-    AgentData::omniscient(
-        "UCT1",
-        MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
-        RandomPlayoutEvaluator {},
-    );
+pub const NIM_UCT1_AGENT: AgentData<
+    MonteCarloAlgorithm<Uct1>,
+    RandomPlayoutEvaluator<NimState, WinLossEvaluator>,
+    NimState,
+> = AgentData::omniscient(
+    "UCT1",
+    MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
+    RandomPlayoutEvaluator { evaluator: WinLossEvaluator, phantom_data: PhantomData },
+);

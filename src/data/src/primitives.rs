@@ -146,6 +146,13 @@ pub enum PlayerName {
 }
 
 impl PlayerName {
+    pub fn opponent(&self) -> Self {
+        match self {
+            PlayerName::User => PlayerName::Opponent,
+            PlayerName::Opponent => PlayerName::User,
+        }
+    }
+
     /// Returns the hand which this player can see at the beginning of the
     /// auction phase.
     ///

@@ -68,6 +68,12 @@ pub fn is_play_phase_over(data: &PlayPhaseData) -> bool {
     data.hands.values().all(|h| h.is_empty())
 }
 
+/// Returns the number of tricks the [PlayerName] player has won in the provided
+/// game so far.
+pub fn tricks_won(data: &PlayPhaseData, player: PlayerName) -> i32 {
+    data.completed_tricks.iter().filter(|t| t.winner.owner() == player).count() as i32
+}
+
 /// Returns the [HandIdentifier] which won a given trick.
 ///
 /// Panics if the provided trick is not completed.

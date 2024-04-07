@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::marker::PhantomData;
+
 use data::play_phase_data::PlayPhaseData;
 
 use crate::core::agent::{Agent, AgentData};
-use crate::core::win_loss_evaluator::WinLossEvaluator;
+use crate::game::evaluators::TrickEvaluator;
 use crate::monte_carlo::monte_carlo_search::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use crate::monte_carlo::uct1::Uct1;
 use crate::tree_search::alpha_beta::AlphaBetaAlgorithm;
@@ -32,12 +34,15 @@ pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
     }
 }
 
-const ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, WinLossEvaluator, PlayPhaseData> =
-    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 25 }, WinLossEvaluator);
+const ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, TrickEvaluator, PlayPhaseData> =
+    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 10 }, TrickEvaluator);
 
-pub const UCT1_AGENT: AgentData<MonteCarloAlgorithm<Uct1>, RandomPlayoutEvaluator, PlayPhaseData> =
-    AgentData::omniscient(
-        "UCT1",
-        MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
-        RandomPlayoutEvaluator {},
-    );
+pub const UCT1_AGENT: AgentData<
+    MonteCarloAlgorithm<Uct1>,
+    RandomPlayoutEvaluator<PlayPhaseData, TrickEvaluator>,
+    PlayPhaseData,
+> = AgentData::omniscient(
+    "UCT1",
+    MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
+    RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
+);

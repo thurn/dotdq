@@ -30,7 +30,7 @@ pub fn poll_action() -> Option<PlayPhaseAction> {
 
 pub fn initiate_selection(data: PlayPhaseData) {
     rayon::spawn(move || {
-        let agent = agents::get_agent(AgentName::Uct1);
+        let agent = agents::get_agent(AgentName::AlphaBeta);
         let action = agent.pick_action(
             AgentConfig {
                 deadline: Instant::now() + Duration::from_secs(3),
@@ -40,21 +40,4 @@ pub fn initiate_selection(data: PlayPhaseData) {
         );
         AGENT_ACTION.store(Some(action));
     });
-}
-
-/// Selects the next action to take for the currently-configured opponent AI
-/// agent.
-pub fn select(data: &PlayPhaseData) -> PlayPhaseAction {
-    let agent = agents::get_agent(AgentName::Uct1);
-    agent.pick_action(
-        AgentConfig {
-            deadline: Instant::now() + Duration::from_secs(3),
-            panic_on_search_timeout: true,
-        },
-        data,
-    )
-
-    // play_phase_queries::legal_actions(data, PlayerName::Opponent)
-    //     .next()
-    //     .expect("No legal actions available")
 }

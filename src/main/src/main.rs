@@ -17,8 +17,6 @@ use cli::Cli;
 use color_eyre::eyre::Result;
 use tracing::info;
 
-use crate::app::App;
-
 pub mod app;
 pub mod cli;
 pub mod tui;
@@ -31,7 +29,7 @@ fn main() -> Result<()> {
     let mut tui = tui::enter()?;
     let commit = env!("VERGEN_GIT_SHA");
     info!(commit, "Starting game");
-    App::run(&mut tui)?;
+    app::run(&mut tui)?;
     tui::exit()?;
     Ok(())
 }

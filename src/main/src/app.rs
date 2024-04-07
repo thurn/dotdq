@@ -29,48 +29,53 @@ use tracing::info;
 
 use crate::tui::Tui;
 
-pub struct App<'a> {
-    pub data: &'a PlayPhaseData,
+pub fn run(tui: &mut Tui) -> Result<()> {
+    let mut data = auction::new_game(&mut rand::thread_rng());
+    let mut context = RenderContext::default();
+    let mut ai_search_running = false;
+    while !context.should_exit() {
+        context.set_last_event(if event::poll(Duration::from_millis(16))? {
+            Some(event::read()?)
+        } else {
+            None
+        });
+        tui.draw(|frame| loop {
+            frame.render_stateful_widget(App { data: &data }, frame.size(), &mut context);
+            let action = if let Some(action) = context.finish_render() {
+                action
+            } else if let Some(action) = ai_agent_action::poll_action() {
+                ai_search_running = false;
+                GameAction::PlayPhaseAction(action)
+            } else {
+                break;
+            };
+            info!(?action, "Got action");
+            match action {
+                GameAction::PlayPhaseAction(a) => {
+                    info!(?a, "Handling PlayPhaseAction");
+                    play_phase_actions::handle_action(&mut data, a);
+                    if play_phase_queries::current_turn(&data) == Some(PlayerName::Opponent)
+                        && !ai_search_running
+                    {
+                        ai_search_running = true;
+                        info!(?a, "Running AI");
+                        ai_agent_action::initiate_selection(data.clone());
+                    }
+                }
+                GameAction::SetHover(id) => {
+                    context.set_current_hover(id);
+                }
+                GameAction::SetMouseDown(id) => {
+                    context.set_current_mouse_down(id);
+                }
+            };
+        })?;
+    }
+    Ok(())
 }
 
-impl<'a> App<'a> {
-    /// runs the application's main loop until the user quits
-    pub fn run(tui: &mut Tui) -> Result<()> {
-        let mut data = auction::new_game(&mut rand::thread_rng());
-        let mut context = RenderContext::default();
-        while !context.should_exit() {
-            context.set_last_event(if event::poll(Duration::from_millis(16))? {
-                Some(event::read()?)
-            } else {
-                None
-            });
-            tui.draw(|frame| loop {
-                frame.render_stateful_widget(App { data: &data }, frame.size(), &mut context);
-                let Some(action) = context.finish_render() else {
-                    break;
-                };
-                info!(?action, "Got action");
-                match action {
-                    GameAction::PlayPhaseAction(a) => {
-                        info!(?a, "Handling PlayPhaseAction");
-                        play_phase_actions::handle_action(&mut data, a);
-                        while play_phase_queries::current_turn(&data) == Some(PlayerName::Opponent)
-                        {
-                            let ai_action = ai_agent_action::select(&data);
-                            play_phase_actions::handle_action(&mut data, ai_action);
-                        }
-                    }
-                    GameAction::SetHover(id) => {
-                        context.set_current_hover(id);
-                    }
-                    GameAction::SetMouseDown(id) => {
-                        context.set_current_mouse_down(id);
-                    }
-                };
-            })?;
-        }
-        Ok(())
-    }
+pub struct App<'a> {
+    pub data: &'a PlayPhaseData,
 }
 
 impl<'a> StatefulWidget for App<'a> {

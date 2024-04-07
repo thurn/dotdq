@@ -13,9 +13,10 @@
 // limitations under the License.
 
 use std::panic;
+use std::panic::PanicInfo;
 use std::path::PathBuf;
 
-use color_eyre::config::HookBuilder;
+use color_eyre::config::{HookBuilder, PanicHook};
 use color_eyre::eyre;
 use color_eyre::eyre::Result;
 use directories::ProjectDirs;
@@ -57,45 +58,48 @@ pub fn initialize_panic_handler() -> Result<()> {
     }))?;
 
     panic::set_hook(Box::new(move |panic_info| {
-        if let Err(r) = tui::exit() {
-            error!("Unable to exit Terminal: {:?}", r);
-        }
-
-        let msg = format!("{}", panic_hook.panic_report(panic_info));
-        log::error!("Error: {}", strip_ansi_escapes::strip_str(msg));
-
-        // human_panic stack trace for release builds
-        #[cfg(not(debug_assertions))]
-        {
-            use human_panic::{handle_dump, print_msg, Metadata};
-            let meta = Metadata {
-                version: env!("CARGO_PKG_VERSION").into(),
-                name: env!("CARGO_PKG_NAME").into(),
-                authors: env!("CARGO_PKG_AUTHORS").replace(':', ", ").into(),
-                homepage: env!("CARGO_PKG_HOMEPAGE").into(),
-            };
-
-            let file_path = handle_dump(&meta, panic_info);
-            // prints human-panic message
-            print_msg(file_path, &meta)
-                .expect("human-panic: printing error message to console failed");
-            eprintln!("{}", panic_hook.panic_report(panic_info)); // prints color-eyre stack trace to stderr
-        }
-
-        // better_panic stack trace for debug builds
-        #[cfg(debug_assertions)]
-        {
-            better_panic::Settings::auto()
-                .most_recent_first(false)
-                .lineno_suffix(true)
-                .verbosity(better_panic::Verbosity::Full)
-                .create_panic_handler()(panic_info);
-        }
-
-        std::process::exit(libc::EXIT_FAILURE);
+        on_panic(&panic_hook, panic_info);
     }));
 
     Ok(())
+}
+
+fn on_panic(panic_hook: &PanicHook, panic_info: &PanicInfo) {
+    if let Err(r) = tui::exit() {
+        error!("Unable to exit Terminal: {:?}", r);
+    }
+
+    let msg = format!("{}", panic_hook.panic_report(panic_info));
+    log::error!("Error: {}", strip_ansi_escapes::strip_str(msg));
+
+    // human_panic stack trace for release builds
+    #[cfg(not(debug_assertions))]
+    {
+        use human_panic::{handle_dump, print_msg, Metadata};
+        let meta = Metadata {
+            version: env!("CARGO_PKG_VERSION").into(),
+            name: env!("CARGO_PKG_NAME").into(),
+            authors: env!("CARGO_PKG_AUTHORS").replace(':', ", ").into(),
+            homepage: env!("CARGO_PKG_HOMEPAGE").into(),
+        };
+
+        let file_path = handle_dump(&meta, panic_info);
+        // prints human-panic message
+        print_msg(file_path, &meta).expect("human-panic: printing error message to console failed");
+        eprintln!("{}", panic_hook.panic_report(panic_info)); // prints color-eyre stack trace to stderr
+    }
+
+    // better_panic stack trace for debug builds
+    #[cfg(debug_assertions)]
+    {
+        better_panic::Settings::auto()
+            .most_recent_first(false)
+            .lineno_suffix(true)
+            .verbosity(better_panic::Verbosity::Full)
+            .create_panic_handler()(panic_info);
+    }
+
+    std::process::exit(libc::EXIT_FAILURE);
 }
 
 pub fn get_data_dir() -> PathBuf {

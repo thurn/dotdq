@@ -14,11 +14,33 @@
 
 use std::time::{Duration, Instant};
 
+use crossbeam::atomic::AtomicCell;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 
 use crate::core::agent::AgentConfig;
 use crate::game::agents;
 use crate::game::agents::AgentName;
+
+static AGENT_ACTION: AtomicCell<Option<PlayPhaseAction>> = AtomicCell::new(None);
+
+/// Removes & returns the next AI agent action to take, if any is available.
+pub fn poll_action() -> Option<PlayPhaseAction> {
+    AGENT_ACTION.take()
+}
+
+pub fn initiate_selection(data: PlayPhaseData) {
+    rayon::spawn(move || {
+        let agent = agents::get_agent(AgentName::Uct1);
+        let action = agent.pick_action(
+            AgentConfig {
+                deadline: Instant::now() + Duration::from_secs(3),
+                panic_on_search_timeout: true,
+            },
+            &data,
+        );
+        AGENT_ACTION.store(Some(action));
+    });
+}
 
 /// Selects the next action to take for the currently-configured opponent AI
 /// agent.

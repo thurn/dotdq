@@ -54,7 +54,8 @@ impl<'a> App<'a> {
                     GameAction::PlayPhaseAction(a) => {
                         info!(?a, "Handling PlayPhaseAction");
                         play_phase_actions::handle_action(&mut data, a);
-                        while play_phase_queries::current_turn(&data) == PlayerName::Opponent {
+                        while play_phase_queries::current_turn(&data) == Some(PlayerName::Opponent)
+                        {
                             let ai_action = ai_agent_action::select(&data);
                             play_phase_actions::handle_action(&mut data, ai_action);
                         }

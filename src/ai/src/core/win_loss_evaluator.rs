@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod agent;
-pub mod compound_evaluator;
-pub mod game_state_node;
-pub mod selection_algorithm;
-pub mod state_combiner;
-pub mod state_evaluator;
-pub mod state_predictor;
-pub mod win_loss_evaluator;
+use crate::core::game_state_node::{GameStateNode, GameStatus};
+use crate::core::state_evaluator::StateEvaluator;
+
+/// Evaluator which returns -1 for a loss, 1 for a win, and 0 otherwise
+pub struct WinLossEvaluator;
+
+impl<TNode: GameStateNode> StateEvaluator<TNode> for WinLossEvaluator {
+    fn evaluate(&self, state: &TNode, player: TNode::PlayerName) -> i32 {
+        match state.status() {
+            GameStatus::InProgress { .. } => 0,
+            GameStatus::Completed { winner } if winner == player => 1,
+            _ => -1,
+        }
+    }
+}

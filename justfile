@@ -11,8 +11,8 @@ check-warnings:
 build:
     cargo build --all-targets --all-features
 
-run:
-    cargo run
+run *args='':
+    cargo run -- "$@"
 
 test:
     cargo test
@@ -56,3 +56,8 @@ remove-unused-deps: machete
     find . -name '*conflicted*' -delete
     mkdir -p target
     xattr -w com.dropbox.ignored 1 target/
+
+internal_clean:
+  cargo clean
+
+clean: internal_clean dropbox

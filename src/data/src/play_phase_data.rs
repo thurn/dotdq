@@ -54,7 +54,7 @@ pub struct PlayedCard {
     pub card: Card,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum PlayPhaseAction {
     PlayCard(PlayerName, HandIdentifier, Card),
 }

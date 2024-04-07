@@ -4,6 +4,7 @@ version = "0.0.0"
 edition = "2021"
 description = "Dungeon of the Diamond Queen"
 build = "build.rs"
+default-run = "dotdq"
 
 [dependencies]
 ai = { path = "../ai", version = "0.0.0" }

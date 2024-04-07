@@ -12,14 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::time::{Duration, Instant};
+
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::PlayerName;
-use rules::play_phase_queries;
+
+use crate::core::agent::AgentConfig;
+use crate::game::agents;
+use crate::game::agents::AgentName;
 
 /// Selects the next action to take for the currently-configured opponent AI
 /// agent.
 pub fn select(data: &PlayPhaseData) -> PlayPhaseAction {
-    play_phase_queries::legal_actions(data, PlayerName::Opponent)
-        .next()
-        .expect("No legal actions available")
+    let agent = agents::get_agent(AgentName::Uct1);
+    agent.pick_action(
+        AgentConfig {
+            deadline: Instant::now() + Duration::from_secs(3),
+            panic_on_search_timeout: true,
+        },
+        data,
+    )
+
+    // play_phase_queries::legal_actions(data, PlayerName::Opponent)
+    //     .next()
+    //     .expect("No legal actions available")
 }

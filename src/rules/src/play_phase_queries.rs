@@ -37,9 +37,14 @@ pub fn legal_actions(
         .filter(|&action| can_perform_action(data, action))
 }
 
-/// Returns the [PlayerName] whose turn to act it currently is
-pub fn current_turn(data: &PlayPhaseData) -> PlayerName {
-    next_to_play(data).owner()
+/// Returns the [PlayerName] whose turn to act it currently is, or None if the
+/// game has ended
+pub fn current_turn(data: &PlayPhaseData) -> Option<PlayerName> {
+    if is_play_phase_over(data) {
+        None
+    } else {
+        Some(next_to_play(data).owner())
+    }
 }
 
 /// Returns the [HandIdentifier] to next play a card during a round.
@@ -56,6 +61,11 @@ pub fn next_to_play(data: &PlayPhaseData) -> HandIdentifier {
         4 => trick_winner(&data.current_trick),
         _ => panic!("Invalid trick size"),
     }
+}
+
+/// Returns true if all cards have been played in the play phase
+pub fn is_play_phase_over(data: &PlayPhaseData) -> bool {
+    data.hands.values().all(|h| h.is_empty())
 }
 
 /// Returns the [HandIdentifier] which won a given trick.
@@ -98,5 +108,5 @@ fn can_play_card(
     next_to_play(data) == hand
         && player.owns_hand(hand)
         && data.hands.get(&hand).unwrap().contains(&card)
-        && follows_suit
+        && (data.current_trick.cards.len() == 4 || follows_suit)
 }

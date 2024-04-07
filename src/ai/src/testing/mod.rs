@@ -12,10 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod ai_agent_action;
-pub mod core;
-pub mod game;
-pub mod monte_carlo;
-pub mod nim;
-pub mod testing;
-pub mod tree_search;
+pub mod run_matchup;

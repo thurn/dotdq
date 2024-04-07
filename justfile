@@ -31,6 +31,9 @@ clippy:
 fmt:
     cargo +nightly fmt
 
+nim *args='':
+    cargo run --bin nim -- "$@"
+
 check-format:
     cargo +nightly fmt -- --check
 

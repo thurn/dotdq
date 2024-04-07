@@ -4,8 +4,13 @@ version = "0.0.0"
 edition = "2021"
 
 [lib]
+name = "ai"
 test = false
 doctest = false
+
+[[bin]]
+name = "nim"
+path = "src/nim/nim_main.rs"
 
 [dependencies]
 data = { path = "../data", version = "0.0.0" }

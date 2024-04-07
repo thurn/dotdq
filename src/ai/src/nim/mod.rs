@@ -14,4 +14,3 @@
 
 pub mod nim_agents;
 pub mod nim_game;
-pub mod run_nim_impl;

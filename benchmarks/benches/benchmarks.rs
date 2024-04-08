@@ -20,7 +20,7 @@ use ai::testing::run_matchup::{Args, Verbosity};
 use criterion::{criterion_group, criterion_main, Criterion};
 
 criterion_main!(benches);
-criterion_group!(benches, alpha_beta, uct1, tmp);
+criterion_group!(benches, alpha_beta, uct1);
 
 pub fn alpha_beta(c: &mut Criterion) {
     let mut group = c.benchmark_group("alpha_beta");

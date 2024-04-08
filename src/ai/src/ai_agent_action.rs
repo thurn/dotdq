@@ -30,11 +30,11 @@ pub fn poll_action() -> Option<PlayPhaseAction> {
 
 pub fn initiate_selection(data: PlayPhaseData) {
     rayon::spawn(move || {
-        let agent = agents::get_agent(AgentName::AlphaBeta);
+        let agent = agents::get_agent(AgentName::Uct1);
         let action = agent.pick_action(
             AgentConfig {
                 deadline: Instant::now() + Duration::from_secs(3),
-                panic_on_search_timeout: true,
+                panic_on_search_timeout: false,
             },
             &data,
         );

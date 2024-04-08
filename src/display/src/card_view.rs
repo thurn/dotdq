@@ -16,6 +16,7 @@ use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseAction;
 use data::primitives::{Card, Suit};
 use data::widget_id::WidgetId;
+use ratatui::layout::Offset;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
@@ -28,6 +29,8 @@ use crate::render_context::RenderContext;
 pub struct CardView {
     card: Card,
     visible: bool,
+    #[builder(default)]
+    debug_visible: bool,
     #[builder(default)]
     on_click: Option<PlayPhaseAction>,
 }
@@ -60,7 +63,7 @@ impl StatefulWidget for CardView {
         let inner = block.inner(area);
         block.render(area, buf);
 
-        if self.visible {
+        if self.visible || self.debug_visible {
             let text = if area.width <= 8 {
                 let mut rank = self.card.rank.to_string();
                 if area.width <= 6 {
@@ -78,7 +81,10 @@ impl StatefulWidget for CardView {
                 .constraints([Constraint::Fill(1), Constraint::Length(text.len() as u16)])
                 .areas(inner);
 
-            Paragraph::new(text.clone()).render(inner, buf);
+            Paragraph::new(text.clone()).render(
+                inner.offset(Offset { x: 0, y: if self.debug_visible { -1 } else { 0 } }),
+                buf,
+            );
             Paragraph::new(text).alignment(Alignment::Right).render(bottom, buf);
         }
     }

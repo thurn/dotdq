@@ -37,7 +37,7 @@ pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
 }
 
 const ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, TrickEvaluator, PlayPhaseData> =
-    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 10 }, TrickEvaluator);
+    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 50 }, TrickEvaluator);
 
 pub const UCT1_AGENT: AgentData<
     MonteCarloAlgorithm<Uct1>,

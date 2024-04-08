@@ -14,6 +14,7 @@
 
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::HandIdentifier;
+use itertools::Itertools;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Offset, Rect, Size};
 use ratatui::prelude::*;
@@ -49,11 +50,12 @@ impl<'a> StatefulWidget for VerticalHandView<'a> {
             height: self.card_size.height,
         };
 
-        for (i, card) in self.data.hand(self.hand).enumerate() {
+        for (i, card) in self.data.hand(self.hand).sorted().enumerate() {
             let action = PlayPhaseAction::PlayCard(self.hand.owner(), self.hand, card);
             CardView::new()
                 .card(card)
-                .visible(true)
+                .visible(false)
+                .debug_visible(true)
                 .on_click(
                     play_phase_queries::can_perform_action(self.data, action).then_some(action),
                 )

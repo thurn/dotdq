@@ -25,12 +25,14 @@ use crate::tree_search::alpha_beta::AlphaBetaAlgorithm;
 pub enum AgentName {
     AlphaBeta,
     Uct1,
+    Uct1Benchmark,
 }
 
 pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
     match name {
         AgentName::AlphaBeta => Box::new(ALPHA_BETA_AGENT),
         AgentName::Uct1 => Box::new(UCT1_AGENT),
+        AgentName::Uct1Benchmark => Box::new(UCT1_BENCHMARK_AGENT),
     }
 }
 
@@ -43,6 +45,16 @@ pub const UCT1_AGENT: AgentData<
     PlayPhaseData,
 > = AgentData::omniscient(
     "UCT1",
-    MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
+    MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: None },
+    RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
+);
+
+pub const UCT1_BENCHMARK_AGENT: AgentData<
+    MonteCarloAlgorithm<Uct1>,
+    RandomPlayoutEvaluator<PlayPhaseData, TrickEvaluator>,
+    PlayPhaseData,
+> = AgentData::omniscient(
+    "UCT1",
+    MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: Some(250) },
     RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
 );

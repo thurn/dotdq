@@ -43,6 +43,6 @@ pub const NIM_UCT1_AGENT: AgentData<
     NimState,
 > = AgentData::omniscient(
     "UCT1",
-    MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
+    MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: None },
     RandomPlayoutEvaluator { evaluator: WinLossEvaluator, phantom_data: PhantomData },
 );

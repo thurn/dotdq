@@ -6,6 +6,7 @@ edition = "2021"
 [lib]
 test = false
 doctest = false
+bench = false
 
 [dependencies]
 enum-iterator = "2.0.0"

@@ -6,6 +6,7 @@ edition = "2021"
 [lib]
 test = false
 doctest = false
+bench = false
 
 [dependencies]
 data = { path = "../data", version = "0.0.0" }

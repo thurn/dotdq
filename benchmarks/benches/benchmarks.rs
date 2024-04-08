@@ -12,20 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::time::Duration;
+
 use ai::game::agents::AgentName;
 use ai::testing::run_matchup;
 use ai::testing::run_matchup::{Args, Verbosity};
 use criterion::{criterion_group, criterion_main, Criterion};
 
 criterion_main!(benches);
-criterion_group!(benches, alpha_beta);
+criterion_group!(benches, alpha_beta, uct1, tmp);
 
 pub fn alpha_beta(c: &mut Criterion) {
-    c.bench_function("Alpha Beta", |b| {
+    let mut group = c.benchmark_group("alpha_beta");
+    group.measurement_time(Duration::from_secs(60));
+    group.bench_function("Alpha Beta", |b| {
         b.iter(|| {
             run_matchup::run(Args {
                 user: AgentName::AlphaBeta,
                 opponent: AgentName::AlphaBeta,
+                move_time: 1,
+                matches: 1,
+                verbosity: Verbosity::None,
+                panic_on_search_timeout: false,
+            })
+        })
+    });
+}
+
+pub fn uct1(c: &mut Criterion) {
+    let mut group = c.benchmark_group("uct1");
+    group.measurement_time(Duration::from_secs(30));
+    group.bench_function("UCT1", |b| {
+        b.iter(|| {
+            run_matchup::run(Args {
+                user: AgentName::Uct1Benchmark,
+                opponent: AgentName::Uct1Benchmark,
                 move_time: 1,
                 matches: 1,
                 verbosity: Verbosity::None,

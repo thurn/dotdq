@@ -77,7 +77,7 @@ pub fn tricks_won(data: &PlayPhaseData, player: PlayerName) -> i32 {
 /// Returns the [HandIdentifier] which won a given trick.
 ///
 /// Panics if the provided trick is not completed.
-fn trick_winner(trick: &Trick) -> HandIdentifier {
+pub fn trick_winner(trick: &Trick) -> HandIdentifier {
     let suit = trick_suit(trick).expect("Trick was empty");
     trick
         .cards

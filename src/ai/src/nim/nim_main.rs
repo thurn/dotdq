@@ -23,7 +23,7 @@ use ai::nim::nim_game::{nim_sum, NimAction, NimPile, NimPlayer, NimState};
 use clap::{Parser, ValueEnum};
 
 #[derive(Parser)]
-#[clap(author, version, about, long_about = None)]
+#[clap()]
 pub struct Args {
     #[arg(value_enum)]
     pub player_one: NimAgentName,

@@ -25,6 +25,7 @@ use std::time::Instant;
 use petgraph::prelude::{EdgeRef, NodeIndex};
 use petgraph::{Direction, Graph};
 use rand::prelude::IteratorRandom;
+use tracing::debug;
 
 use crate::core::agent::AgentConfig;
 use crate::core::game_state_node::{GameStateNode, GameStatus};
@@ -169,7 +170,41 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
             node.legal_actions(player).collect(),
             SelectionMode::Best,
         );
+
+        self.log_results(node, player, &graph, root);
         action
+    }
+
+    fn log_results<TStateNode: GameStateNode>(
+        &self,
+        node: &TStateNode,
+        player: TStateNode::PlayerName,
+        graph: &SearchGraph<TStateNode>,
+        root: NodeIndex,
+    ) {
+        let parent_visits = graph[root].visit_count;
+        let mut edges = graph
+            .edges(root)
+            .filter(|edge| node.legal_actions(player).any(|a| a == edge.weight().action))
+            .map(|edge| {
+                let child = &graph[edge.target()];
+                (
+                    edge,
+                    self.child_score_algorithm.score(
+                        f64::from(parent_visits),
+                        f64::from(child.visit_count),
+                        child.total_reward,
+                        SelectionMode::Best,
+                    ),
+                )
+            })
+            .collect::<Vec<_>>();
+        edges.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
+        edges.reverse();
+
+        for (child, weight) in edges.iter().map(|(edge, weight)| (edge.weight().action, *weight)) {
+            debug!("Action: {:?} at {:?}", weight, child);
+        }
     }
 
     /// Returns a descendant node to examine next for the provided parent node,

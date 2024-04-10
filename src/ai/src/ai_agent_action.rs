@@ -16,6 +16,7 @@ use std::time::{Duration, Instant};
 
 use crossbeam::atomic::AtomicCell;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
+use tracing::info;
 
 use crate::core::agent::AgentConfig;
 use crate::game::agents;
@@ -29,11 +30,12 @@ pub fn poll_action() -> Option<PlayPhaseAction> {
 }
 
 pub fn initiate_selection(data: PlayPhaseData) {
+    info!("Starting AI Agent search");
     rayon::spawn(move || {
         let agent = agents::get_agent(AgentName::Uct1);
         let action = agent.pick_action(
             AgentConfig {
-                deadline: Instant::now() + Duration::from_secs(3),
+                deadline: Instant::now() + Duration::from_secs(5),
                 panic_on_search_timeout: false,
             },
             &data,

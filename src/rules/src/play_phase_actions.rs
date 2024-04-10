@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData, PlayedCard};
+use data::play_phase_data::{CompletedTrick, PlayPhaseAction, PlayPhaseData, PlayedCard};
 use data::primitives::{Card, HandIdentifier, PlayerName};
 
 use crate::play_phase_queries;
@@ -35,4 +35,9 @@ fn play_card(data: &mut PlayPhaseData, _: PlayerName, hand: HandIdentifier, card
         data.current_trick.cards.clear();
     }
     data.current_trick.cards.push(PlayedCard { played_by: hand, card });
+    if data.current_trick.cards.len() == 4 {
+        let trick = data.current_trick.clone();
+        let winner = play_phase_queries::trick_winner(&trick);
+        data.completed_tricks.push(CompletedTrick { trick, winner });
+    }
 }

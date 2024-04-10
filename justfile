@@ -34,6 +34,9 @@ fmt:
 nim *args='':
     cargo run --bin nim -- "$@"
 
+run_matchup *args='':
+    cargo run --bin run_matchup -- "$@"
+
 check-format:
     cargo +nightly fmt -- --check
 

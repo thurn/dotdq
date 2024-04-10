@@ -14,6 +14,7 @@
 
 use std::time::{Duration, Instant};
 
+use clap::{Parser, ValueEnum};
 use data::primitives::PlayerName;
 use rules::{auction, play_phase_queries};
 
@@ -22,23 +23,31 @@ use crate::core::game_state_node::{GameStateNode, GameStatus};
 use crate::game::agents;
 use crate::game::agents::AgentName;
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Verbosity {
     None,
     Matches,
     Actions,
 }
 
+#[derive(Parser)]
+#[clap()]
 pub struct Args {
+    #[arg(value_enum)]
     pub user: AgentName,
+    #[arg(value_enum)]
     pub opponent: AgentName,
     /// Maximum time in seconds for each agent to use for moves.
+    #[arg(long, default_value_t = 1)]
     pub move_time: u64,
     /// Number of matches to run between these two named players
+    #[arg(long, default_value_t = 1)]
     pub matches: u64,
     /// How much log output to produce while running
+    #[arg(long, value_enum, default_value_t = Verbosity::Matches)]
     pub verbosity: Verbosity,
     /// Whether to crash the program if a search timeout is exceeded.
+    #[arg(long, default_value_t = false)]
     pub panic_on_search_timeout: bool,
 }
 
@@ -75,9 +84,8 @@ pub fn run(args: Args) {
                     if args.verbosity >= Verbosity::Matches {
                         clear_action_line(args.verbosity);
                         println!(
-                            "{} wins as {:?}, {} to {}",
+                            "{} wins, {} to {}",
                             agent.name(),
-                            winner,
                             play_phase_queries::tricks_won(&game, winner),
                             play_phase_queries::tricks_won(&game, winner.opponent())
                         );

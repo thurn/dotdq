@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fmt::Debug;
 use std::hash::Hash;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -30,7 +31,7 @@ pub enum GameStatus<TPlayer: Eq> {
 /// doing broadly correct things.
 pub trait GameStateNode {
     /// A game action to transition the game to a new state.
-    type Action: Eq + Copy + Hash;
+    type Action: Eq + Copy + Hash + Debug;
 
     /// A player in the game.
     type PlayerName: Eq + Copy;

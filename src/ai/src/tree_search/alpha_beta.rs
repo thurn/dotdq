@@ -15,6 +15,8 @@
 use std::cmp;
 use std::time::Instant;
 
+use tracing::debug;
+
 use crate::core::agent::AgentConfig;
 use crate::core::game_state_node::{GameStateNode, GameStatus};
 use crate::core::selection_algorithm::SelectionAlgorithm;
@@ -44,11 +46,12 @@ impl SelectionAlgorithm for AlphaBetaAlgorithm {
         E: StateEvaluator<N>,
     {
         assert!(matches!(node.status(), GameStatus::InProgress { .. }));
-        run_internal(config, node, evaluator, self.search_depth, player, i32::MIN, i32::MAX)
+        run_internal(config, node, evaluator, self.search_depth, player, i32::MIN, i32::MAX, true)
             .action()
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn run_internal<N, E>(
     config: AgentConfig,
     node: &N,
@@ -57,6 +60,7 @@ fn run_internal<N, E>(
     player: N::PlayerName,
     mut alpha: i32,
     mut beta: i32,
+    top_level: bool,
 ) -> ScoredAction<N::Action>
 where
     N: GameStateNode,
@@ -74,7 +78,11 @@ where
                 let mut child = node.make_copy();
                 child.execute_action(current_turn, action);
                 let score =
-                    run_internal(config, &child, evaluator, depth - 1, player, alpha, beta).score();
+                    run_internal(config, &child, evaluator, depth - 1, player, alpha, beta, false)
+                        .score();
+                if top_level {
+                    debug!("Score {:?} for action {:?}", score, action);
+                }
                 alpha = cmp::max(alpha, score);
                 result.insert_max(action, score);
                 if score >= beta {
@@ -92,7 +100,11 @@ where
                 let mut child = node.make_copy();
                 child.execute_action(current_turn, action);
                 let score =
-                    run_internal(config, &child, evaluator, depth - 1, player, alpha, beta).score();
+                    run_internal(config, &child, evaluator, depth - 1, player, alpha, beta, false)
+                        .score();
+                if top_level {
+                    debug!("Score {:?} for action {:?}", score, action);
+                }
                 beta = cmp::min(beta, score);
                 result.insert_min(action, score);
                 if score <= alpha {

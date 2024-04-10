@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::PlayPhaseData;
-use data::primitives::PlayerName;
-use rules::play_phase_queries;
+use ai::testing::run_matchup;
+use ai::testing::run_matchup::Args;
+use clap::Parser;
 
-use crate::core::state_evaluator::StateEvaluator;
-
-pub struct TrickEvaluator;
-
-impl StateEvaluator<PlayPhaseData> for TrickEvaluator {
-    fn evaluate(&self, data: &PlayPhaseData, player: PlayerName) -> i32 {
-        play_phase_queries::tricks_won(data, player)
-    }
+pub fn main() {
+    let args = Args::parse();
+    run_matchup::run(args)
 }

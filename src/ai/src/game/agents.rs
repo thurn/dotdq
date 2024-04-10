@@ -14,6 +14,7 @@
 
 use std::marker::PhantomData;
 
+use clap::ValueEnum;
 use data::play_phase_data::PlayPhaseData;
 
 use crate::core::agent::{Agent, AgentData};
@@ -22,6 +23,7 @@ use crate::monte_carlo::monte_carlo_search::{MonteCarloAlgorithm, RandomPlayoutE
 use crate::monte_carlo::uct1::Uct1;
 use crate::tree_search::alpha_beta::AlphaBetaAlgorithm;
 
+#[derive(ValueEnum, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum AgentName {
     AlphaBeta,
     Uct1,
@@ -37,7 +39,7 @@ pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
 }
 
 const ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, TrickEvaluator, PlayPhaseData> =
-    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 50 }, TrickEvaluator);
+    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 13 }, TrickEvaluator);
 
 pub const UCT1_AGENT: AgentData<
     MonteCarloAlgorithm<Uct1>,

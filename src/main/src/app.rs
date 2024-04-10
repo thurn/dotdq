@@ -49,7 +49,6 @@ pub fn run(tui: &mut Tui) -> Result<()> {
             } else {
                 break;
             };
-            info!(?action, "Got action");
             match action {
                 GameAction::PlayPhaseAction(a) => {
                     info!(?a, "Handling PlayPhaseAction");

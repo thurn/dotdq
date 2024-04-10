@@ -35,7 +35,7 @@ pub fn initiate_selection(data: PlayPhaseData) {
         let agent = agents::get_agent(AgentName::Uct1);
         let action = agent.pick_action(
             AgentConfig {
-                deadline: Instant::now() + Duration::from_secs(5),
+                deadline: Instant::now() + Duration::from_secs(3),
                 panic_on_search_timeout: false,
             },
             &data,

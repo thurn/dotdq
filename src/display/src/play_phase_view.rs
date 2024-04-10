@@ -13,8 +13,9 @@
 // limitations under the License.
 
 use data::play_phase_data::PlayPhaseData;
-use data::primitives::HandIdentifier;
+use data::primitives::{HandIdentifier, PlayerName};
 use ratatui::prelude::*;
+use rules::play_phase_queries;
 use typed_builder::TypedBuilder;
 
 use crate::horizontal_hand_view::HorizontalHandView;
@@ -32,6 +33,18 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        let [status_bar, card_area] = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([Constraint::Length(1), Constraint::Fill(1)])
+            .areas(area);
+        Line::from(format!(
+            "User: {} tricks. Opponent: {} tricks.",
+            play_phase_queries::tricks_won(self.data, PlayerName::User),
+            play_phase_queries::tricks_won(self.data, PlayerName::Opponent)
+        ))
+        .alignment(Alignment::Right)
+        .render(status_bar, buf);
+
         let [west, center, east] = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
@@ -39,7 +52,7 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
                 Constraint::Percentage(80),
                 Constraint::Percentage(20),
             ])
-            .areas(area);
+            .areas(card_area);
 
         let [north, tricks, south] = Layout::default()
             .direction(Direction::Vertical)

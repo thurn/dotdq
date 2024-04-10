@@ -12,23 +12,66 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::{HashMap, HashSet};
 use std::fmt::{Debug, Formatter};
+
+use enumset::EnumSet;
 
 use crate::auction_data::Contract;
 use crate::primitives::{Card, HandIdentifier, PlayerName};
 
 #[derive(Debug, Clone)]
 pub struct PlayPhaseData {
-    pub hands: HashMap<HandIdentifier, HashSet<Card>>,
     pub current_trick: Trick,
     pub completed_tricks: Vec<CompletedTrick>,
     pub contract: Contract,
+    north: EnumSet<Card>,
+    east: EnumSet<Card>,
+    south: EnumSet<Card>,
+    west: EnumSet<Card>,
 }
 
 impl PlayPhaseData {
-    pub fn hand(&self, identifier: HandIdentifier) -> impl Iterator<Item = Card> + '_ {
-        self.hands.get(&identifier).unwrap().iter().copied()
+    pub fn new(
+        contract: Contract,
+        north: EnumSet<Card>,
+        east: EnumSet<Card>,
+        south: EnumSet<Card>,
+        west: EnumSet<Card>,
+    ) -> Self {
+        Self {
+            current_trick: Trick::default(),
+            completed_tricks: vec![],
+            contract,
+            north,
+            east,
+            south,
+            west,
+        }
+    }
+
+    pub fn hand(&self, identifier: HandIdentifier) -> &EnumSet<Card> {
+        match identifier {
+            HandIdentifier::North => &self.north,
+            HandIdentifier::East => &self.east,
+            HandIdentifier::South => &self.south,
+            HandIdentifier::West => &self.west,
+        }
+    }
+
+    pub fn hand_mut(&mut self, identifier: HandIdentifier) -> &mut EnumSet<Card> {
+        match identifier {
+            HandIdentifier::North => &mut self.north,
+            HandIdentifier::East => &mut self.east,
+            HandIdentifier::South => &mut self.south,
+            HandIdentifier::West => &mut self.west,
+        }
+    }
+
+    pub fn all_hands_empty(&self) -> bool {
+        self.north.is_empty()
+            && self.east.is_empty()
+            && self.south.is_empty()
+            && self.west.is_empty()
     }
 }
 

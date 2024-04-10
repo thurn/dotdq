@@ -16,6 +16,7 @@ use std::fmt::{Debug, Formatter};
 use std::{fmt, iter};
 
 use enum_iterator::Sequence;
+use enumset::EnumSetType;
 
 /// Represents the four traditional playing card suits.
 ///
@@ -79,15 +80,184 @@ impl fmt::Display for Rank {
 
 /// Represents one of the 52 standard playing cards. Card ordering is by [Suit]
 /// first and then by [Rank].
-#[derive(PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
-pub struct Card {
-    pub suit: Suit,
-    pub rank: Rank,
+///
+/// This is represented as an expanded enum so we can store hands in a bitset
+/// efficiently. Changing this was a roughly 3x increase in all benchmarks.
+#[derive(Hash, Ord, PartialOrd, EnumSetType)]
+pub enum Card {
+    TwoOfClubs,
+    ThreeOfClubs,
+    FourOfClubs,
+    FiveOfClubs,
+    SixOfClubs,
+    SevenOfClubs,
+    EightOfClubs,
+    NineOfClubs,
+    TenOfClubs,
+    JackOfClubs,
+    QueenOfClubs,
+    KingOfClubs,
+    AceOfClubs,
+    TwoOfDiamonds,
+    ThreeOfDiamonds,
+    FourOfDiamonds,
+    FiveOfDiamonds,
+    SixOfDiamonds,
+    SevenOfDiamonds,
+    EightOfDiamonds,
+    NineOfDiamonds,
+    TenOfDiamonds,
+    JackOfDiamonds,
+    QueenOfDiamonds,
+    KingOfDiamonds,
+    AceOfDiamonds,
+    TwoOfHearts,
+    ThreeOfHearts,
+    FourOfHearts,
+    FiveOfHearts,
+    SixOfHearts,
+    SevenOfHearts,
+    EightOfHearts,
+    NineOfHearts,
+    TenOfHearts,
+    JackOfHearts,
+    QueenOfHearts,
+    KingOfHearts,
+    AceOfHearts,
+    TwoOfSpades,
+    ThreeOfSpades,
+    FourOfSpades,
+    FiveOfSpades,
+    SixOfSpades,
+    SevenOfSpades,
+    EightOfSpades,
+    NineOfSpades,
+    TenOfSpades,
+    JackOfSpades,
+    QueenOfSpades,
+    KingOfSpades,
+    AceOfSpades,
+}
+
+impl Card {
+    pub fn suit(&self) -> Suit {
+        match self {
+            Card::TwoOfClubs => Suit::Clubs,
+            Card::ThreeOfClubs => Suit::Clubs,
+            Card::FourOfClubs => Suit::Clubs,
+            Card::FiveOfClubs => Suit::Clubs,
+            Card::SixOfClubs => Suit::Clubs,
+            Card::SevenOfClubs => Suit::Clubs,
+            Card::EightOfClubs => Suit::Clubs,
+            Card::NineOfClubs => Suit::Clubs,
+            Card::TenOfClubs => Suit::Clubs,
+            Card::JackOfClubs => Suit::Clubs,
+            Card::QueenOfClubs => Suit::Clubs,
+            Card::KingOfClubs => Suit::Clubs,
+            Card::AceOfClubs => Suit::Clubs,
+            Card::TwoOfDiamonds => Suit::Diamonds,
+            Card::ThreeOfDiamonds => Suit::Diamonds,
+            Card::FourOfDiamonds => Suit::Diamonds,
+            Card::FiveOfDiamonds => Suit::Diamonds,
+            Card::SixOfDiamonds => Suit::Diamonds,
+            Card::SevenOfDiamonds => Suit::Diamonds,
+            Card::EightOfDiamonds => Suit::Diamonds,
+            Card::NineOfDiamonds => Suit::Diamonds,
+            Card::TenOfDiamonds => Suit::Diamonds,
+            Card::JackOfDiamonds => Suit::Diamonds,
+            Card::QueenOfDiamonds => Suit::Diamonds,
+            Card::KingOfDiamonds => Suit::Diamonds,
+            Card::AceOfDiamonds => Suit::Diamonds,
+            Card::TwoOfHearts => Suit::Hearts,
+            Card::ThreeOfHearts => Suit::Hearts,
+            Card::FourOfHearts => Suit::Hearts,
+            Card::FiveOfHearts => Suit::Hearts,
+            Card::SixOfHearts => Suit::Hearts,
+            Card::SevenOfHearts => Suit::Hearts,
+            Card::EightOfHearts => Suit::Hearts,
+            Card::NineOfHearts => Suit::Hearts,
+            Card::TenOfHearts => Suit::Hearts,
+            Card::JackOfHearts => Suit::Hearts,
+            Card::QueenOfHearts => Suit::Hearts,
+            Card::KingOfHearts => Suit::Hearts,
+            Card::AceOfHearts => Suit::Hearts,
+            Card::TwoOfSpades => Suit::Spades,
+            Card::ThreeOfSpades => Suit::Spades,
+            Card::FourOfSpades => Suit::Spades,
+            Card::FiveOfSpades => Suit::Spades,
+            Card::SixOfSpades => Suit::Spades,
+            Card::SevenOfSpades => Suit::Spades,
+            Card::EightOfSpades => Suit::Spades,
+            Card::NineOfSpades => Suit::Spades,
+            Card::TenOfSpades => Suit::Spades,
+            Card::JackOfSpades => Suit::Spades,
+            Card::QueenOfSpades => Suit::Spades,
+            Card::KingOfSpades => Suit::Spades,
+            Card::AceOfSpades => Suit::Spades,
+        }
+    }
+
+    pub fn rank(&self) -> Rank {
+        match self {
+            Card::TwoOfClubs => Rank::Two,
+            Card::ThreeOfClubs => Rank::Three,
+            Card::FourOfClubs => Rank::Four,
+            Card::FiveOfClubs => Rank::Five,
+            Card::SixOfClubs => Rank::Six,
+            Card::SevenOfClubs => Rank::Seven,
+            Card::EightOfClubs => Rank::Eight,
+            Card::NineOfClubs => Rank::Nine,
+            Card::TenOfClubs => Rank::Ten,
+            Card::JackOfClubs => Rank::Jack,
+            Card::QueenOfClubs => Rank::Queen,
+            Card::KingOfClubs => Rank::King,
+            Card::AceOfClubs => Rank::Ace,
+            Card::TwoOfDiamonds => Rank::Two,
+            Card::ThreeOfDiamonds => Rank::Three,
+            Card::FourOfDiamonds => Rank::Four,
+            Card::FiveOfDiamonds => Rank::Five,
+            Card::SixOfDiamonds => Rank::Six,
+            Card::SevenOfDiamonds => Rank::Seven,
+            Card::EightOfDiamonds => Rank::Eight,
+            Card::NineOfDiamonds => Rank::Nine,
+            Card::TenOfDiamonds => Rank::Ten,
+            Card::JackOfDiamonds => Rank::Jack,
+            Card::QueenOfDiamonds => Rank::Queen,
+            Card::KingOfDiamonds => Rank::King,
+            Card::AceOfDiamonds => Rank::Ace,
+            Card::TwoOfHearts => Rank::Two,
+            Card::ThreeOfHearts => Rank::Three,
+            Card::FourOfHearts => Rank::Four,
+            Card::FiveOfHearts => Rank::Five,
+            Card::SixOfHearts => Rank::Six,
+            Card::SevenOfHearts => Rank::Seven,
+            Card::EightOfHearts => Rank::Eight,
+            Card::NineOfHearts => Rank::Nine,
+            Card::TenOfHearts => Rank::Ten,
+            Card::JackOfHearts => Rank::Jack,
+            Card::QueenOfHearts => Rank::Queen,
+            Card::KingOfHearts => Rank::King,
+            Card::AceOfHearts => Rank::Ace,
+            Card::TwoOfSpades => Rank::Two,
+            Card::ThreeOfSpades => Rank::Three,
+            Card::FourOfSpades => Rank::Four,
+            Card::FiveOfSpades => Rank::Five,
+            Card::SixOfSpades => Rank::Six,
+            Card::SevenOfSpades => Rank::Seven,
+            Card::EightOfSpades => Rank::Eight,
+            Card::NineOfSpades => Rank::Nine,
+            Card::TenOfSpades => Rank::Ten,
+            Card::JackOfSpades => Rank::Jack,
+            Card::QueenOfSpades => Rank::Queen,
+            Card::KingOfSpades => Rank::King,
+            Card::AceOfSpades => Rank::Ace,
+        }
+    }
 }
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}{}", self.rank, self.suit)
+        write!(f, "{}{}", self.rank(), self.suit())
     }
 }
 
@@ -99,7 +269,68 @@ impl Debug for Card {
 
 impl Card {
     pub fn new(suit: Suit, rank: Rank) -> Self {
-        Self { suit, rank }
+        match suit {
+            Suit::Clubs => match rank {
+                Rank::Two => Card::TwoOfClubs,
+                Rank::Three => Card::ThreeOfClubs,
+                Rank::Four => Card::FourOfClubs,
+                Rank::Five => Card::FiveOfClubs,
+                Rank::Six => Card::SixOfClubs,
+                Rank::Seven => Card::SevenOfClubs,
+                Rank::Eight => Card::EightOfClubs,
+                Rank::Nine => Card::NineOfClubs,
+                Rank::Ten => Card::TenOfClubs,
+                Rank::Jack => Card::JackOfClubs,
+                Rank::Queen => Card::QueenOfClubs,
+                Rank::King => Card::KingOfClubs,
+                Rank::Ace => Card::AceOfClubs,
+            },
+            Suit::Diamonds => match rank {
+                Rank::Two => Card::TwoOfDiamonds,
+                Rank::Three => Card::ThreeOfDiamonds,
+                Rank::Four => Card::FourOfDiamonds,
+                Rank::Five => Card::FiveOfDiamonds,
+                Rank::Six => Card::SixOfDiamonds,
+                Rank::Seven => Card::SevenOfDiamonds,
+                Rank::Eight => Card::EightOfDiamonds,
+                Rank::Nine => Card::NineOfDiamonds,
+                Rank::Ten => Card::TenOfDiamonds,
+                Rank::Jack => Card::JackOfDiamonds,
+                Rank::Queen => Card::QueenOfDiamonds,
+                Rank::King => Card::KingOfDiamonds,
+                Rank::Ace => Card::AceOfDiamonds,
+            },
+            Suit::Hearts => match rank {
+                Rank::Two => Card::TwoOfHearts,
+                Rank::Three => Card::ThreeOfHearts,
+                Rank::Four => Card::FourOfHearts,
+                Rank::Five => Card::FiveOfHearts,
+                Rank::Six => Card::SixOfHearts,
+                Rank::Seven => Card::SevenOfHearts,
+                Rank::Eight => Card::EightOfHearts,
+                Rank::Nine => Card::NineOfHearts,
+                Rank::Ten => Card::TenOfHearts,
+                Rank::Jack => Card::JackOfHearts,
+                Rank::Queen => Card::QueenOfHearts,
+                Rank::King => Card::KingOfHearts,
+                Rank::Ace => Card::AceOfHearts,
+            },
+            Suit::Spades => match rank {
+                Rank::Two => Card::TwoOfSpades,
+                Rank::Three => Card::ThreeOfSpades,
+                Rank::Four => Card::FourOfSpades,
+                Rank::Five => Card::FiveOfSpades,
+                Rank::Six => Card::SixOfSpades,
+                Rank::Seven => Card::SevenOfSpades,
+                Rank::Eight => Card::EightOfSpades,
+                Rank::Nine => Card::NineOfSpades,
+                Rank::Ten => Card::TenOfSpades,
+                Rank::Jack => Card::JackOfSpades,
+                Rank::Queen => Card::QueenOfSpades,
+                Rank::King => Card::KingOfSpades,
+                Rank::Ace => Card::AceOfSpades,
+            },
+        }
     }
 }
 

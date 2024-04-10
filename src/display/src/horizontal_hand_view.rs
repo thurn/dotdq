@@ -42,7 +42,7 @@ impl<'a> StatefulWidget for HorizontalHandView<'a> {
             width: self.card_size.width,
             height: self.card_size.height,
         };
-        let suits = self.data.hand(self.hand).sorted().group_by(|card| card.suit);
+        let suits = self.data.hand(self.hand).iter().sorted().group_by(|card| card.suit());
 
         let mut offset = 0;
         for (_, group) in &suits {

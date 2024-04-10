@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::{HashMap, HashSet};
 use std::slice::ChunksExact;
 
 use data::auction_data::Contract;
-use data::play_phase_data::{PlayPhaseData, Trick};
-use data::primitives::{Card, HandIdentifier, PlayerName, Rank, Suit};
+use data::play_phase_data::PlayPhaseData;
+use data::primitives::{Card, PlayerName, Rank, Suit};
+use enumset::EnumSet;
 use rand::prelude::SliceRandom;
 use rand::Rng;
 
@@ -31,20 +31,20 @@ pub fn new_game(rng: &mut impl Rng) -> PlayPhaseData {
     cards.shuffle(rng);
 
     let mut chunks = cards.chunks_exact(13);
-    let mut hands = HashMap::new();
-    hands.insert(HandIdentifier::North, build_hand(&mut chunks));
-    hands.insert(HandIdentifier::East, build_hand(&mut chunks));
-    hands.insert(HandIdentifier::South, build_hand(&mut chunks));
-    hands.insert(HandIdentifier::West, build_hand(&mut chunks));
+    let north = build_hand(&mut chunks);
+    let east = build_hand(&mut chunks);
+    let south = build_hand(&mut chunks);
+    let west = build_hand(&mut chunks);
 
-    PlayPhaseData {
-        hands,
-        current_trick: Trick::default(),
-        completed_tricks: vec![],
-        contract: Contract { declarer: PlayerName::User, trump: Some(Suit::Spades), bid: 8 },
-    }
+    PlayPhaseData::new(
+        Contract { declarer: PlayerName::User, trump: Some(Suit::Spades), bid: 8 },
+        north,
+        east,
+        south,
+        west,
+    )
 }
 
-fn build_hand(chunks: &mut ChunksExact<Card>) -> HashSet<Card> {
-    HashSet::from_iter(chunks.next().expect("Invalid deck size").iter().copied())
+fn build_hand(chunks: &mut ChunksExact<Card>) -> EnumSet<Card> {
+    EnumSet::from_iter(chunks.next().expect("Invalid deck size").iter().copied())
 }

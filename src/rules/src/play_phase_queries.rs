@@ -14,7 +14,6 @@
 
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData, Trick};
 use data::primitives::{Card, HandIdentifier, PlayerName, Suit};
-use itertools::Itertools;
 
 /// Returns true if the indicated [PlayPhaseAction] is currently legal to take
 pub fn can_perform_action(data: &PlayPhaseData, action: PlayPhaseAction) -> bool {
@@ -32,7 +31,7 @@ pub fn legal_actions(
     player
         .owned_hands()
         .flat_map(move |hand| {
-            data.hand(hand).sorted().map(move |card| PlayPhaseAction::PlayCard(player, hand, card))
+            data.hand(hand).iter().map(move |card| PlayPhaseAction::PlayCard(player, hand, card))
         })
         .filter(|&action| can_perform_action(data, action))
 }
@@ -40,7 +39,7 @@ pub fn legal_actions(
 /// Returns the [PlayerName] whose turn to act it currently is, or None if the
 /// game has ended
 pub fn current_turn(data: &PlayPhaseData) -> Option<PlayerName> {
-    if is_play_phase_over(data) {
+    if data.all_hands_empty() {
         None
     } else {
         Some(next_to_play(data).owner())
@@ -63,11 +62,6 @@ pub fn next_to_play(data: &PlayPhaseData) -> HandIdentifier {
     }
 }
 
-/// Returns true if all cards have been played in the play phase
-pub fn is_play_phase_over(data: &PlayPhaseData) -> bool {
-    data.hands.values().all(|h| h.is_empty())
-}
-
 /// Returns the number of tricks the [PlayerName] player has won in the provided
 /// game so far.
 pub fn tricks_won(data: &PlayPhaseData, player: PlayerName) -> i32 {
@@ -82,7 +76,7 @@ pub fn trick_winner(trick: &Trick) -> HandIdentifier {
     trick
         .cards
         .iter()
-        .filter(|c| c.card.suit == suit)
+        .filter(|c| c.card.suit() == suit)
         .max_by_key(|c| c.card)
         .expect("Trick was empty")
         .played_by
@@ -91,12 +85,12 @@ pub fn trick_winner(trick: &Trick) -> HandIdentifier {
 /// Returns the [Suit] being used for the provided trick, or None if the trick
 /// is empty.
 fn trick_suit(trick: &Trick) -> Option<Suit> {
-    Some(trick.cards.first()?.card.suit)
+    Some(trick.cards.first()?.card.suit())
 }
 
 /// Returns the number of cards of the given [Suit] in the indicated hand.
 fn suit_count(data: &PlayPhaseData, hand: HandIdentifier, suit: Suit) -> usize {
-    data.hand(hand).filter(|card| card.suit == suit).count()
+    data.hand(hand).iter().filter(|card| card.suit() == suit).count()
 }
 
 fn can_play_card(
@@ -106,13 +100,13 @@ fn can_play_card(
     card: Card,
 ) -> bool {
     let follows_suit = if let Some(suit) = trick_suit(&data.current_trick) {
-        suit == card.suit || suit_count(data, hand, suit) == 0
+        suit == card.suit() || suit_count(data, hand, suit) == 0
     } else {
         true
     };
 
     next_to_play(data) == hand
         && player.owns_hand(hand)
-        && data.hands.get(&hand).unwrap().contains(&card)
+        && data.hand(hand).contains(card)
         && (data.current_trick.cards.len() == 4 || follows_suit)
 }

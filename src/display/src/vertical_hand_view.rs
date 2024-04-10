@@ -50,7 +50,7 @@ impl<'a> StatefulWidget for VerticalHandView<'a> {
             height: self.card_size.height,
         };
 
-        for (i, card) in self.data.hand(self.hand).sorted().enumerate() {
+        for (i, card) in self.data.hand(self.hand).iter().sorted().enumerate() {
             let action = PlayPhaseAction::PlayCard(self.hand.owner(), self.hand, card);
             CardView::new()
                 .card(card)

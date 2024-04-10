@@ -65,13 +65,18 @@ impl StatefulWidget for CardView {
 
         if self.visible || self.debug_visible {
             let text = if area.width <= 8 {
-                let mut rank = self.card.rank.to_string();
+                let mut rank = self.card.rank().to_string();
                 if area.width <= 6 {
                     rank = rank.replace("10", "T");
                 };
                 vec![
                     Line::from(text_style(rank, self.card, hovered, pressed)),
-                    Line::from(text_style(self.card.suit.to_string(), self.card, hovered, pressed)),
+                    Line::from(text_style(
+                        self.card.suit().to_string(),
+                        self.card,
+                        hovered,
+                        pressed,
+                    )),
                 ]
             } else {
                 vec![Line::from(text_style(self.card.to_string(), self.card, hovered, pressed))]
@@ -91,7 +96,7 @@ impl StatefulWidget for CardView {
 }
 
 fn text_style<'a>(text: String, card: Card, hovered: bool, pressed: bool) -> Span<'a> {
-    let color = match card.suit {
+    let color = match card.suit() {
         Suit::Clubs => "#597dce".parse::<Color>().unwrap(),
         Suit::Diamonds => "#d2aa99".parse::<Color>().unwrap(),
         Suit::Hearts => "#d04648".parse::<Color>().unwrap(),

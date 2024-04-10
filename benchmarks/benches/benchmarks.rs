@@ -28,8 +28,8 @@ pub fn alpha_beta(c: &mut Criterion) {
     group.bench_function("Alpha Beta", |b| {
         b.iter(|| {
             run_matchup::run(Args {
-                user: AgentName::AlphaBeta,
-                opponent: AgentName::AlphaBeta,
+                user: AgentName::AlphaBetaDepth10,
+                opponent: AgentName::AlphaBetaDepth10,
                 move_time: 1,
                 matches: 1,
                 verbosity: Verbosity::None,
@@ -45,8 +45,8 @@ pub fn uct1(c: &mut Criterion) {
     group.bench_function("UCT1", |b| {
         b.iter(|| {
             run_matchup::run(Args {
-                user: AgentName::Uct1Benchmark,
-                opponent: AgentName::Uct1Benchmark,
+                user: AgentName::Uct1Iterations250,
+                opponent: AgentName::Uct1Iterations250,
                 move_time: 1,
                 matches: 1,
                 verbosity: Verbosity::None,

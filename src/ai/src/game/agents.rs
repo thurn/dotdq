@@ -25,38 +25,33 @@ use crate::tree_search::alpha_beta::AlphaBetaAlgorithm;
 
 #[derive(ValueEnum, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum AgentName {
-    AlphaBeta,
+    AlphaBetaDepth10,
+    AlphaBetaDepth13,
     Uct1,
-    Uct1Benchmark,
+    Uct1Iterations250,
 }
 
 pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
     match name {
-        AgentName::AlphaBeta => Box::new(ALPHA_BETA_AGENT),
-        AgentName::Uct1 => Box::new(UCT1_AGENT),
-        AgentName::Uct1Benchmark => Box::new(UCT1_BENCHMARK_AGENT),
+        AgentName::AlphaBetaDepth10 => Box::new(AgentData::omniscient(
+            "ALPHA_BETA_10",
+            AlphaBetaAlgorithm { search_depth: 10 },
+            TrickEvaluator,
+        )),
+        AgentName::AlphaBetaDepth13 => Box::new(AgentData::omniscient(
+            "ALPHA_BETA_13",
+            AlphaBetaAlgorithm { search_depth: 13 },
+            TrickEvaluator,
+        )),
+        AgentName::Uct1 => Box::new(AgentData::omniscient(
+            "UCT1",
+            MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: None },
+            RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
+        )),
+        AgentName::Uct1Iterations250 => Box::new(AgentData::omniscient(
+            "UCT1_250",
+            MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: Some(250) },
+            RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
+        )),
     }
 }
-
-const ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, TrickEvaluator, PlayPhaseData> =
-    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 13 }, TrickEvaluator);
-
-pub const UCT1_AGENT: AgentData<
-    MonteCarloAlgorithm<Uct1>,
-    RandomPlayoutEvaluator<PlayPhaseData, TrickEvaluator>,
-    PlayPhaseData,
-> = AgentData::omniscient(
-    "UCT1",
-    MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: None },
-    RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
-);
-
-pub const UCT1_BENCHMARK_AGENT: AgentData<
-    MonteCarloAlgorithm<Uct1>,
-    RandomPlayoutEvaluator<PlayPhaseData, TrickEvaluator>,
-    PlayPhaseData,
-> = AgentData::omniscient(
-    "UCT1",
-    MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: Some(250) },
-    RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
-);

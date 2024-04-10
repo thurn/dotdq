@@ -15,6 +15,7 @@
 use std::time::{Duration, Instant};
 
 use clap::{Parser, ValueEnum};
+use data::play_phase_data::PlayPhaseData;
 use data::primitives::PlayerName;
 use rules::{auction, play_phase_queries};
 
@@ -32,7 +33,7 @@ pub enum Verbosity {
 
 #[derive(Parser)]
 #[clap()]
-pub struct Args {
+pub struct MatchupArgs {
     #[arg(value_enum)]
     pub user: AgentName,
     #[arg(value_enum)]
@@ -51,7 +52,7 @@ pub struct Args {
     pub panic_on_search_timeout: bool,
 }
 
-pub fn run(args: Args) {
+pub fn run_with_args(args: &MatchupArgs) {
     let user = agents::get_agent(args.user);
     let opponent = agents::get_agent(args.opponent);
 
@@ -60,38 +61,61 @@ pub fn run(args: Args) {
             println!(">>> Running match {} between {} and {}", i, user.name(), opponent.name());
         }
         let mut game = auction::new_game(&mut rand::thread_rng());
-        if args.verbosity > Verbosity::None {
-            println!("Starting game");
-        }
+        run_match(
+            args.user,
+            args.opponent,
+            &mut game,
+            args.move_time,
+            args.verbosity,
+            args.panic_on_search_timeout,
+        );
+    }
+}
 
-        loop {
-            match game.status() {
-                GameStatus::InProgress { current_turn } => {
-                    let agent = if current_turn == PlayerName::User { &user } else { &opponent };
-                    let config = AgentConfig {
-                        panic_on_search_timeout: args.panic_on_search_timeout,
-                        deadline: Instant::now() + Duration::from_secs(args.move_time),
-                    };
-                    let action = agent.pick_action(config, &game);
-                    game.execute_action(current_turn, action);
-                    clear_action_line(args.verbosity);
-                    if args.verbosity > Verbosity::None {
-                        println!("{} performs action {:?}", agent.name(), action);
-                    }
+pub fn run_match(
+    user_agent: AgentName,
+    opponent_agent: AgentName,
+    game: &mut PlayPhaseData,
+    move_time: u64,
+    verbosity: Verbosity,
+    panic_on_search_timeout: bool,
+) -> AgentName {
+    let user = agents::get_agent(user_agent);
+    let opponent = agents::get_agent(opponent_agent);
+    if verbosity > Verbosity::None {
+        println!("Starting game");
+    }
+
+    loop {
+        match game.status() {
+            GameStatus::InProgress { current_turn } => {
+                let agent = if current_turn == PlayerName::User { &user } else { &opponent };
+                let config = AgentConfig {
+                    panic_on_search_timeout,
+                    deadline: Instant::now() + Duration::from_secs(move_time),
+                };
+                let action = agent.pick_action(config, game);
+                game.execute_action(current_turn, action);
+                clear_action_line(verbosity);
+                if verbosity > Verbosity::None {
+                    println!("{} performs action {:?}", agent.name(), action);
                 }
-                GameStatus::Completed { winner } => {
-                    let agent = if winner == PlayerName::User { &user } else { &opponent };
-                    if args.verbosity >= Verbosity::Matches {
-                        clear_action_line(args.verbosity);
-                        println!(
-                            "{} wins, {} to {}",
-                            agent.name(),
-                            play_phase_queries::tricks_won(&game, winner),
-                            play_phase_queries::tricks_won(&game, winner.opponent())
-                        );
-                    }
-                    break;
+            }
+            GameStatus::Completed { winner } => {
+                let agent = if winner == PlayerName::User { &user } else { &opponent };
+                if verbosity >= Verbosity::Matches {
+                    clear_action_line(verbosity);
+                    println!(
+                        "{} wins, {} to {}",
+                        agent.name(),
+                        play_phase_queries::tricks_won(game, winner),
+                        play_phase_queries::tricks_won(game, winner.opponent())
+                    );
                 }
+                return match winner {
+                    PlayerName::User => user_agent,
+                    PlayerName::Opponent => opponent_agent,
+                };
             }
         }
     }

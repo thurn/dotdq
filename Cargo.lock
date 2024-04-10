@@ -45,6 +45,7 @@ dependencies = [
  "clap",
  "crossbeam",
  "data",
+ "itertools 0.12.1",
  "petgraph",
  "rand",
  "rayon",

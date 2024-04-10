@@ -17,12 +17,17 @@ path = "src/nim/nim_main.rs"
 name = "run_matchup"
 path = "src/testing/run_matchup_main.rs"
 
+[[bin]]
+name = "run_tournament"
+path = "src/testing/run_tournament_main.rs"
+
 [dependencies]
 data = { path = "../data", version = "0.0.0" }
 rules = { path = "../rules", version = "0.0.0" }
 
 clap = { version = "4.4.5", features = ["derive", "cargo", "wrap_help", "unicode", "string", "unstable-styles"] }
 crossbeam = "0.8.4"
+itertools = "0.12.1"
 petgraph = "0.6.4"
 rand = "0.8.5"
 rayon = "1.10.0"

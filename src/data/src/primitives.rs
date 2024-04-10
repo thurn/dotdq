@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fmt::{Debug, Formatter};
 use std::{fmt, iter};
 
 use enum_iterator::Sequence;
@@ -78,7 +79,7 @@ impl fmt::Display for Rank {
 
 /// Represents one of the 52 standard playing cards. Card ordering is by [Suit]
 /// first and then by [Rank].
-#[derive(PartialEq, Eq, Hash, Debug, Copy, Clone, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank,
@@ -90,6 +91,12 @@ impl fmt::Display for Card {
     }
 }
 
+impl Debug for Card {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self)
+    }
+}
+
 impl Card {
     pub fn new(suit: Suit, rank: Rank) -> Self {
         Self { suit, rank }
@@ -97,7 +104,7 @@ impl Card {
 }
 
 /// Represents one of the four hands in an Oak game.
-#[derive(PartialEq, Eq, Hash, Debug, Copy, Clone, Sequence, Ord, PartialOrd)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Sequence, Ord, PartialOrd)]
 pub enum HandIdentifier {
     /// Dummy partner of human player
     North,
@@ -107,6 +114,17 @@ pub enum HandIdentifier {
     South,
     /// Always the AI player in the round
     West,
+}
+
+impl Debug for HandIdentifier {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            HandIdentifier::North => "N",
+            HandIdentifier::East => "E",
+            HandIdentifier::South => "S",
+            HandIdentifier::West => "W",
+        })
+    }
 }
 
 impl HandIdentifier {
@@ -139,10 +157,19 @@ impl HandIdentifier {
 }
 
 /// Identifies one of the two players participating in a round
-#[derive(PartialEq, Eq, Hash, Debug, Copy, Clone, Sequence)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Sequence)]
 pub enum PlayerName {
     User,
     Opponent,
+}
+
+impl Debug for PlayerName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            PlayerName::User => "U",
+            PlayerName::Opponent => "O",
+        })
+    }
 }
 
 impl PlayerName {

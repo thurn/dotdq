@@ -23,7 +23,7 @@ use crate::monte_carlo::monte_carlo_search::{MonteCarloAlgorithm, RandomPlayoutE
 use crate::monte_carlo::uct1::Uct1;
 use crate::tree_search::alpha_beta::AlphaBetaAlgorithm;
 
-#[derive(ValueEnum, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(ValueEnum, Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub enum AgentName {
     AlphaBetaDepth10,
     AlphaBetaDepth13,

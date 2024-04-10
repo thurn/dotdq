@@ -16,7 +16,7 @@ use std::time::Duration;
 
 use ai::game::agents::AgentName;
 use ai::testing::run_matchup;
-use ai::testing::run_matchup::{Args, Verbosity};
+use ai::testing::run_matchup::{MatchupArgs, Verbosity};
 use criterion::{criterion_group, criterion_main, Criterion};
 
 criterion_main!(benches);
@@ -27,7 +27,7 @@ pub fn alpha_beta(c: &mut Criterion) {
     group.measurement_time(Duration::from_secs(60));
     group.bench_function("Alpha Beta", |b| {
         b.iter(|| {
-            run_matchup::run(Args {
+            run_matchup::run_with_args(&MatchupArgs {
                 user: AgentName::AlphaBetaDepth10,
                 opponent: AgentName::AlphaBetaDepth10,
                 move_time: 1,
@@ -44,7 +44,7 @@ pub fn uct1(c: &mut Criterion) {
     group.measurement_time(Duration::from_secs(30));
     group.bench_function("UCT1", |b| {
         b.iter(|| {
-            run_matchup::run(Args {
+            run_matchup::run_with_args(&MatchupArgs {
                 user: AgentName::Uct1Iterations250,
                 opponent: AgentName::Uct1Iterations250,
                 move_time: 1,

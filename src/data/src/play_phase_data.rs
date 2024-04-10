@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use std::collections::{HashMap, HashSet};
+use std::fmt::{Debug, Formatter};
 
 use crate::auction_data::Contract;
 use crate::primitives::{Card, HandIdentifier, PlayerName};
@@ -54,7 +55,17 @@ pub struct PlayedCard {
     pub card: Card,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash)]
 pub enum PlayPhaseAction {
     PlayCard(PlayerName, HandIdentifier, Card),
+}
+
+impl Debug for PlayPhaseAction {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PlayPhaseAction::PlayCard(player, hand, card) => {
+                write!(f, "{:?}·{:?}·{:?}", player, hand, card)
+            }
+        }
+    }
 }

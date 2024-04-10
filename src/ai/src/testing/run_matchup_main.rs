@@ -13,10 +13,10 @@
 // limitations under the License.
 
 use ai::testing::run_matchup;
-use ai::testing::run_matchup::Args;
+use ai::testing::run_matchup::MatchupArgs;
 use clap::Parser;
 
 pub fn main() {
-    let args = Args::parse();
-    run_matchup::run(args)
+    let args = MatchupArgs::parse();
+    run_matchup::run_with_args(&args)
 }

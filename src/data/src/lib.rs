@@ -13,7 +13,6 @@
 // limitations under the License.
 
 pub mod auction_phase_data;
-pub mod bid_data;
 pub mod game_action;
 pub mod play_phase_data;
 pub mod primitives;

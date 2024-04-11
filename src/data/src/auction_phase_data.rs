@@ -14,19 +14,16 @@
 
 use std::fmt::{Debug, Formatter};
 
-use enumset::EnumSet;
+use crate::primitives::{PlayerName, Suit};
 
-use crate::bid_data::Bid;
-use crate::primitives::PlayerName;
-
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct AuctionPhaseData {
     /// Most recently bid Contract value, if any
     pub current: Option<Contract>,
     /// Bids which have been submitted by the user
-    pub user_bids: EnumSet<Bid>,
+    pub user_bids: Vec<Bid>,
     /// Bids which have been submitted by the opponent
-    pub opponent_bids: EnumSet<Bid>,
+    pub opponent_bids: Vec<Bid>,
 }
 
 /// A bid for a number of tricks a player has committed to winning with a given
@@ -37,6 +34,39 @@ pub struct Contract {
     pub declarer: PlayerName,
     /// Bid for this contract
     pub bid: Bid,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
+pub struct Bid {
+    pub number: BidNumber,
+    pub suit: Option<Suit>,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
+pub enum BidNumber {
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Eleven,
+    Twelve,
+    Thirteen,
+}
+
+impl BidNumber {
+    pub fn as_u32(&self) -> u32 {
+        match self {
+            BidNumber::Six => 6,
+            BidNumber::Seven => 7,
+            BidNumber::Eight => 8,
+            BidNumber::Nine => 9,
+            BidNumber::Ten => 10,
+            BidNumber::Eleven => 11,
+            BidNumber::Twelve => 12,
+            BidNumber::Thirteen => 13,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]

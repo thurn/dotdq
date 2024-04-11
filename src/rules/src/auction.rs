@@ -14,8 +14,7 @@
 
 use std::slice::ChunksExact;
 
-use data::auction_phase_data::Contract;
-use data::bid_data::Bid;
+use data::auction_phase_data::{Bid, BidNumber, Contract};
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::{Card, PlayerName, Rank, Suit};
 use enumset::EnumSet;
@@ -38,7 +37,7 @@ pub fn new_game(rng: &mut impl Rng) -> PlayPhaseData {
     let west = build_hand(&mut chunks);
 
     PlayPhaseData::new(
-        Contract { declarer: PlayerName::User, bid: Bid::SixClubs },
+        Contract { declarer: PlayerName::User, bid: Bid { number: BidNumber::Six, suit: None } },
         north,
         east,
         south,

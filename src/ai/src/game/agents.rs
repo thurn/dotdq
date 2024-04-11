@@ -18,6 +18,8 @@ use clap::ValueEnum;
 use data::play_phase_data::PlayPhaseData;
 
 use crate::core::agent::{Agent, AgentData};
+use crate::core::first_available_action::FirstAvailableActionAlgorithm;
+use crate::core::win_loss_evaluator::WinLossEvaluator;
 use crate::game::evaluators::TrickEvaluator;
 use crate::monte_carlo::monte_carlo_search::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use crate::monte_carlo::uct1::Uct1;
@@ -29,6 +31,7 @@ pub enum AgentName {
     AlphaBetaDepth13,
     Uct1,
     Uct1Iterations250,
+    FirstAvailableAction,
 }
 
 pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
@@ -52,6 +55,11 @@ pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
             "UCT1_250",
             MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: Some(250) },
             RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
+        )),
+        AgentName::FirstAvailableAction => Box::new(AgentData::omniscient(
+            "FIRST_AVAILABLE_ACTION",
+            FirstAvailableActionAlgorithm,
+            WinLossEvaluator,
         )),
     }
 }

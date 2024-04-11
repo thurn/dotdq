@@ -37,6 +37,9 @@ nim *args='':
 run_matchup *args='':
     cargo run --bin run_matchup -- "$@"
 
+run_tournament *args='':
+    cargo run --bin run_tournament -- "$@"
+
 check-format:
     cargo +nightly fmt -- --check
 

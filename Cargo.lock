@@ -2194,6 +2194,7 @@ dependencies = [
  "enumset",
  "itertools 0.12.1",
  "rand",
+ "tracing",
 ]
 
 [[package]]

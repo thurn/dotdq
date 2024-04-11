@@ -26,6 +26,9 @@ use rules::auction;
 pub struct TournamentArgs {
     #[arg(value_enum)]
     pub players: Vec<AgentName>,
+    /// Maximum time in seconds for each agent to use for moves.
+    #[arg(long, default_value_t = 1)]
+    pub move_time: u64,
 }
 
 pub fn main() {
@@ -34,7 +37,7 @@ pub fn main() {
     let mut scores = HashMap::new();
     for combination in args.players.iter().combinations(2) {
         println!("Running 10-game match between {:?} and {:?}", combination[0], combination[1]);
-        run_tournament_match(&mut scores, *combination[0], *combination[1]);
+        run_tournament_match(&args, &mut scores, *combination[0], *combination[1]);
         println!("\nUpdated Scores:");
         print_scores(&scores);
     }
@@ -43,12 +46,24 @@ pub fn main() {
     print_scores(&scores);
 }
 
-fn run_tournament_match(scores: &mut HashMap<AgentName, u32>, p1: AgentName, p2: AgentName) {
+fn run_tournament_match(
+    args: &TournamentArgs,
+    scores: &mut HashMap<AgentName, u32>,
+    p1: AgentName,
+    p2: AgentName,
+) {
     for _ in 0..5 {
         // Players play the game from both sides in order to ensure fairness
-        let mut game = auction::new_game(&mut rand::thread_rng());
-        add_winner(scores, run_matchup::run_match(p1, p2, &mut game, 3, Verbosity::Matches, false));
-        add_winner(scores, run_matchup::run_match(p2, p1, &mut game, 3, Verbosity::Matches, false));
+        let mut game1 = auction::new_game(&mut rand::thread_rng());
+        let mut game2 = game1.clone();
+        add_winner(
+            scores,
+            run_matchup::run_match(p1, p2, &mut game1, args.move_time, Verbosity::Matches, false),
+        );
+        add_winner(
+            scores,
+            run_matchup::run_match(p2, p1, &mut game2, args.move_time, Verbosity::Matches, false),
+        );
     }
 }
 

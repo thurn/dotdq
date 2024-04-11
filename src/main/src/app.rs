@@ -61,6 +61,7 @@ pub fn run(tui: &mut Tui) -> Result<()> {
                         ai_agent_action::initiate_selection(data.clone());
                     }
                 }
+                GameAction::AuctionPhaseActon(_) => {}
                 GameAction::SetHover(id) => {
                     context.set_current_hover(id);
                 }

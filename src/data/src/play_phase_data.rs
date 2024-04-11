@@ -16,7 +16,7 @@ use std::fmt::{Debug, Formatter};
 
 use enumset::EnumSet;
 
-use crate::auction_data::Contract;
+use crate::auction_phase_data::Contract;
 use crate::primitives::{Card, HandIdentifier, PlayerName};
 
 #[derive(Debug, Clone)]

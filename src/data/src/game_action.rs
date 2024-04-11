@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::auction_phase_data::AuctionPhaseAction;
 use crate::play_phase_data::PlayPhaseAction;
 use crate::widget_id::WidgetId;
 
@@ -20,4 +21,5 @@ pub enum GameAction {
     SetHover(Option<WidgetId>),
     SetMouseDown(Option<WidgetId>),
     PlayPhaseAction(PlayPhaseAction),
+    AuctionPhaseActon(AuctionPhaseAction),
 }

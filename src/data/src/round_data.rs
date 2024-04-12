@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::auction_phase_data::AuctionPhaseData;
+use crate::contract_phase_data::ContractPhaseData;
 use crate::play_phase_data::PlayPhaseData;
 
 #[derive(Debug, Clone)]
 pub enum RoundData {
-    AuctionPhase(AuctionPhaseData),
+    ContractPhase(ContractPhaseData),
     PlayPhase(PlayPhaseData),
 }

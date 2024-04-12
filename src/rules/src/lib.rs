@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod auction;
+pub mod new_game;
 pub mod play_phase_actions;
 pub mod play_phase_queries;

@@ -31,10 +31,12 @@ impl GameStateNode for PlayPhaseData {
             GameStatus::InProgress { current_turn: p }
         } else {
             GameStatus::Completed {
-                winner: if play_phase_queries::tricks_won(self, PlayerName::User) > 6 {
+                winner: if play_phase_queries::tricks_won(self, PlayerName::User)
+                    == self.contract.contract_number(PlayerName::User)
+                {
                     PlayerName::User
                 } else {
-                    PlayerName::Opponent
+                    PlayerName::North
                 },
             }
         }
@@ -47,7 +49,7 @@ impl GameStateNode for PlayPhaseData {
         Box::new(play_phase_queries::legal_actions(self, player))
     }
 
-    fn execute_action(&mut self, _: Self::PlayerName, action: Self::Action) {
-        play_phase_actions::handle_action(self, action);
+    fn execute_action(&mut self, player_name: Self::PlayerName, action: Self::Action) {
+        play_phase_actions::handle_action(self, player_name, action);
     }
 }

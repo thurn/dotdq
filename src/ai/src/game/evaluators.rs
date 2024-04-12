@@ -22,6 +22,6 @@ pub struct TrickEvaluator;
 
 impl StateEvaluator<PlayPhaseData> for TrickEvaluator {
     fn evaluate(&self, data: &PlayPhaseData, player: PlayerName) -> i32 {
-        play_phase_queries::tricks_won(data, player)
+        play_phase_queries::tricks_won(data, player) as i32
     }
 }

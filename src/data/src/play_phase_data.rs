@@ -16,14 +16,14 @@ use std::fmt::{Debug, Formatter};
 
 use enumset::EnumSet;
 
-use crate::auction_phase_data::Contract;
-use crate::primitives::{Card, HandIdentifier, PlayerName};
+use crate::contract_phase_data::ContractPhaseData;
+use crate::primitives::{Card, PlayerName};
 
 #[derive(Debug, Clone)]
 pub struct PlayPhaseData {
     pub current_trick: Trick,
     pub completed_tricks: Vec<CompletedTrick>,
-    pub contract: Contract,
+    pub contract: ContractPhaseData,
     north: EnumSet<Card>,
     east: EnumSet<Card>,
     south: EnumSet<Card>,
@@ -32,7 +32,7 @@ pub struct PlayPhaseData {
 
 impl PlayPhaseData {
     pub fn new(
-        contract: Contract,
+        contract: ContractPhaseData,
         north: EnumSet<Card>,
         east: EnumSet<Card>,
         south: EnumSet<Card>,
@@ -49,21 +49,21 @@ impl PlayPhaseData {
         }
     }
 
-    pub fn hand(&self, identifier: HandIdentifier) -> &EnumSet<Card> {
+    pub fn hand(&self, identifier: PlayerName) -> &EnumSet<Card> {
         match identifier {
-            HandIdentifier::North => &self.north,
-            HandIdentifier::East => &self.east,
-            HandIdentifier::South => &self.south,
-            HandIdentifier::West => &self.west,
+            PlayerName::North => &self.north,
+            PlayerName::East => &self.east,
+            PlayerName::User => &self.south,
+            PlayerName::West => &self.west,
         }
     }
 
-    pub fn hand_mut(&mut self, identifier: HandIdentifier) -> &mut EnumSet<Card> {
+    pub fn hand_mut(&mut self, identifier: PlayerName) -> &mut EnumSet<Card> {
         match identifier {
-            HandIdentifier::North => &mut self.north,
-            HandIdentifier::East => &mut self.east,
-            HandIdentifier::South => &mut self.south,
-            HandIdentifier::West => &mut self.west,
+            PlayerName::North => &mut self.north,
+            PlayerName::East => &mut self.east,
+            PlayerName::User => &mut self.south,
+            PlayerName::West => &mut self.west,
         }
     }
 
@@ -80,7 +80,7 @@ pub struct CompletedTrick {
     /// Cards which were played in this trick.
     pub trick: Trick,
     /// Player who won this trick
-    pub winner: HandIdentifier,
+    pub winner: PlayerName,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -93,21 +93,21 @@ pub struct Trick {
 #[derive(Debug, Clone, Copy)]
 pub struct PlayedCard {
     /// Player who played this card
-    pub played_by: HandIdentifier,
+    pub played_by: PlayerName,
     /// Card which was played
     pub card: Card,
 }
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 pub enum PlayPhaseAction {
-    PlayCard(PlayerName, HandIdentifier, Card),
+    PlayCard(Card),
 }
 
 impl Debug for PlayPhaseAction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            PlayPhaseAction::PlayCard(player, hand, card) => {
-                write!(f, "{:?}·{:?}·{:?}", player, hand, card)
+            PlayPhaseAction::PlayCard(card) => {
+                write!(f, "Play {:?}", card)
             }
         }
     }

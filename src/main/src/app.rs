@@ -19,18 +19,17 @@ use color_eyre::Result;
 use crossterm::event;
 use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseData;
-use data::primitives::PlayerName;
 use display::play_phase_view::PlayPhaseView;
 use display::render_context::RenderContext;
 use ratatui::prelude::*;
 use ratatui::widgets::{Paragraph, Wrap};
-use rules::{auction, play_phase_actions, play_phase_queries};
+use rules::{new_game, play_phase_actions, play_phase_queries};
 use tracing::info;
 
 use crate::tui::Tui;
 
 pub fn run(tui: &mut Tui) -> Result<()> {
-    let mut data = auction::new_game(&mut rand::thread_rng());
+    let mut data = new_game::create(&mut rand::thread_rng());
     let mut context = RenderContext::default();
     let mut ai_search_running = false;
     while !context.should_exit() {
@@ -49,19 +48,22 @@ pub fn run(tui: &mut Tui) -> Result<()> {
             } else {
                 break;
             };
+            let Some(current_player) = play_phase_queries::current_turn(&data) else {
+                continue;
+            };
             match action {
                 GameAction::PlayPhaseAction(a) => {
                     info!(?a, "Handling PlayPhaseAction");
-                    play_phase_actions::handle_action(&mut data, a);
-                    if play_phase_queries::current_turn(&data) == Some(PlayerName::Opponent)
-                        && !ai_search_running
-                    {
+                    play_phase_actions::handle_action(&mut data, current_player, a);
+                    let Some(next_player) = play_phase_queries::current_turn(&data) else {
+                        continue;
+                    };
+                    if next_player.is_agent() && !ai_search_running {
                         ai_search_running = true;
-                        info!(?a, "Running AI");
                         ai_agent_action::initiate_selection(data.clone());
                     }
                 }
-                GameAction::AuctionPhaseActon(_) => {}
+                GameAction::ContractPhaseAction(_) => {}
                 GameAction::SetHover(id) => {
                     context.set_current_hover(id);
                 }

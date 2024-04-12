@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::HandIdentifier;
+use data::primitives::PlayerName;
 use itertools::Itertools;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Offset, Rect, Size};
@@ -29,7 +29,7 @@ use crate::render_context::RenderContext;
 #[builder(builder_method(name = new))]
 pub struct VerticalHandView<'a> {
     data: &'a PlayPhaseData,
-    hand: HandIdentifier,
+    player_name: PlayerName,
     card_size: Size,
 }
 
@@ -50,14 +50,15 @@ impl<'a> StatefulWidget for VerticalHandView<'a> {
             height: self.card_size.height,
         };
 
-        for (i, card) in self.data.hand(self.hand).iter().sorted().enumerate() {
-            let action = PlayPhaseAction::PlayCard(self.hand.owner(), self.hand, card);
+        for (i, card) in self.data.hand(self.player_name).iter().sorted().enumerate() {
+            let action = PlayPhaseAction::PlayCard(card);
             CardView::new()
                 .card(card)
                 .visible(false)
                 .debug_visible(true)
                 .on_click(
-                    play_phase_queries::can_perform_action(self.data, action).then_some(action),
+                    play_phase_queries::can_perform_action(self.data, PlayerName::User, action)
+                        .then_some(action),
                 )
                 .build()
                 .render(

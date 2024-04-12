@@ -19,7 +19,7 @@ use ai::testing::run_matchup;
 use ai::testing::run_matchup::Verbosity;
 use clap::Parser;
 use itertools::Itertools;
-use rules::auction;
+use rules::new_game;
 
 #[derive(Parser)]
 #[clap()]
@@ -54,7 +54,7 @@ fn run_tournament_match(
 ) {
     for _ in 0..5 {
         // Players play the game from both sides in order to ensure fairness
-        let mut game1 = auction::new_game(&mut rand::thread_rng());
+        let mut game1 = new_game::create(&mut rand::thread_rng());
         let mut game2 = game1.clone();
         add_winner(
             scores,

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fmt;
 use std::fmt::{Debug, Formatter};
-use std::{fmt, iter};
 
 use enum_iterator::Sequence;
 use enumset::EnumSetType;
@@ -336,107 +336,37 @@ impl Card {
 
 /// Represents one of the four hands in an Oak game.
 #[derive(PartialEq, Eq, Hash, Copy, Clone, Sequence, Ord, PartialOrd)]
-pub enum HandIdentifier {
-    /// Dummy partner of human player
-    North,
-    /// Dummy partner of AI player
-    East,
-    /// Always the human player in the round
-    South,
-    /// Always the AI player in the round
-    West,
-}
-
-impl Debug for HandIdentifier {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            HandIdentifier::North => "N",
-            HandIdentifier::East => "E",
-            HandIdentifier::South => "S",
-            HandIdentifier::West => "W",
-        })
-    }
-}
-
-impl HandIdentifier {
-    /// Returns the next position in turn sequence after this one
-    pub fn next(&self) -> Self {
-        match self {
-            Self::North => Self::East,
-            Self::East => Self::South,
-            Self::South => Self::West,
-            Self::West => Self::North,
-        }
-    }
-
-    /// Returns the partner position of this position
-    pub fn partner(&self) -> Self {
-        match self {
-            Self::North => Self::South,
-            Self::East => Self::West,
-            Self::South => Self::North,
-            Self::West => Self::East,
-        }
-    }
-
-    pub fn owner(&self) -> PlayerName {
-        match self {
-            Self::South | Self::North => PlayerName::User,
-            Self::East | Self::West => PlayerName::Opponent,
-        }
-    }
-}
-
-/// Identifies one of the two players participating in a round
-#[derive(PartialEq, Eq, Hash, Copy, Clone, Sequence)]
 pub enum PlayerName {
     User,
-    Opponent,
+    North,
+    East,
+    West,
 }
 
 impl Debug for PlayerName {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match self {
             PlayerName::User => "U",
-            PlayerName::Opponent => "O",
+            PlayerName::North => "N",
+            PlayerName::East => "E",
+            PlayerName::West => "W",
         })
     }
 }
 
 impl PlayerName {
-    pub fn opponent(&self) -> Self {
+    /// Returns the next position in turn sequence after this one
+    pub fn next(&self) -> Self {
         match self {
-            PlayerName::User => PlayerName::Opponent,
-            PlayerName::Opponent => PlayerName::User,
+            Self::North => Self::East,
+            Self::East => Self::User,
+            Self::User => Self::West,
+            Self::West => Self::North,
         }
     }
 
-    /// Returns the hand which this player can see at the beginning of the
-    /// auction phase.
-    ///
-    /// This is also the hand which gets the lead for the first trick of a round
-    /// when this player is the declarer.
-    pub fn primary_hand(&self) -> HandIdentifier {
-        match self {
-            PlayerName::User => HandIdentifier::South,
-            PlayerName::Opponent => HandIdentifier::West,
-        }
-    }
-
-    /// Returns an iterator over hand identifiers for hands owned by this player
-    pub fn owned_hands(&self) -> impl Iterator<Item = HandIdentifier> {
-        match self {
-            PlayerName::User => {
-                iter::once(HandIdentifier::South).chain(iter::once(HandIdentifier::North))
-            }
-            PlayerName::Opponent => {
-                iter::once(HandIdentifier::East).chain(iter::once(HandIdentifier::West))
-            }
-        }
-    }
-
-    /// Returns true if this player owns the indicated `hand`.
-    pub fn owns_hand(&self, hand: HandIdentifier) -> bool {
-        &hand.owner() == self
+    /// Returns true if this player name corresponds to an AI player
+    pub fn is_agent(&self) -> bool {
+        *self != Self::User
     }
 }

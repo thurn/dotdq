@@ -17,7 +17,7 @@ use std::time::{Duration, Instant};
 use clap::{Parser, ValueEnum};
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::PlayerName;
-use rules::{auction, play_phase_queries};
+use rules::{new_game, play_phase_queries};
 
 use crate::core::agent::AgentConfig;
 use crate::core::game_state_node::{GameStateNode, GameStatus};
@@ -60,7 +60,7 @@ pub fn run_with_args(args: &MatchupArgs) {
         if args.verbosity >= Verbosity::Matches {
             println!(">>> Running match {} between {} and {}", i, user.name(), opponent.name());
         }
-        let mut game = auction::new_game(&mut rand::thread_rng());
+        let mut game = new_game::create(&mut rand::thread_rng());
         run_match(
             args.user,
             args.opponent,
@@ -106,15 +106,14 @@ pub fn run_match(
                 if verbosity >= Verbosity::Matches {
                     clear_action_line(verbosity);
                     println!(
-                        "{} wins, {} to {}",
+                        "{} wins with {} tricks",
                         agent.name(),
                         play_phase_queries::tricks_won(game, winner),
-                        play_phase_queries::tricks_won(game, winner.opponent())
                     );
                 }
                 return match winner {
                     PlayerName::User => user_agent,
-                    PlayerName::Opponent => opponent_agent,
+                    _ => opponent_agent,
                 };
             }
         }

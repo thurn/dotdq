@@ -14,14 +14,14 @@
 
 use std::slice::ChunksExact;
 
-use data::auction_phase_data::{Bid, BidNumber, Contract};
+use data::contract_phase_data::ContractPhaseData;
 use data::play_phase_data::PlayPhaseData;
-use data::primitives::{Card, PlayerName, Rank, Suit};
+use data::primitives::{Card, Rank, Suit};
 use enumset::EnumSet;
 use rand::prelude::SliceRandom;
 use rand::Rng;
 
-pub fn new_game(rng: &mut impl Rng) -> PlayPhaseData {
+pub fn create(rng: &mut impl Rng) -> PlayPhaseData {
     let mut cards = Vec::new();
     for suit in enum_iterator::all::<Suit>() {
         for rank in enum_iterator::all::<Rank>() {
@@ -36,13 +36,7 @@ pub fn new_game(rng: &mut impl Rng) -> PlayPhaseData {
     let south = build_hand(&mut chunks);
     let west = build_hand(&mut chunks);
 
-    PlayPhaseData::new(
-        Contract { declarer: PlayerName::User, bid: Bid { number: BidNumber::Six, suit: None } },
-        north,
-        east,
-        south,
-        west,
-    )
+    PlayPhaseData::new(ContractPhaseData::new(None), north, east, south, west)
 }
 
 fn build_hand(chunks: &mut ChunksExact<Card>) -> EnumSet<Card> {

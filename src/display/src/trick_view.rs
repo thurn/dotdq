@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::{PlayPhaseData, PlayedCard};
-use data::primitives::HandIdentifier;
+use data::primitives::PlayerName;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
 use typed_builder::TypedBuilder;
@@ -40,15 +40,15 @@ impl<'a> TrickView<'a> {
         let center = layout::centered_rect(self.card_size, parent_area);
         let offset = 0.65;
         let target = match card.played_by {
-            HandIdentifier::North => center.offset(Offset {
+            PlayerName::North => center.offset(Offset {
                 x: 0,
                 y: (self.card_size.height as f64 * -offset).round() as i32,
             }),
-            HandIdentifier::East => center
+            PlayerName::East => center
                 .offset(Offset { x: (self.card_size.width as f64 * offset).round() as i32, y: 0 }),
-            HandIdentifier::South => center
+            PlayerName::User => center
                 .offset(Offset { x: 0, y: (self.card_size.height as f64 * offset).round() as i32 }),
-            HandIdentifier::West => center
+            PlayerName::West => center
                 .offset(Offset { x: (self.card_size.width as f64 * -offset).round() as i32, y: 0 }),
         };
         CardView::new().card(card.card).visible(true).build().render(target, buf, context);

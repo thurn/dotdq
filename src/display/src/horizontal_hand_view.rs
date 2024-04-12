@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::HandIdentifier;
+use data::primitives::PlayerName;
 use itertools::Itertools;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
@@ -27,7 +27,7 @@ use crate::render_context::RenderContext;
 #[builder(builder_method(name = new))]
 pub struct HorizontalHandView<'a> {
     data: &'a PlayPhaseData,
-    hand: HandIdentifier,
+    player_name: PlayerName,
     card_size: Size,
 }
 
@@ -42,17 +42,18 @@ impl<'a> StatefulWidget for HorizontalHandView<'a> {
             width: self.card_size.width,
             height: self.card_size.height,
         };
-        let suits = self.data.hand(self.hand).iter().sorted().group_by(|card| card.suit());
+        let suits = self.data.hand(self.player_name).iter().sorted().group_by(|card| card.suit());
 
         let mut offset = 0;
         for (_, group) in &suits {
             for card in group {
-                let action = PlayPhaseAction::PlayCard(self.hand.owner(), self.hand, card);
+                let action = PlayPhaseAction::PlayCard(card);
                 CardView::new()
                     .card(card)
                     .visible(true)
                     .on_click(
-                        play_phase_queries::can_perform_action(self.data, action).then_some(action),
+                        play_phase_queries::can_perform_action(self.data, PlayerName::User, action)
+                            .then_some(action),
                     )
                     .build()
                     .render(card_rect.offset(Offset { x: offset, y: 0 }), buf, context);

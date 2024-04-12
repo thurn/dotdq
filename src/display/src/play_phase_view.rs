@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::PlayPhaseData;
-use data::primitives::{HandIdentifier, PlayerName};
+use data::primitives::PlayerName;
 use ratatui::prelude::*;
 use rules::play_phase_queries;
 use typed_builder::TypedBuilder;
@@ -38,9 +38,9 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
             .constraints([Constraint::Length(1), Constraint::Fill(1)])
             .areas(area);
         Line::from(format!(
-            "User: {} tricks. Opponent: {} tricks.",
+            "User: {}/{} tricks",
             play_phase_queries::tricks_won(self.data, PlayerName::User),
-            play_phase_queries::tricks_won(self.data, PlayerName::Opponent)
+            self.data.contract.contract_number(PlayerName::User)
         ))
         .alignment(Alignment::Right)
         .render(status_bar, buf);
@@ -71,25 +71,25 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
 
         HorizontalHandView::new()
             .data(self.data)
-            .hand(HandIdentifier::North)
+            .player_name(PlayerName::North)
             .card_size(card_size)
             .build()
             .render(north, buf, context);
         VerticalHandView::new()
             .data(self.data)
-            .hand(HandIdentifier::East)
+            .player_name(PlayerName::East)
             .card_size(card_size)
             .build()
             .render(east, buf, context);
         HorizontalHandView::new()
             .data(self.data)
-            .hand(HandIdentifier::South)
+            .player_name(PlayerName::User)
             .card_size(card_size)
             .build()
             .render(south, buf, context);
         VerticalHandView::new()
             .data(self.data)
-            .hand(HandIdentifier::West)
+            .player_name(PlayerName::West)
             .card_size(card_size)
             .build()
             .render(west, buf, context);

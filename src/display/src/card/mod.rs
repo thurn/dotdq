@@ -12,16 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::PlayPhaseData;
-use data::primitives::PlayerName;
-use rules::play_phase::play_phase_queries;
-
-use crate::core::state_evaluator::StateEvaluator;
-
-pub struct TrickEvaluator;
-
-impl StateEvaluator<PlayPhaseData> for TrickEvaluator {
-    fn evaluate(&self, data: &PlayPhaseData, player: PlayerName) -> i32 {
-        play_phase_queries::tricks_won(data, player) as i32
-    }
-}
+pub mod card_view;

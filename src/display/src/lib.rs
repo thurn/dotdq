@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod card_view;
-pub mod horizontal_hand_view;
-pub mod layout;
-pub mod play_phase_view;
-pub mod render_context;
-pub mod trick_view;
-pub mod vertical_hand_view;
+pub mod card;
+pub mod play_phase;
+pub mod rendering;

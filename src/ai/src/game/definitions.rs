@@ -15,7 +15,7 @@
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::PlayerName;
 use enumset::EnumSet;
-use rules::{play_phase_actions, play_phase_queries};
+use rules::play_phase::{play_phase_actions, play_phase_queries};
 
 use crate::core::game_state_node::{GameStateNode, GameStatus};
 

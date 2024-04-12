@@ -19,17 +19,18 @@ use color_eyre::Result;
 use crossterm::event;
 use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseData;
-use display::play_phase_view::PlayPhaseView;
-use display::render_context::RenderContext;
+use display::play_phase::play_phase_view::PlayPhaseView;
+use display::rendering::render_context::RenderContext;
 use ratatui::prelude::*;
 use ratatui::widgets::{Paragraph, Wrap};
-use rules::{new_game, play_phase_actions, play_phase_queries};
+use rules::play_phase::{play_phase_actions, play_phase_queries};
+use rules::rounds::new_round;
 use tracing::info;
 
 use crate::tui::Tui;
 
 pub fn run(tui: &mut Tui) -> Result<()> {
-    let mut data = new_game::create(&mut rand::thread_rng());
+    let mut data = new_round::create_play_phase(&mut rand::thread_rng());
     let mut context = RenderContext::default();
     let mut ai_search_running = false;
     while !context.should_exit() {

@@ -22,7 +22,7 @@ use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use typed_builder::TypedBuilder;
 
-use crate::render_context::RenderContext;
+use crate::rendering::render_context::RenderContext;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]

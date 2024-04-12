@@ -17,11 +17,20 @@ use std::slice::ChunksExact;
 use data::contract_phase_data::ContractPhaseData;
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::{Card, Rank, Suit};
+use data::round_data::RoundData;
 use enumset::EnumSet;
 use rand::prelude::SliceRandom;
 use rand::Rng;
 
-pub fn create(rng: &mut impl Rng) -> PlayPhaseData {
+pub fn create(rng: &mut impl Rng) -> RoundData {
+    let trump =
+        [None, Some(Suit::Clubs), Some(Suit::Diamonds), Some(Suit::Hearts), Some(Suit::Spades)]
+            .choose(rng)
+            .expect("Slice was empty");
+    RoundData::ContractPhase(ContractPhaseData::new(*trump))
+}
+
+pub fn create_play_phase(rng: &mut impl Rng) -> PlayPhaseData {
     let mut cards = Vec::new();
     for suit in enum_iterator::all::<Suit>() {
         for rank in enum_iterator::all::<Rank>() {

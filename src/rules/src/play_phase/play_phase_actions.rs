@@ -15,7 +15,7 @@
 use data::play_phase_data::{CompletedTrick, PlayPhaseAction, PlayPhaseData, PlayedCard};
 use data::primitives::{Card, PlayerName};
 
-use crate::play_phase_queries;
+use crate::play_phase::play_phase_queries;
 
 pub fn handle_action(data: &mut PlayPhaseData, player: PlayerName, action: PlayPhaseAction) {
     assert!(

@@ -15,13 +15,13 @@
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::PlayerName;
 use ratatui::prelude::*;
-use rules::play_phase_queries;
+use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
-use crate::horizontal_hand_view::HorizontalHandView;
-use crate::render_context::RenderContext;
-use crate::trick_view::TrickView;
-use crate::vertical_hand_view::VerticalHandView;
+use crate::play_phase::horizontal_hand_view::HorizontalHandView;
+use crate::play_phase::trick_view::TrickView;
+use crate::play_phase::vertical_hand_view::VerticalHandView;
+use crate::rendering::render_context::RenderContext;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]

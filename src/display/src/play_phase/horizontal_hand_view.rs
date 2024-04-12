@@ -17,11 +17,11 @@ use data::primitives::PlayerName;
 use itertools::Itertools;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
-use rules::play_phase_queries;
+use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
-use crate::card_view::CardView;
-use crate::render_context::RenderContext;
+use crate::card::card_view::CardView;
+use crate::rendering::render_context::RenderContext;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]

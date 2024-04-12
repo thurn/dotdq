@@ -18,9 +18,9 @@ use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
 use typed_builder::TypedBuilder;
 
-use crate::card_view::CardView;
-use crate::layout;
-use crate::render_context::RenderContext;
+use crate::card::card_view::CardView;
+use crate::rendering::layout;
+use crate::rendering::render_context::RenderContext;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]

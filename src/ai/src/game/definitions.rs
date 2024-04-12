@@ -14,6 +14,7 @@
 
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::PlayerName;
+use enumset::EnumSet;
 use rules::{play_phase_actions, play_phase_queries};
 
 use crate::core::game_state_node::{GameStateNode, GameStatus};
@@ -31,13 +32,9 @@ impl GameStateNode for PlayPhaseData {
             GameStatus::InProgress { current_turn: p }
         } else {
             GameStatus::Completed {
-                winner: if play_phase_queries::tricks_won(self, PlayerName::User)
-                    == self.contract.contract_number(PlayerName::User)
-                {
-                    PlayerName::User
-                } else {
-                    PlayerName::North
-                },
+                winners: enum_iterator::all::<PlayerName>()
+                    .filter(|&name| play_phase_queries::met_contract(self, name))
+                    .collect::<EnumSet<_>>(),
             }
         }
     }

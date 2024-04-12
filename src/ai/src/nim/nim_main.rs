@@ -95,11 +95,11 @@ fn print_optimal_action(state: &NimState, player_name: &str) {
 }
 
 fn check_game_over(game: &NimState, p1_name: &str, p2_name: &str) {
-    if let GameStatus::Completed { winner } = game.status() {
-        println!("Game Over. {} wins!", match winner {
-            NimPlayer::One => p1_name,
-            NimPlayer::Two => p2_name,
-        });
+    if let GameStatus::Completed { winners } = game.status() {
+        println!(
+            "Game Over. {} wins!",
+            if winners.contains(NimPlayer::One) { p1_name } else { p2_name }
+        );
         std::process::exit(0)
     }
 }

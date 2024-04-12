@@ -15,12 +15,14 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
+use enumset::{EnumSet, EnumSetType};
+
 #[derive(Debug, PartialEq, Eq)]
-pub enum GameStatus<TPlayer: Eq> {
+pub enum GameStatus<TPlayer: EnumSetType> {
     /// Game is still ongoing, it is TPlayer's turn.
     InProgress { current_turn: TPlayer },
-    /// Game has ended, TPlayer has won.
-    Completed { winner: TPlayer },
+    /// Game has ended, the indicated set of players have won.
+    Completed { winners: EnumSet<TPlayer> },
 }
 
 /// A generic game state used by an AI algorithm.
@@ -34,7 +36,7 @@ pub trait GameStateNode {
     type Action: Eq + Copy + Hash + Debug;
 
     /// A player in the game.
-    type PlayerName: Eq + Copy;
+    type PlayerName: EnumSetType;
 
     /// Create a copy of this search node to be mutated by selection algorithms.
     /// A basic implementation of this would be to simply call `.clone()`, but

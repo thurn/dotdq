@@ -22,7 +22,7 @@ impl<TNode: GameStateNode> StateEvaluator<TNode> for WinLossEvaluator {
     fn evaluate(&self, state: &TNode, player: TNode::PlayerName) -> i32 {
         match state.status() {
             GameStatus::InProgress { .. } => 0,
-            GameStatus::Completed { winner } if winner == player => 1,
+            GameStatus::Completed { winners } if winners.contains(player) => 1,
             _ => -1,
         }
     }

@@ -24,9 +24,9 @@ pub struct ContractPhaseData {
     pub trump: Option<Suit>,
 
     user_contract: ContractNumber,
+    west_contract: ContractNumber,
     north_contract: ContractNumber,
     east_contract: ContractNumber,
-    west_contract: ContractNumber,
 }
 
 impl ContractPhaseData {
@@ -37,9 +37,18 @@ impl ContractPhaseData {
     pub fn contract_number(&self, player: PlayerName) -> ContractNumber {
         match player {
             PlayerName::User => self.user_contract,
+            PlayerName::West => self.west_contract,
             PlayerName::North => self.north_contract,
             PlayerName::East => self.east_contract,
-            PlayerName::West => self.west_contract,
+        }
+    }
+
+    pub fn contract_number_mut(&mut self, player: PlayerName) -> &mut ContractNumber {
+        match player {
+            PlayerName::User => &mut self.user_contract,
+            PlayerName::West => &mut self.west_contract,
+            PlayerName::North => &mut self.north_contract,
+            PlayerName::East => &mut self.east_contract,
         }
     }
 }

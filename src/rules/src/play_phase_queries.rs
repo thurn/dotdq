@@ -70,6 +70,11 @@ pub fn tricks_won(data: &PlayPhaseData, player: PlayerName) -> usize {
     data.completed_tricks.iter().filter(|t| t.winner == player).count()
 }
 
+/// Returns true if the [PlayerName] player completed their assigned contract
+pub fn met_contract(data: &PlayPhaseData, player: PlayerName) -> bool {
+    data.contract.contract_number(player) == tricks_won(data, player)
+}
+
 /// Returns the [PlayerName] which won a given trick.
 ///
 /// Panics if the provided trick is not completed.

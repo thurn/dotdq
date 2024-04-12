@@ -18,7 +18,7 @@ use crate::core::agent::AgentData;
 use crate::core::win_loss_evaluator::WinLossEvaluator;
 use crate::monte_carlo::monte_carlo_search::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use crate::monte_carlo::uct1::Uct1;
-use crate::nim::nim_game::{NimPerfectEvaluator, NimState, NimWinLossEvaluator};
+use crate::nim::nim_game::{NimPerfectEvaluator, NimState};
 use crate::tree_search::alpha_beta::AlphaBetaAlgorithm;
 use crate::tree_search::minimax::MinimaxAlgorithm;
 use crate::tree_search::single_level::SingleLevel;
@@ -27,15 +27,11 @@ use crate::tree_search::single_level::SingleLevel;
 pub const NIM_PERFECT_AGENT: AgentData<SingleLevel, NimPerfectEvaluator, NimState> =
     AgentData::omniscient("PERFECT", SingleLevel {}, NimPerfectEvaluator {});
 
-pub const NIM_MINIMAX_AGENT: AgentData<MinimaxAlgorithm, NimWinLossEvaluator, NimState> =
-    AgentData::omniscient("MINIMAX", MinimaxAlgorithm { search_depth: 25 }, NimWinLossEvaluator {});
+pub const NIM_MINIMAX_AGENT: AgentData<MinimaxAlgorithm, WinLossEvaluator, NimState> =
+    AgentData::omniscient("MINIMAX", MinimaxAlgorithm { search_depth: 25 }, WinLossEvaluator {});
 
-pub const NIM_ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, NimWinLossEvaluator, NimState> =
-    AgentData::omniscient(
-        "ALPHA_BETA",
-        AlphaBetaAlgorithm { search_depth: 25 },
-        NimWinLossEvaluator {},
-    );
+pub const NIM_ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, WinLossEvaluator, NimState> =
+    AgentData::omniscient("ALPHA_BETA", AlphaBetaAlgorithm { search_depth: 25 }, WinLossEvaluator);
 
 pub const NIM_UCT1_AGENT: AgentData<
     MonteCarloAlgorithm<Uct1>,

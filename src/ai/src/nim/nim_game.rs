@@ -16,6 +16,8 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
+use enumset::{EnumSet, EnumSetType};
+
 use crate::core::agent::{Agent, AgentConfig};
 use crate::core::game_state_node::{GameStateNode, GameStatus};
 use crate::core::state_evaluator::StateEvaluator;
@@ -41,19 +43,6 @@ pub fn assert_perfect_in_seconds(state: &NimState, agent: &impl Agent<NimState>,
     assert_eq!(1, NimPerfectEvaluator {}.evaluate(&copy, current));
 }
 
-/// Evaluator which returns -1 for a loss, 1 for a win, and 0 otherwise
-pub struct NimWinLossEvaluator {}
-
-impl StateEvaluator<NimState> for NimWinLossEvaluator {
-    fn evaluate(&self, state: &NimState, player: NimPlayer) -> i32 {
-        match state.status() {
-            GameStatus::InProgress { .. } => 0,
-            GameStatus::Completed { winner } if winner == player => 1,
-            _ => -1,
-        }
-    }
-}
-
 /// Evaluator which returns 1 if the current game state is a winning state the
 /// player and -1 otherwise.
 pub struct NimPerfectEvaluator {}
@@ -75,7 +64,7 @@ impl StateEvaluator<NimState> for NimPerfectEvaluator {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Hash, Ord, PartialOrd, Debug, EnumSetType)]
 pub enum NimPlayer {
     One,
     Two,
@@ -155,9 +144,9 @@ impl GameStateNode for NimState {
     fn status(&self) -> GameStatus<NimPlayer> {
         if all_piles().iter().all(|pile| self.piles[pile] == 0) {
             GameStatus::Completed {
-                winner: match self.turn {
-                    NimPlayer::One => NimPlayer::Two,
-                    NimPlayer::Two => NimPlayer::One,
+                winners: match self.turn {
+                    NimPlayer::One => EnumSet::only(NimPlayer::Two),
+                    NimPlayer::Two => EnumSet::only(NimPlayer::One),
                 },
             }
         } else {

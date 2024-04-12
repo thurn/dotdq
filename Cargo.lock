@@ -45,6 +45,8 @@ dependencies = [
  "clap",
  "crossbeam",
  "data",
+ "enum-iterator",
+ "enumset",
  "itertools 0.12.1",
  "petgraph",
  "rand",

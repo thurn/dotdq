@@ -30,7 +30,7 @@ pub enum Suit {
 }
 
 impl fmt::Display for Suit {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match self {
             Suit::Clubs => "♣",
             Suit::Diamonds => "♦",
@@ -334,22 +334,22 @@ impl Card {
     }
 }
 
-/// Represents one of the four hands in an Oak game.
-#[derive(PartialEq, Eq, Hash, Copy, Clone, Sequence, Ord, PartialOrd)]
+/// Represents one of the four hands in a game.
+#[derive(Hash, Ord, PartialOrd, EnumSetType, Sequence)]
 pub enum PlayerName {
     User,
+    West,
     North,
     East,
-    West,
 }
 
 impl Debug for PlayerName {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match self {
             PlayerName::User => "U",
+            PlayerName::West => "W",
             PlayerName::North => "N",
             PlayerName::East => "E",
-            PlayerName::West => "W",
         })
     }
 }
@@ -358,10 +358,10 @@ impl PlayerName {
     /// Returns the next position in turn sequence after this one
     pub fn next(&self) -> Self {
         match self {
-            Self::North => Self::East,
-            Self::East => Self::User,
             Self::User => Self::West,
             Self::West => Self::North,
+            Self::North => Self::East,
+            Self::East => Self::User,
         }
     }
 

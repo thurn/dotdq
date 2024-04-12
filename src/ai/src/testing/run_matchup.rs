@@ -17,7 +17,7 @@ use std::time::{Duration, Instant};
 use clap::{Parser, ValueEnum};
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::PlayerName;
-use rules::{new_game, play_phase_queries};
+use rules::new_game;
 
 use crate::core::agent::AgentConfig;
 use crate::core::game_state_node::{GameStateNode, GameStatus};
@@ -101,20 +101,14 @@ pub fn run_match(
                     println!("{} performs action {:?}", agent.name(), action);
                 }
             }
-            GameStatus::Completed { winner } => {
-                let agent = if winner == PlayerName::User { &user } else { &opponent };
+            GameStatus::Completed { winners } => {
+                let user_won = winners.contains(PlayerName::User);
+                let agent = if user_won { &user } else { &opponent };
                 if verbosity >= Verbosity::Matches {
                     clear_action_line(verbosity);
-                    println!(
-                        "{} wins with {} tricks",
-                        agent.name(),
-                        play_phase_queries::tricks_won(game, winner),
-                    );
+                    println!("{} wins", agent.name(),);
                 }
-                return match winner {
-                    PlayerName::User => user_agent,
-                    _ => opponent_agent,
-                };
+                return if user_won { user_agent } else { opponent_agent };
             }
         }
     }

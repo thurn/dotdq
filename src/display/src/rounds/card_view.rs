@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use data::game_action::GameAction;
-use data::play_phase_data::PlayPhaseAction;
 use data::primitives::{Card, Suit};
 use data::widget_id::WidgetId;
 use ratatui::layout::Offset;
@@ -32,7 +31,7 @@ pub struct CardView {
     #[builder(default)]
     debug_visible: bool,
     #[builder(default)]
-    on_click: Option<PlayPhaseAction>,
+    on_click: Option<GameAction>,
 }
 
 impl StatefulWidget for CardView {
@@ -53,11 +52,7 @@ impl StatefulWidget for CardView {
         let pressed =
             self.on_click.is_some() && context.mouse_down(WidgetId::CardView(self.card), area);
         if let Some(action) = self.on_click {
-            context.clicked(
-                WidgetId::CardView(self.card),
-                area,
-                GameAction::PlayPhaseAction(action),
-            );
+            context.clicked(WidgetId::CardView(self.card), area, action);
         }
 
         let inner = block.inner(area);

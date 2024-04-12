@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod card_view;
-pub mod horizontal_hand_view;
-pub mod play_area_state;
-pub mod play_area_view;
-pub mod trick_view;
-pub mod vertical_hand_view;
+use data::game_action::GameAction;
+use data::primitives::{Card, PlayerName};
+use ratatui::widgets::StatefulWidget;
+
+pub trait PlayAreaState {
+    fn card_action(&self, card: Card) -> Option<GameAction>;
+
+    fn is_card_visible(&self, player: PlayerName, card: Card) -> bool;
+
+    fn top_status_bar(&self) -> impl StatefulWidget;
+
+    fn center_content(&self) -> impl StatefulWidget;
+}

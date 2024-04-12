@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::PlayerName;
+use data::primitives::Card;
+use enumset::EnumSet;
 use itertools::Itertools;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Offset, Rect, Size};
 use ratatui::prelude::*;
-use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
 use crate::rendering::layout;
@@ -27,13 +26,12 @@ use crate::rounds::card_view::CardView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct VerticalHandView<'a> {
-    data: &'a PlayPhaseData,
-    player_name: PlayerName,
+pub struct VerticalHandView {
     card_size: Size,
+    hand: EnumSet<Card>,
 }
 
-impl<'a> StatefulWidget for VerticalHandView<'a> {
+impl StatefulWidget for VerticalHandView {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -50,16 +48,12 @@ impl<'a> StatefulWidget for VerticalHandView<'a> {
             height: self.card_size.height,
         };
 
-        for (i, card) in self.data.hands.hand(self.player_name).iter().sorted().enumerate() {
-            let action = PlayPhaseAction::PlayCard(card);
+        for (i, card) in self.hand.iter().sorted().enumerate() {
             CardView::new()
                 .card(card)
                 .visible(false)
                 .debug_visible(true)
-                .on_click(
-                    play_phase_queries::can_perform_action(self.data, PlayerName::User, action)
-                        .then_some(action),
-                )
+                .on_click(None)
                 .build()
                 .render(
                     card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),

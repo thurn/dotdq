@@ -46,12 +46,12 @@ impl Hands {
         Self { north, east, south, west }
     }
 
-    pub fn hand(&self, identifier: PlayerName) -> &EnumSet<Card> {
+    pub fn hand(&self, identifier: PlayerName) -> EnumSet<Card> {
         match identifier {
-            PlayerName::North => &self.north,
-            PlayerName::East => &self.east,
-            PlayerName::User => &self.south,
-            PlayerName::West => &self.west,
+            PlayerName::North => self.north,
+            PlayerName::East => self.east,
+            PlayerName::User => self.south,
+            PlayerName::West => self.west,
         }
     }
 

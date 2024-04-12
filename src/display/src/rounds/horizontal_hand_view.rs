@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::PlayerName;
+use data::game_action::GameAction;
+use data::primitives::Card;
+use enumset::EnumSet;
 use itertools::Itertools;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
-use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
 use crate::rendering::render_context::RenderContext;
@@ -25,13 +25,19 @@ use crate::rounds::card_view::CardView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct HorizontalHandView<'a> {
-    data: &'a PlayPhaseData,
-    player_name: PlayerName,
+pub struct HorizontalHandView<TFn>
+where
+    TFn: Fn(Card) -> Option<GameAction>,
+{
     card_size: Size,
+    hand: EnumSet<Card>,
+    card_action: TFn,
 }
 
-impl<'a> StatefulWidget for HorizontalHandView<'a> {
+impl<TFn> StatefulWidget for HorizontalHandView<TFn>
+where
+    TFn: Fn(Card) -> Option<GameAction>,
+{
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -42,20 +48,15 @@ impl<'a> StatefulWidget for HorizontalHandView<'a> {
             width: self.card_size.width,
             height: self.card_size.height,
         };
-        let suits =
-            self.data.hands.hand(self.player_name).iter().sorted().group_by(|card| card.suit());
+        let suits = self.hand.iter().sorted().group_by(|card| card.suit());
 
         let mut offset = 0;
         for (_, group) in &suits {
             for card in group {
-                let action = PlayPhaseAction::PlayCard(card);
                 CardView::new()
                     .card(card)
                     .visible(true)
-                    .on_click(
-                        play_phase_queries::can_perform_action(self.data, PlayerName::User, action)
-                            .then_some(action),
-                    )
+                    .on_click((self.card_action)(card))
                     .build()
                     .render(card_rect.offset(Offset { x: offset, y: 0 }), buf, context);
                 offset += card_offset as i32;

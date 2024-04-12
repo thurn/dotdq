@@ -733,6 +733,7 @@ version = "0.0.0"
 dependencies = [
  "crossterm",
  "data",
+ "enumset",
  "itertools 0.12.1",
  "log",
  "ratatui",

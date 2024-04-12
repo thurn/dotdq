@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::PlayPhaseData;
-use data::primitives::PlayerName;
+use data::game_action::GameAction;
+use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
+use data::primitives::{Card, PlayerName};
 use ratatui::prelude::*;
 use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
@@ -27,6 +28,19 @@ use crate::rounds::vertical_hand_view::VerticalHandView;
 #[builder(builder_method(name = new))]
 pub struct PlayAreaView<'a> {
     data: &'a PlayPhaseData,
+}
+
+impl<'a> PlayAreaView<'a> {
+    fn card_action(&self) -> impl Fn(Card) -> Option<GameAction> + '_ {
+        |card| {
+            play_phase_queries::can_perform_action(
+                self.data,
+                PlayerName::North,
+                PlayPhaseAction::PlayCard(card),
+            )
+            .then_some(GameAction::PlayPhaseAction(PlayPhaseAction::PlayCard(card)))
+        }
+    }
 }
 
 impl<'a> StatefulWidget for PlayAreaView<'a> {
@@ -70,26 +84,24 @@ impl<'a> StatefulWidget for PlayAreaView<'a> {
             .as_size();
 
         HorizontalHandView::new()
-            .data(self.data)
-            .player_name(PlayerName::North)
+            .hand(self.data.hands.hand(PlayerName::North))
             .card_size(card_size)
+            .card_action(self.card_action())
             .build()
             .render(north, buf, context);
         VerticalHandView::new()
-            .data(self.data)
-            .player_name(PlayerName::East)
+            .hand(self.data.hands.hand(PlayerName::East))
             .card_size(card_size)
             .build()
             .render(east, buf, context);
         HorizontalHandView::new()
-            .data(self.data)
-            .player_name(PlayerName::User)
+            .hand(self.data.hands.hand(PlayerName::User))
             .card_size(card_size)
+            .card_action(self.card_action())
             .build()
-            .render(south, buf, context);
+            .render(north, buf, context);
         VerticalHandView::new()
-            .data(self.data)
-            .player_name(PlayerName::West)
+            .hand(self.data.hands.hand(PlayerName::West))
             .card_size(card_size)
             .build()
             .render(west, buf, context);

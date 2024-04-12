@@ -32,7 +32,8 @@ pub fn legal_actions(
     data: &PlayPhaseData,
     player: PlayerName,
 ) -> impl Iterator<Item = PlayPhaseAction> + '_ {
-    data.hand(player)
+    data.hands
+        .hand(player)
         .iter()
         .map(PlayPhaseAction::PlayCard)
         .filter(move |&action| can_perform_action(data, player, action))
@@ -41,7 +42,7 @@ pub fn legal_actions(
 /// Returns the [PlayerName] whose turn to act it currently is, or None if
 /// the game has ended
 pub fn current_turn(data: &PlayPhaseData) -> Option<PlayerName> {
-    if data.all_hands_empty() {
+    if data.hands.all_empty() {
         None
     } else {
         Some(next_to_play(data))
@@ -72,7 +73,7 @@ pub fn tricks_won(data: &PlayPhaseData, player: PlayerName) -> usize {
 
 /// Returns true if the [PlayerName] player completed their assigned contract
 pub fn met_contract(data: &PlayPhaseData, player: PlayerName) -> bool {
-    data.contract.contract_number(player) == tricks_won(data, player)
+    data.contracts.contract_number(player) == tricks_won(data, player)
 }
 
 /// Returns the [PlayerName] which won a given trick.
@@ -97,7 +98,7 @@ fn trick_suit(trick: &Trick) -> Option<Suit> {
 
 /// Returns the number of cards of the given [Suit] in the indicated hand.
 fn suit_count(data: &PlayPhaseData, hand: PlayerName, suit: Suit) -> usize {
-    data.hand(hand).iter().filter(|card| card.suit() == suit).count()
+    data.hands.hand(hand).iter().filter(|card| card.suit() == suit).count()
 }
 
 fn can_play_card(data: &PlayPhaseData, player: PlayerName, card: Card) -> bool {
@@ -108,6 +109,6 @@ fn can_play_card(data: &PlayPhaseData, player: PlayerName, card: Card) -> bool {
     };
 
     next_to_play(data) == player
-        && data.hand(player).contains(card)
+        && data.hands.hand(player).contains(card)
         && (data.current_trick.cards.len() == 4 || follows_suit)
 }

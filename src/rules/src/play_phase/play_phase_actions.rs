@@ -30,7 +30,7 @@ pub fn handle_action(data: &mut PlayPhaseData, player: PlayerName, action: PlayP
 /// Plays the indicated [Card] from the hand identified by [PlayerName] if
 /// it is currently legal to do so.
 fn play_card(data: &mut PlayPhaseData, hand: PlayerName, card: Card) {
-    data.hand_mut(hand).remove(card);
+    data.hands.hand_mut(hand).remove(card);
     if data.current_trick.cards.len() >= 4 {
         data.current_trick.cards.clear();
     }

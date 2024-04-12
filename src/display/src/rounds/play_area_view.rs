@@ -18,18 +18,18 @@ use ratatui::prelude::*;
 use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
-use crate::play_phase::horizontal_hand_view::HorizontalHandView;
-use crate::play_phase::trick_view::TrickView;
-use crate::play_phase::vertical_hand_view::VerticalHandView;
 use crate::rendering::render_context::RenderContext;
+use crate::rounds::horizontal_hand_view::HorizontalHandView;
+use crate::rounds::trick_view::TrickView;
+use crate::rounds::vertical_hand_view::VerticalHandView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct PlayPhaseView<'a> {
+pub struct PlayAreaView<'a> {
     data: &'a PlayPhaseData,
 }
 
-impl<'a> StatefulWidget for PlayPhaseView<'a> {
+impl<'a> StatefulWidget for PlayAreaView<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -40,7 +40,7 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
         Line::from(format!(
             "User: {}/{} tricks",
             play_phase_queries::tricks_won(self.data, PlayerName::User),
-            self.data.contract.contract_number(PlayerName::User)
+            self.data.contracts.contract_number(PlayerName::User)
         ))
         .alignment(Alignment::Right)
         .render(status_bar, buf);

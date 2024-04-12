@@ -21,9 +21,9 @@ use ratatui::prelude::*;
 use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
-use crate::card::card_view::CardView;
 use crate::rendering::layout;
 use crate::rendering::render_context::RenderContext;
+use crate::rounds::card_view::CardView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
@@ -50,7 +50,7 @@ impl<'a> StatefulWidget for VerticalHandView<'a> {
             height: self.card_size.height,
         };
 
-        for (i, card) in self.data.hand(self.player_name).iter().sorted().enumerate() {
+        for (i, card) in self.data.hands.hand(self.player_name).iter().sorted().enumerate() {
             let action = PlayPhaseAction::PlayCard(card);
             CardView::new()
                 .card(card)

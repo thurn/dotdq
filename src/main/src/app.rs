@@ -19,8 +19,8 @@ use color_eyre::Result;
 use crossterm::event;
 use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseData;
-use display::play_phase::play_phase_view::PlayPhaseView;
 use display::rendering::render_context::RenderContext;
+use display::rounds::play_area_view::PlayAreaView;
 use ratatui::prelude::*;
 use ratatui::widgets::{Paragraph, Wrap};
 use rules::play_phase::{play_phase_actions, play_phase_queries};
@@ -97,7 +97,7 @@ impl<'a> StatefulWidget for App<'a> {
             .alignment(Alignment::Center)
             .render(area, buf);
         } else {
-            PlayPhaseView::new().data(self.data).build().render(area, buf, context);
+            PlayAreaView::new().data(self.data).build().render(area, buf, context);
         }
     }
 }

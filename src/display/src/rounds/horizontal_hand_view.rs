@@ -20,8 +20,8 @@ use ratatui::prelude::*;
 use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
-use crate::card::card_view::CardView;
 use crate::rendering::render_context::RenderContext;
+use crate::rounds::card_view::CardView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
@@ -42,7 +42,8 @@ impl<'a> StatefulWidget for HorizontalHandView<'a> {
             width: self.card_size.width,
             height: self.card_size.height,
         };
-        let suits = self.data.hand(self.player_name).iter().sorted().group_by(|card| card.suit());
+        let suits =
+            self.data.hands.hand(self.player_name).iter().sorted().group_by(|card| card.suit());
 
         let mut offset = 0;
         for (_, group) in &suits {

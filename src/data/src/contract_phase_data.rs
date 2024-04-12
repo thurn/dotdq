@@ -14,6 +14,7 @@
 
 use std::fmt::Debug;
 
+use crate::play_phase_data::Hands;
 use crate::primitives::{PlayerName, Suit};
 
 pub type ContractNumber = usize;
@@ -22,18 +23,22 @@ pub type ContractNumber = usize;
 pub struct ContractPhaseData {
     /// Trump suit to use for this round
     pub trump: Option<Suit>,
+    /// Contract numbers which have currently been set, or 0 if no contract has
+    /// yet been selected for a player.
+    pub contracts: Contracts,
+    /// Player hands
+    pub hands: Hands,
+}
 
+#[derive(Debug, Clone, Default)]
+pub struct Contracts {
     user_contract: ContractNumber,
     west_contract: ContractNumber,
     north_contract: ContractNumber,
     east_contract: ContractNumber,
 }
 
-impl ContractPhaseData {
-    pub fn new(trump: Option<Suit>) -> Self {
-        Self { trump, user_contract: 0, north_contract: 0, east_contract: 0, west_contract: 0 }
-    }
-
+impl Contracts {
     pub fn contract_number(&self, player: PlayerName) -> ContractNumber {
         match player {
             PlayerName::User => self.user_contract,

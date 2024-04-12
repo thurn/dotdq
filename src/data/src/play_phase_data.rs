@@ -16,37 +16,34 @@ use std::fmt::{Debug, Formatter};
 
 use enumset::EnumSet;
 
-use crate::contract_phase_data::ContractPhaseData;
-use crate::primitives::{Card, PlayerName};
+use crate::contract_phase_data::Contracts;
+use crate::primitives::{Card, PlayerName, Suit};
 
 #[derive(Debug, Clone)]
 pub struct PlayPhaseData {
     pub current_trick: Trick,
     pub completed_tricks: Vec<CompletedTrick>,
-    pub contract: ContractPhaseData,
+    pub trump: Option<Suit>,
+    pub contracts: Contracts,
+    pub hands: Hands,
+}
+
+#[derive(Debug, Clone)]
+pub struct Hands {
     north: EnumSet<Card>,
     east: EnumSet<Card>,
     south: EnumSet<Card>,
     west: EnumSet<Card>,
 }
 
-impl PlayPhaseData {
+impl Hands {
     pub fn new(
-        contract: ContractPhaseData,
         north: EnumSet<Card>,
         east: EnumSet<Card>,
         south: EnumSet<Card>,
         west: EnumSet<Card>,
     ) -> Self {
-        Self {
-            current_trick: Trick::default(),
-            completed_tricks: vec![],
-            contract,
-            north,
-            east,
-            south,
-            west,
-        }
+        Self { north, east, south, west }
     }
 
     pub fn hand(&self, identifier: PlayerName) -> &EnumSet<Card> {
@@ -67,7 +64,7 @@ impl PlayPhaseData {
         }
     }
 
-    pub fn all_hands_empty(&self) -> bool {
+    pub fn all_empty(&self) -> bool {
         self.north.is_empty()
             && self.east.is_empty()
             && self.south.is_empty()

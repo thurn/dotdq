@@ -13,16 +13,11 @@
 // limitations under the License.
 
 use data::game_action::GameAction;
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::{Card, PlayerName};
-use ratatui::layout::{Alignment, Size};
-use ratatui::prelude::Line;
+use ratatui::layout::Size;
 use ratatui::widgets::StatefulWidget;
-use rules::play_phase::play_phase_queries;
 
 use crate::rendering::render_context::RenderContext;
-use crate::rendering::widget_adapter::WidgetExt;
-use crate::rounds::trick_view::TrickView;
 
 pub trait PlayAreaDelegate {
     fn card_action(&self, player: PlayerName, card: Card) -> Option<GameAction>;
@@ -32,34 +27,4 @@ pub trait PlayAreaDelegate {
     fn status_bar(&self) -> impl StatefulWidget<State = RenderContext>;
 
     fn center_content(&self, card_size: Size) -> impl StatefulWidget<State = RenderContext>;
-}
-
-impl PlayAreaDelegate for PlayPhaseData {
-    fn card_action(&self, player: PlayerName, card: Card) -> Option<GameAction> {
-        if player == PlayerName::User
-            && play_phase_queries::can_perform_action(self, player, PlayPhaseAction::PlayCard(card))
-        {
-            Some(GameAction::PlayPhaseAction(PlayPhaseAction::PlayCard(card)))
-        } else {
-            None
-        }
-    }
-
-    fn is_card_visible(&self, _player: PlayerName, _card: Card) -> bool {
-        true
-    }
-
-    fn status_bar(&self) -> impl StatefulWidget<State = RenderContext> {
-        Line::from(format!(
-            "User: {}/{} tricks",
-            play_phase_queries::tricks_won(self, PlayerName::User),
-            self.contracts.contract_number(PlayerName::User)
-        ))
-        .alignment(Alignment::Right)
-        .adapt()
-    }
-
-    fn center_content(&self, card_size: Size) -> impl StatefulWidget<State = RenderContext> {
-        TrickView::new().trick(self.current_trick.clone()).card_size(card_size).build()
-    }
 }

@@ -18,8 +18,9 @@ use ai::ai_agent_action;
 use color_eyre::Result;
 use crossterm::event;
 use data::game_action::GameAction;
-use data::play_phase_data::PlayPhaseData;
+use data::round_data::RoundData;
 use display::rendering::render_context::RenderContext;
+use display::rounds::contract_phase_view::ContractPhaseView;
 use display::rounds::play_phase_view::PlayPhaseView;
 use ratatui::prelude::*;
 use ratatui::widgets::{Paragraph, Wrap};
@@ -30,7 +31,7 @@ use tracing::info;
 use crate::tui::Tui;
 
 pub fn run(tui: &mut Tui) -> Result<()> {
-    let mut data = new_round::create_play_phase(&mut rand::thread_rng());
+    let mut data = new_round::create(&mut rand::thread_rng());
     let mut context = RenderContext::default();
     let mut ai_search_running = false;
     while !context.should_exit() {
@@ -49,27 +50,30 @@ pub fn run(tui: &mut Tui) -> Result<()> {
             } else {
                 break;
             };
-            let Some(current_player) = play_phase_queries::current_turn(&data) else {
-                continue;
-            };
-            match action {
-                GameAction::PlayPhaseAction(a) => {
+            match (&mut data, action) {
+                (RoundData::PlayPhase(play_data), GameAction::PlayPhaseAction(a)) => {
                     info!(?a, "Handling PlayPhaseAction");
-                    play_phase_actions::handle_action(&mut data, current_player, a);
-                    let Some(next_player) = play_phase_queries::current_turn(&data) else {
+                    let Some(current_player) = play_phase_queries::current_turn(play_data) else {
+                        break;
+                    };
+                    play_phase_actions::handle_action(play_data, current_player, a);
+                    let Some(next_player) = play_phase_queries::current_turn(play_data) else {
                         continue;
                     };
                     if next_player.is_agent() && !ai_search_running {
                         ai_search_running = true;
-                        ai_agent_action::initiate_selection(data.clone());
+                        ai_agent_action::initiate_selection(play_data.clone());
                     }
                 }
-                GameAction::ContractPhaseAction(_) => {}
-                GameAction::SetHover(id) => {
+                (RoundData::ContractPhase(_contract_data), GameAction::ContractPhaseAction(_)) => {}
+                (_, GameAction::SetHover(id)) => {
                     context.set_current_hover(id);
                 }
-                GameAction::SetMouseDown(id) => {
+                (_, GameAction::SetMouseDown(id)) => {
                     context.set_current_mouse_down(id);
+                }
+                _ => {
+                    panic!("Action {:?} not valid for current phase", action);
                 }
             };
         })?;
@@ -78,7 +82,7 @@ pub fn run(tui: &mut Tui) -> Result<()> {
 }
 
 pub struct App<'a> {
-    pub data: &'a PlayPhaseData,
+    pub data: &'a RoundData,
 }
 
 impl<'a> StatefulWidget for App<'a> {
@@ -97,7 +101,14 @@ impl<'a> StatefulWidget for App<'a> {
             .alignment(Alignment::Center)
             .render(area, buf);
         } else {
-            PlayPhaseView::new().data(self.data).build().render(area, buf, context);
+            match self.data {
+                RoundData::ContractPhase(c) => {
+                    ContractPhaseView::new().data(c).build().render(area, buf, context);
+                }
+                RoundData::PlayPhase(p) => {
+                    PlayPhaseView::new().data(p).build().render(area, buf, context);
+                }
+            }
         }
     }
 }

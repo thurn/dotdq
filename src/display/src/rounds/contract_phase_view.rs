@@ -12,28 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::contract_phase_data::ContractPhaseData;
 use data::game_action::GameAction;
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::{Card, PlayerName};
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Rect, Size};
 use ratatui::prelude::*;
-use rules::play_phase::play_phase_queries;
+use ratatui::widgets::Clear;
 use typed_builder::TypedBuilder;
 
 use crate::rendering::render_context::RenderContext;
 use crate::rendering::widget_adapter::WidgetExt;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;
-use crate::rounds::trick_view::TrickView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct PlayPhaseView<'a> {
-    data: &'a PlayPhaseData,
+pub struct ContractPhaseView<'a> {
+    data: &'a ContractPhaseData,
 }
 
-impl<'a> StatefulWidget for PlayPhaseView<'a> {
+impl<'a> StatefulWidget for ContractPhaseView<'a> {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -45,15 +44,9 @@ impl<'a> StatefulWidget for PlayPhaseView<'a> {
     }
 }
 
-impl PlayAreaDelegate for PlayPhaseData {
-    fn card_action(&self, player: PlayerName, card: Card) -> Option<GameAction> {
-        if player == PlayerName::User
-            && play_phase_queries::can_perform_action(self, player, PlayPhaseAction::PlayCard(card))
-        {
-            Some(GameAction::PlayPhaseAction(PlayPhaseAction::PlayCard(card)))
-        } else {
-            None
-        }
+impl PlayAreaDelegate for ContractPhaseData {
+    fn card_action(&self, _player: PlayerName, _card: Card) -> Option<GameAction> {
+        None
     }
 
     fn is_card_visible(&self, _player: PlayerName, _card: Card) -> bool {
@@ -61,16 +54,12 @@ impl PlayAreaDelegate for PlayPhaseData {
     }
 
     fn status_bar(&self) -> impl StatefulWidget<State = RenderContext> {
-        Line::from(format!(
-            "User: {}/{} tricks",
-            play_phase_queries::tricks_won(self, PlayerName::User),
-            self.contracts.contract_number(PlayerName::User)
-        ))
-        .alignment(Alignment::Right)
-        .adapt()
+        Line::from(format!("Trump: {}", self.trump.map_or("NT".to_string(), |t| t.to_string())))
+            .alignment(Alignment::Right)
+            .adapt()
     }
 
-    fn center_content(&self, card_size: Size) -> impl StatefulWidget<State = RenderContext> {
-        TrickView::new().trick(self.current_trick.clone()).card_size(card_size).build()
+    fn center_content(&self, _card_size: Size) -> impl StatefulWidget<State = RenderContext> {
+        Clear.adapt()
     }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::{PlayPhaseData, PlayedCard};
+use data::play_phase_data::{PlayedCard, Trick};
 use data::primitives::PlayerName;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
@@ -24,12 +24,12 @@ use crate::rounds::card_view::CardView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct TrickView<'a> {
-    data: &'a PlayPhaseData,
+pub struct TrickView {
+    trick: Trick,
     card_size: Size,
 }
 
-impl<'a> TrickView<'a> {
+impl TrickView {
     fn render_trick_card(
         &self,
         card: PlayedCard,
@@ -55,11 +55,11 @@ impl<'a> TrickView<'a> {
     }
 }
 
-impl<'a> StatefulWidget for TrickView<'a> {
+impl StatefulWidget for TrickView {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        for played in &self.data.current_trick.cards {
+        for played in &self.trick.cards {
             self.render_trick_card(*played, area, buf, context);
         }
     }

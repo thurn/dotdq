@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::game_action::GameAction;
-use data::primitives::Card;
+use data::primitives::{Card, PlayerName};
 use enumset::EnumSet;
 use itertools::Itertools;
 use ratatui::layout::{Offset, Size};
@@ -22,21 +21,23 @@ use typed_builder::TypedBuilder;
 
 use crate::rendering::render_context::RenderContext;
 use crate::rounds::card_view::CardView;
+use crate::rounds::play_area_delegate::PlayAreaDelegate;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct HorizontalHandView<TFn>
+pub struct HorizontalHandView<'a, TDelegate>
 where
-    TFn: Fn(Card) -> Option<GameAction>,
+    TDelegate: PlayAreaDelegate,
 {
     card_size: Size,
+    player_name: PlayerName,
     hand: EnumSet<Card>,
-    card_action: TFn,
+    delegate: &'a TDelegate,
 }
 
-impl<TFn> StatefulWidget for HorizontalHandView<TFn>
+impl<'a, TDelegate> StatefulWidget for HorizontalHandView<'a, TDelegate>
 where
-    TFn: Fn(Card) -> Option<GameAction>,
+    TDelegate: PlayAreaDelegate,
 {
     type State = RenderContext;
 
@@ -56,7 +57,7 @@ where
                 CardView::new()
                     .card(card)
                     .visible(true)
-                    .on_click((self.card_action)(card))
+                    .on_click(self.delegate.card_action(self.player_name, card))
                     .build()
                     .render(card_rect.offset(Offset { x: offset, y: 0 }), buf, context);
                 offset += card_offset as i32;

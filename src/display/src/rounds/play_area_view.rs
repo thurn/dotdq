@@ -12,38 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::game_action::GameAction;
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::{Card, PlayerName};
+use data::play_phase_data::Hands;
+use data::primitives::PlayerName;
 use ratatui::prelude::*;
-use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
 use crate::rendering::render_context::RenderContext;
 use crate::rounds::horizontal_hand_view::HorizontalHandView;
-use crate::rounds::trick_view::TrickView;
+use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::vertical_hand_view::VerticalHandView;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
-pub struct PlayAreaView<'a> {
-    data: &'a PlayPhaseData,
+pub struct PlayAreaView<'a, TDelegate>
+where
+    TDelegate: PlayAreaDelegate,
+{
+    delegate: &'a TDelegate,
+    hands: &'a Hands,
 }
 
-impl<'a> PlayAreaView<'a> {
-    fn card_action(&self) -> impl Fn(Card) -> Option<GameAction> + '_ {
-        |card| {
-            play_phase_queries::can_perform_action(
-                self.data,
-                PlayerName::North,
-                PlayPhaseAction::PlayCard(card),
-            )
-            .then_some(GameAction::PlayPhaseAction(PlayPhaseAction::PlayCard(card)))
-        }
-    }
-}
-
-impl<'a> StatefulWidget for PlayAreaView<'a> {
+impl<'a, TDelegate> StatefulWidget for PlayAreaView<'a, TDelegate>
+where
+    TDelegate: PlayAreaDelegate,
+{
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
@@ -51,13 +43,7 @@ impl<'a> StatefulWidget for PlayAreaView<'a> {
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(1), Constraint::Fill(1)])
             .areas(area);
-        Line::from(format!(
-            "User: {}/{} tricks",
-            play_phase_queries::tricks_won(self.data, PlayerName::User),
-            self.data.contracts.contract_number(PlayerName::User)
-        ))
-        .alignment(Alignment::Right)
-        .render(status_bar, buf);
+        self.delegate.status_bar().render(status_bar, buf, context);
 
         let [west, center, east] = Layout::default()
             .direction(Direction::Horizontal)
@@ -84,28 +70,30 @@ impl<'a> StatefulWidget for PlayAreaView<'a> {
             .as_size();
 
         HorizontalHandView::new()
-            .hand(self.data.hands.hand(PlayerName::North))
+            .hand(self.hands.hand(PlayerName::North))
             .card_size(card_size)
-            .card_action(self.card_action())
+            .player_name(PlayerName::North)
+            .delegate(self.delegate)
             .build()
             .render(north, buf, context);
         VerticalHandView::new()
-            .hand(self.data.hands.hand(PlayerName::East))
+            .hand(self.hands.hand(PlayerName::East))
             .card_size(card_size)
             .build()
             .render(east, buf, context);
         HorizontalHandView::new()
-            .hand(self.data.hands.hand(PlayerName::User))
+            .hand(self.hands.hand(PlayerName::User))
             .card_size(card_size)
-            .card_action(self.card_action())
+            .player_name(PlayerName::User)
+            .delegate(self.delegate)
             .build()
-            .render(north, buf, context);
+            .render(south, buf, context);
         VerticalHandView::new()
-            .hand(self.data.hands.hand(PlayerName::West))
+            .hand(self.hands.hand(PlayerName::West))
             .card_size(card_size)
             .build()
             .render(west, buf, context);
 
-        TrickView::new().data(self.data).card_size(card_size).build().render(tricks, buf, context);
+        self.delegate.center_content(card_size).render(tricks, buf, context);
     }
 }

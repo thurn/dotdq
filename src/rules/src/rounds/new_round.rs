@@ -15,7 +15,7 @@
 use std::slice::ChunksExact;
 
 use data::contract_phase_data::{ContractPhaseData, Contracts};
-use data::play_phase_data::{Hands, PlayPhaseData};
+use data::play_phase_data::{Hands, PlayPhaseData, Trick};
 use data::primitives::{Card, Rank, Suit};
 use data::round_data::RoundData;
 use enumset::EnumSet;
@@ -48,8 +48,32 @@ pub fn create(rng: &mut impl Rng) -> RoundData {
     })
 }
 
-pub fn create_play_phase(_rng: &mut impl Rng) -> PlayPhaseData {
-    todo!("")
+pub fn create_play_phase(rng: &mut impl Rng) -> PlayPhaseData {
+    let mut cards = Vec::new();
+    for suit in enum_iterator::all::<Suit>() {
+        for rank in enum_iterator::all::<Rank>() {
+            cards.push(Card::new(suit, rank))
+        }
+    }
+    cards.shuffle(rng);
+
+    let mut chunks = cards.chunks_exact(13);
+    let north = build_hand(&mut chunks);
+    let east = build_hand(&mut chunks);
+    let south = build_hand(&mut chunks);
+    let west = build_hand(&mut chunks);
+
+    let trump =
+        *[None, Some(Suit::Clubs), Some(Suit::Diamonds), Some(Suit::Hearts), Some(Suit::Spades)]
+            .choose(rng)
+            .expect("Empty slice");
+    PlayPhaseData {
+        current_trick: Trick::default(),
+        completed_tricks: vec![],
+        trump,
+        contracts: Contracts::default(),
+        hands: Hands::new(north, east, south, west),
+    }
 }
 
 fn build_hand(chunks: &mut ChunksExact<Card>) -> EnumSet<Card> {

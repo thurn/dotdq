@@ -23,6 +23,7 @@ use typed_builder::TypedBuilder;
 
 use crate::rendering::render_context::RenderContext;
 use crate::rendering::widget_adapter::WidgetExt;
+use crate::rounds::contract_bid_view::ContractBidView;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;
 
@@ -54,12 +55,10 @@ impl PlayAreaDelegate for ContractPhaseData {
     }
 
     fn status_bar(&self) -> impl StatefulWidget<State = RenderContext> {
-        Line::from(format!("Trump: {}", self.trump.map_or("NT".to_string(), |t| t.to_string())))
-            .alignment(Alignment::Right)
-            .adapt()
+        Clear.adapt()
     }
 
     fn center_content(&self, _card_size: Size) -> impl StatefulWidget<State = RenderContext> {
-        Clear.adapt()
+        ContractBidView::new().data(self).build()
     }
 }

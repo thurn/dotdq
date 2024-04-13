@@ -13,6 +13,7 @@
 // limitations under the License.
 
 pub mod card_view;
+pub mod contract_bid_view;
 pub mod contract_phase_view;
 pub mod horizontal_hand_view;
 pub mod play_area_delegate;

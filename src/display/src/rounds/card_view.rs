@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::game_action::GameAction;
-use data::primitives::{Card, Suit};
+use data::primitives::Card;
 use data::widget_id::WidgetId;
 use ratatui::layout::Offset;
 use ratatui::prelude::*;
@@ -21,6 +21,7 @@ use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use typed_builder::TypedBuilder;
 
+use crate::rendering::colors;
 use crate::rendering::render_context::RenderContext;
 
 #[derive(TypedBuilder)]
@@ -43,9 +44,9 @@ impl StatefulWidget for CardView {
             .borders(Borders::ALL)
             .border_set(border::ROUNDED)
             .border_style(Style::new().fg(if self.on_click.is_some() {
-                "#dad45e".parse().unwrap()
+                colors::yellow()
             } else {
-                Color::White
+                colors::white()
             }));
         let hovered =
             self.on_click.is_some() && context.hovered(WidgetId::CardView(self.card), area);
@@ -91,18 +92,11 @@ impl StatefulWidget for CardView {
 }
 
 fn text_style<'a>(text: String, card: Card, hovered: bool, pressed: bool) -> Span<'a> {
-    let color = match card.suit() {
-        Suit::Clubs => "#597dce".parse::<Color>().unwrap(),
-        Suit::Diamonds => "#d2aa99".parse::<Color>().unwrap(),
-        Suit::Hearts => "#d04648".parse::<Color>().unwrap(),
-        Suit::Spades => "#6dc2ca".parse::<Color>().unwrap(),
-    };
-
-    let mut result = text.fg(color);
+    let mut result = text.fg(colors::suit(card.suit()));
     result = if pressed { result.underlined() } else { result };
 
     if hovered {
-        result.bg("#4e4a4e".parse().unwrap())
+        result.bg(colors::dark_gray())
     } else {
         result
     }

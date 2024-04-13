@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod colors;
 pub mod layout;
 pub mod render_context;
 pub mod widget_adapter;

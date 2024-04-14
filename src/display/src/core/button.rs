@@ -14,17 +14,13 @@
 
 use data::game_action::GameAction;
 use data::widget_id::WidgetId;
-use ratatui::layout::Size;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 use typed_builder::TypedBuilder;
 
+use crate::core::colors;
 use crate::core::render_context::RenderContext;
-use crate::core::{colors, layout};
-
-pub const BUTTON_HEIGHT: u16 = 4;
-pub const BUTTON_WIDTH: u16 = 20;
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
@@ -40,10 +36,9 @@ impl StatefulWidget for Button {
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        let draw = layout::centered_rect(Size { width: BUTTON_WIDTH, height: BUTTON_HEIGHT }, area);
-        let hovered = context.hovered(self.id, draw);
-        let pressed = context.mouse_down(self.id, draw);
-        context.clicked(self.id, draw, self.action);
+        let hovered = context.hovered(self.id, area);
+        let pressed = context.mouse_down(self.id, area);
+        context.clicked(self.id, area, self.action);
 
         Paragraph::new(
             self.label
@@ -59,7 +54,7 @@ impl StatefulWidget for Button {
                 .border_set(border::DOUBLE)
                 .border_style(colors::white()),
         )
-        .render(draw, buf)
+        .render(area, buf)
     }
 }
 

@@ -30,7 +30,7 @@ pub fn alpha_beta(c: &mut Criterion) {
             run_matchup::run_with_args(&MatchupArgs {
                 user: AgentName::AlphaBetaDepth10,
                 opponent: AgentName::AlphaBetaDepth10,
-                move_time: 1,
+                move_time_ms: 1000,
                 matches: 1,
                 verbosity: Verbosity::None,
                 panic_on_search_timeout: false,
@@ -47,7 +47,7 @@ pub fn uct1(c: &mut Criterion) {
             run_matchup::run_with_args(&MatchupArgs {
                 user: AgentName::Uct1Iterations250,
                 opponent: AgentName::Uct1Iterations250,
-                move_time: 1,
+                move_time_ms: 1000,
                 matches: 1,
                 verbosity: Verbosity::None,
                 panic_on_search_timeout: false,

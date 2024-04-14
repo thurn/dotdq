@@ -12,5 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod contract_phase;
 pub mod play_phase;
 pub mod rounds;

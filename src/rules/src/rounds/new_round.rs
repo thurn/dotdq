@@ -14,7 +14,7 @@
 
 use std::slice::ChunksExact;
 
-use data::contract_phase_data::{ContractPhaseData, Contracts};
+use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep, Contracts};
 use data::play_phase_data::{Hands, PlayPhaseData, Trick};
 use data::primitives::{Card, Rank, Suit};
 use data::round_data::RoundData;
@@ -45,6 +45,7 @@ pub fn create(rng: &mut impl Rng) -> RoundData {
         trump,
         contracts: Contracts::default(),
         hands: Hands::new(north, east, south, west),
+        step: ContractPhaseStep::AwaitingUserContact,
     })
 }
 

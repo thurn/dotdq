@@ -15,10 +15,17 @@
 use std::fmt::Debug;
 
 use crate::game_action::GameAction;
-use crate::play_phase_data::Hands;
+use crate::play_phase_data::{Hands, PlayPhaseData, Trick};
 use crate::primitives::{PlayerName, Suit};
 
 pub type ContractNumber = usize;
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum ContractPhaseStep {
+    AwaitingUserContact,
+    AwaitingAgentContracts,
+    ReadyToStart,
+}
 
 #[derive(Debug, Clone)]
 pub struct ContractPhaseData {
@@ -29,9 +36,23 @@ pub struct ContractPhaseData {
     pub contracts: Contracts,
     /// Player hands
     pub hands: Hands,
+    /// Current step within the contract phase
+    pub step: ContractPhaseStep,
 }
 
-#[derive(Debug, Clone, Default)]
+impl ContractPhaseData {
+    pub fn to_play_phase(self) -> PlayPhaseData {
+        PlayPhaseData {
+            current_trick: Trick::default(),
+            completed_tricks: vec![],
+            trump: self.trump,
+            contracts: self.contracts,
+            hands: self.hands,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, Default)]
 pub struct Contracts {
     user_contract: ContractNumber,
     west_contract: ContractNumber,
@@ -61,9 +82,10 @@ impl Contracts {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum ContractPhaseAction {
-    IncreaseContract,
-    AcceptContract,
-    SetContractNumber(ContractNumber),
+    SetUserContract(ContractNumber),
+    AcceptUserContract,
+    SetAgentContracts { west: ContractNumber, north: ContractNumber, east: ContractNumber },
+    StartPlayPhase,
 }
 
 impl From<ContractPhaseAction> for GameAction {

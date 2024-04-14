@@ -38,9 +38,9 @@ pub struct MatchupArgs {
     pub user: AgentName,
     #[arg(value_enum)]
     pub opponent: AgentName,
-    /// Maximum time in seconds for each agent to use for moves.
+    /// Maximum time in milliseconds for each agent to use for moves.
     #[arg(long, default_value_t = 1)]
-    pub move_time: u64,
+    pub move_time_ms: u64,
     /// Number of matches to run between these two named players
     #[arg(long, default_value_t = 1)]
     pub matches: u64,
@@ -65,7 +65,7 @@ pub fn run_with_args(args: &MatchupArgs) {
             args.user,
             args.opponent,
             &mut game,
-            args.move_time,
+            args.move_time_ms,
             args.verbosity,
             args.panic_on_search_timeout,
         );
@@ -76,7 +76,7 @@ pub fn run_match(
     user_agent: AgentName,
     opponent_agent: AgentName,
     game: &mut PlayPhaseData,
-    move_time: u64,
+    move_time_ms: u64,
     verbosity: Verbosity,
     panic_on_search_timeout: bool,
 ) -> AgentName {
@@ -92,7 +92,7 @@ pub fn run_match(
                 let agent = if current_turn == PlayerName::User { &user } else { &opponent };
                 let config = AgentConfig {
                     panic_on_search_timeout,
-                    deadline: Instant::now() + Duration::from_secs(move_time),
+                    deadline: Instant::now() + Duration::from_millis(move_time_ms),
                 };
                 let action = agent.pick_action(config, game);
                 game.execute_action(current_turn, action);

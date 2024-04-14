@@ -12,12 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod card_view;
-pub mod contract_phase_view;
-pub mod contract_view;
-pub mod horizontal_hand_view;
-pub mod play_area_delegate;
-pub mod play_area_view;
-pub mod play_phase_view;
-pub mod trick_view;
-pub mod vertical_hand_view;
+pub mod contract_phase_actions;
+pub mod contract_phase_queries;

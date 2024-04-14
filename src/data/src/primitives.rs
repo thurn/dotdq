@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use std::fmt;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 use enum_iterator::Sequence;
 use enumset::EnumSetType;
@@ -34,7 +34,7 @@ impl fmt::Display for Suit {
         write!(f, "{}", match self {
             Suit::Clubs => "♣",
             Suit::Diamonds => "♦",
-            Suit::Hearts => "♥",
+            Suit::Hearts => "♥︎",
             Suit::Spades => "♠",
         })
     }
@@ -350,6 +350,17 @@ impl Debug for PlayerName {
             PlayerName::West => "W",
             PlayerName::North => "N",
             PlayerName::East => "E",
+        })
+    }
+}
+
+impl Display for PlayerName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            PlayerName::User => "USER",
+            PlayerName::West => "WEST",
+            PlayerName::North => "NORTH",
+            PlayerName::East => "EAST",
         })
     }
 }

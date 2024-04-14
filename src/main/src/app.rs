@@ -17,13 +17,16 @@ use std::time::Duration;
 use ai::ai_agent_action;
 use color_eyre::Result;
 use crossterm::event;
+use data::contract_phase_data::ContractPhaseStep;
 use data::game_action::GameAction;
+use data::primitives::PlayerName;
 use data::round_data::RoundData;
 use display::core::render_context::RenderContext;
 use display::rounds::contract_phase_view::ContractPhaseView;
 use display::rounds::play_phase_view::PlayPhaseView;
 use ratatui::prelude::*;
 use ratatui::widgets::{Paragraph, Wrap};
+use rules::contract_phase::contract_phase_actions;
 use rules::play_phase::{play_phase_actions, play_phase_queries};
 use rules::rounds::new_round;
 use tracing::info;
@@ -42,11 +45,12 @@ pub fn run(tui: &mut Tui) -> Result<()> {
         });
         tui.draw(|frame| loop {
             frame.render_stateful_widget(App { data: &data }, frame.size(), &mut context);
+
             let action = if let Some(action) = context.finish_render() {
                 action
             } else if let Some(action) = ai_agent_action::poll_action() {
                 ai_search_running = false;
-                GameAction::PlayAction(action)
+                action
             } else {
                 break;
             };
@@ -65,7 +69,16 @@ pub fn run(tui: &mut Tui) -> Result<()> {
                         ai_agent_action::initiate_selection(play_data.clone());
                     }
                 }
-                (RoundData::ContractPhase(_contract_data), GameAction::ContractAction(_)) => {}
+                (RoundData::ContractPhase(contract_data), GameAction::ContractAction(a)) => {
+                    info!(?a, "Handling ContractPhaseAction");
+                    contract_phase_actions::handle_action(contract_data, PlayerName::User, a);
+                    if contract_data.step == ContractPhaseStep::AwaitingAgentContracts
+                        && !ai_search_running
+                    {
+                        ai_search_running = true;
+                        ai_agent_action::populate_agent_contracts(contract_data.clone());
+                    }
+                }
                 (_, GameAction::SetHover(id)) => {
                     context.set_current_hover(id);
                 }

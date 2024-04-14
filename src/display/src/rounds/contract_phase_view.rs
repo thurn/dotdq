@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::contract_phase_data::ContractPhaseData;
+use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep};
 use data::game_action::GameAction;
 use data::primitives::{Card, PlayerName};
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Rect, Size};
 use ratatui::prelude::*;
-use ratatui::widgets::Clear;
 use typed_builder::TypedBuilder;
 
+use crate::core::colors;
 use crate::core::render_context::RenderContext;
-use crate::core::widget_adapter::WidgetExt;
-use crate::rounds::contract_bid_view::ContractBidView;
+use crate::rounds::contract_view::ContractView;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;
 
@@ -54,11 +53,27 @@ impl PlayAreaDelegate for ContractPhaseData {
         true
     }
 
-    fn status_bar(&self) -> impl StatefulWidget<State = RenderContext> {
-        Clear.adapt()
+    fn render_top_status_bar(&self, area: Rect, buf: &mut Buffer, _: &mut RenderContext) {
+        if self.step == ContractPhaseStep::ReadyToStart {
+            contract_string(self, PlayerName::West).alignment(Alignment::Left).render(area, buf);
+            contract_string(self, PlayerName::North).alignment(Alignment::Center).render(area, buf);
+            contract_string(self, PlayerName::East).alignment(Alignment::Right).render(area, buf);
+        }
+    }
+
+    fn render_bottom_status_bar(&self, area: Rect, buf: &mut Buffer, _: &mut RenderContext) {
+        if self.step == ContractPhaseStep::ReadyToStart {
+            contract_string(self, PlayerName::User).alignment(Alignment::Center).render(area, buf);
+        }
     }
 
     fn center_content(&self, _card_size: Size) -> impl StatefulWidget<State = RenderContext> {
-        ContractBidView::new().data(self).build()
+        ContractView::new().data(self).build()
     }
+}
+
+pub fn contract_string(data: &ContractPhaseData, name: PlayerName) -> Line {
+    Line::from(
+        format!("{name}: {} Tricks", data.contracts.contract_number(name)).fg(colors::white()),
+    )
 }

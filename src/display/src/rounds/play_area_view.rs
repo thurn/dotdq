@@ -39,11 +39,12 @@ where
     type State = RenderContext;
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
-        let [status_bar, card_area] = Layout::default()
+        let [top_status, card_area, bottom_status] = Layout::default()
             .direction(Direction::Vertical)
-            .constraints([Constraint::Length(1), Constraint::Fill(1)])
+            .constraints([Constraint::Length(1), Constraint::Fill(1), Constraint::Length(1)])
             .areas(area);
-        self.delegate.status_bar().render(status_bar, buf, context);
+        self.delegate.render_top_status_bar(top_status, buf, context);
+        self.delegate.render_bottom_status_bar(bottom_status, buf, context);
 
         let [west, center, east] = Layout::default()
             .direction(Direction::Horizontal)
@@ -57,9 +58,9 @@ where
         let [north, tricks, south] = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Percentage(20),
-                Constraint::Percentage(80),
-                Constraint::Percentage(20),
+                Constraint::Percentage(21),
+                Constraint::Percentage(78),
+                Constraint::Percentage(21),
             ])
             .areas(center);
 

@@ -63,6 +63,7 @@ where
                 offset += card_offset as i32;
             }
 
+            // Separate suits into distinct piles
             offset += i32::from(card_rect.width);
         }
     }

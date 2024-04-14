@@ -20,7 +20,7 @@ use crossterm::cursor;
 use crossterm::event::{
     DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture,
 };
-use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen, SetTitle};
 use ratatui::prelude::CrosstermBackend;
 use ratatui::Terminal;
 
@@ -31,6 +31,7 @@ pub fn enter() -> Result<Tui> {
     crossterm::execute!(io::stdout(), EnterAlternateScreen, cursor::Hide)?;
     crossterm::execute!(io::stdout(), EnableMouseCapture)?;
     crossterm::execute!(io::stdout(), EnableBracketedPaste)?;
+    crossterm::execute!(io::stdout(), SetTitle("Labyrinth of the Diamond Queen"))?;
     Ok(Terminal::new(CrosstermBackend::new(io::stdout()))?)
 }
 

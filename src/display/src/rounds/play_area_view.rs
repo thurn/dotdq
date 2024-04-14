@@ -17,7 +17,7 @@ use data::primitives::PlayerName;
 use ratatui::prelude::*;
 use typed_builder::TypedBuilder;
 
-use crate::rendering::render_context::RenderContext;
+use crate::core::render_context::RenderContext;
 use crate::rounds::horizontal_hand_view::HorizontalHandView;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::vertical_hand_view::VerticalHandView;

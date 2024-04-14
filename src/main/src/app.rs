@@ -19,7 +19,7 @@ use color_eyre::Result;
 use crossterm::event;
 use data::game_action::GameAction;
 use data::round_data::RoundData;
-use display::rendering::render_context::RenderContext;
+use display::core::render_context::RenderContext;
 use display::rounds::contract_phase_view::ContractPhaseView;
 use display::rounds::play_phase_view::PlayPhaseView;
 use ratatui::prelude::*;
@@ -46,12 +46,12 @@ pub fn run(tui: &mut Tui) -> Result<()> {
                 action
             } else if let Some(action) = ai_agent_action::poll_action() {
                 ai_search_running = false;
-                GameAction::PlayPhaseAction(action)
+                GameAction::PlayAction(action)
             } else {
                 break;
             };
             match (&mut data, action) {
-                (RoundData::PlayPhase(play_data), GameAction::PlayPhaseAction(a)) => {
+                (RoundData::PlayPhase(play_data), GameAction::PlayAction(a)) => {
                     info!(?a, "Handling PlayPhaseAction");
                     let Some(current_player) = play_phase_queries::current_turn(play_data) else {
                         break;
@@ -65,7 +65,7 @@ pub fn run(tui: &mut Tui) -> Result<()> {
                         ai_agent_action::initiate_selection(play_data.clone());
                     }
                 }
-                (RoundData::ContractPhase(_contract_data), GameAction::ContractPhaseAction(_)) => {}
+                (RoundData::ContractPhase(_contract_data), GameAction::ContractAction(_)) => {}
                 (_, GameAction::SetHover(id)) => {
                     context.set_current_hover(id);
                 }

@@ -17,4 +17,6 @@ use crate::primitives::Card;
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum WidgetId {
     CardView(Card),
+    IncreaseContractButton,
+    AcceptContractButton,
 }

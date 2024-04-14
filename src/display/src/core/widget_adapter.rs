@@ -14,7 +14,7 @@
 
 use ratatui::prelude::*;
 
-use crate::rendering::render_context::RenderContext;
+use crate::core::render_context::RenderContext;
 
 pub trait WidgetExt<T: Widget> {
     fn adapt(self) -> WidgetAdapter<T>;

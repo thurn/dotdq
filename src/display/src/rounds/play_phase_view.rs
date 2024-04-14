@@ -21,8 +21,8 @@ use ratatui::prelude::*;
 use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
-use crate::rendering::render_context::RenderContext;
-use crate::rendering::widget_adapter::WidgetExt;
+use crate::core::render_context::RenderContext;
+use crate::core::widget_adapter::WidgetExt;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;
 use crate::rounds::trick_view::TrickView;
@@ -50,7 +50,7 @@ impl PlayAreaDelegate for PlayPhaseData {
         if player == PlayerName::User
             && play_phase_queries::can_perform_action(self, player, PlayPhaseAction::PlayCard(card))
         {
-            Some(GameAction::PlayPhaseAction(PlayPhaseAction::PlayCard(card)))
+            Some(GameAction::PlayAction(PlayPhaseAction::PlayCard(card)))
         } else {
             None
         }

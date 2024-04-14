@@ -21,8 +21,8 @@ use ratatui::prelude::*;
 use ratatui::widgets::Clear;
 use typed_builder::TypedBuilder;
 
-use crate::rendering::render_context::RenderContext;
-use crate::rendering::widget_adapter::WidgetExt;
+use crate::core::render_context::RenderContext;
+use crate::core::widget_adapter::WidgetExt;
 use crate::rounds::contract_bid_view::ContractBidView;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;

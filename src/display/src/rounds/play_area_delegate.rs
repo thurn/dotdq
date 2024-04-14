@@ -17,7 +17,7 @@ use data::primitives::{Card, PlayerName};
 use ratatui::layout::Size;
 use ratatui::widgets::StatefulWidget;
 
-use crate::rendering::render_context::RenderContext;
+use crate::core::render_context::RenderContext;
 
 pub trait PlayAreaDelegate {
     fn card_action(&self, player: PlayerName, card: Card) -> Option<GameAction>;

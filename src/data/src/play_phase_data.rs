@@ -17,6 +17,7 @@ use std::fmt::{Debug, Formatter};
 use enumset::EnumSet;
 
 use crate::contract_phase_data::Contracts;
+use crate::game_action::GameAction;
 use crate::primitives::{Card, PlayerName, Suit};
 
 #[derive(Debug, Clone)]
@@ -98,6 +99,12 @@ pub struct PlayedCard {
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 pub enum PlayPhaseAction {
     PlayCard(Card),
+}
+
+impl From<PlayPhaseAction> for GameAction {
+    fn from(value: PlayPhaseAction) -> Self {
+        GameAction::PlayAction(value)
+    }
 }
 
 impl Debug for PlayPhaseAction {

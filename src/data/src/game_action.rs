@@ -20,6 +20,6 @@ use crate::widget_id::WidgetId;
 pub enum GameAction {
     SetHover(Option<WidgetId>),
     SetMouseDown(Option<WidgetId>),
-    PlayPhaseAction(PlayPhaseAction),
-    ContractPhaseAction(ContractPhaseAction),
+    PlayAction(PlayPhaseAction),
+    ContractAction(ContractPhaseAction),
 }

@@ -14,6 +14,7 @@
 
 use std::fmt::Debug;
 
+use crate::game_action::GameAction;
 use crate::play_phase_data::Hands;
 use crate::primitives::{PlayerName, Suit};
 
@@ -60,7 +61,13 @@ impl Contracts {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum ContractPhaseAction {
-    IncreaseBid,
-    Pass,
+    IncreaseContract,
+    AcceptContract,
     SetContractNumber(ContractNumber),
+}
+
+impl From<ContractPhaseAction> for GameAction {
+    fn from(value: ContractPhaseAction) -> Self {
+        GameAction::ContractAction(value)
+    }
 }

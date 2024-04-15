@@ -72,7 +72,7 @@ impl PlayAreaDelegate for ContractPhaseData {
     }
 }
 
-pub fn contract_string(data: &ContractPhaseData, name: PlayerName) -> Line {
+fn contract_string(data: &ContractPhaseData, name: PlayerName) -> Line {
     Line::from(
         format!("{name}: {} Tricks", data.contracts.contract_number(name)).fg(colors::white()),
     )

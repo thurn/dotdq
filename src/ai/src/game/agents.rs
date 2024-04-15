@@ -20,7 +20,7 @@ use data::play_phase_data::PlayPhaseData;
 use crate::core::agent::{Agent, AgentData};
 use crate::core::first_available_action::FirstAvailableActionAlgorithm;
 use crate::core::win_loss_evaluator::WinLossEvaluator;
-use crate::game::evaluators::TrickEvaluator;
+use crate::game::evaluators::{MaxTricksEvaluator, TrickEvaluator};
 use crate::monte_carlo::monte_carlo_search::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use crate::monte_carlo::uct1::Uct1;
 use crate::tree_search::alpha_beta::AlphaBetaAlgorithm;
@@ -30,6 +30,7 @@ pub enum AgentName {
     AlphaBetaDepth10,
     AlphaBetaDepth13,
     Uct1,
+    Uct1MaxTricks,
     Uct1Iterations250,
     FirstAvailableAction,
 }
@@ -50,6 +51,11 @@ pub fn get_agent(name: AgentName) -> Box<dyn Agent<PlayPhaseData>> {
             "UCT1",
             MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: None },
             RandomPlayoutEvaluator { evaluator: TrickEvaluator, phantom_data: PhantomData },
+        )),
+        AgentName::Uct1MaxTricks => Box::new(AgentData::omniscient(
+            "UCT1_MAX_TRICKS",
+            MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: None },
+            RandomPlayoutEvaluator { evaluator: MaxTricksEvaluator, phantom_data: PhantomData },
         )),
         AgentName::Uct1Iterations250 => Box::new(AgentData::omniscient(
             "UCT1_250",

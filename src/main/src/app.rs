@@ -71,12 +71,16 @@ pub fn run(tui: &mut Tui) -> Result<()> {
                 }
                 (RoundData::ContractPhase(contract_data), GameAction::ContractAction(a)) => {
                     info!(?a, "Handling ContractPhaseAction");
-                    contract_phase_actions::handle_action(contract_data, PlayerName::User, a);
+                    let result =
+                        contract_phase_actions::handle_action(contract_data, PlayerName::User, a);
                     if contract_data.step == ContractPhaseStep::AwaitingAgentContracts
                         && !ai_search_running
                     {
                         ai_search_running = true;
                         ai_agent_action::populate_agent_contracts(contract_data.clone());
+                    }
+                    if let Some(r) = result {
+                        data = r;
                     }
                 }
                 (_, GameAction::SetHover(id)) => {

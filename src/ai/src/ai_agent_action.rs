@@ -56,8 +56,8 @@ pub fn populate_agent_contracts(data: ContractPhaseData) {
     rayon::spawn(move || {
         let mut play_phase_data = data.to_play_phase();
         run_matchup::run_match(
-            AgentName::Uct1,
-            AgentName::Uct1,
+            AgentName::Uct1MaxTricks,
+            AgentName::Uct1MaxTricks,
             &mut play_phase_data,
             100,
             Verbosity::None,

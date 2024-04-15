@@ -21,6 +21,7 @@ use ratatui::prelude::*;
 use rules::play_phase::play_phase_queries;
 use typed_builder::TypedBuilder;
 
+use crate::core::colors;
 use crate::core::render_context::RenderContext;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;
@@ -59,17 +60,28 @@ impl PlayAreaDelegate for PlayPhaseData {
         true
     }
 
-    fn render_top_status_bar(&self, _area: Rect, _buf: &mut Buffer, _context: &mut RenderContext) {}
+    fn render_top_status_bar(&self, area: Rect, buf: &mut Buffer, _: &mut RenderContext) {
+        contract_string(self, PlayerName::West).alignment(Alignment::Left).render(area, buf);
+        contract_string(self, PlayerName::North).alignment(Alignment::Center).render(area, buf);
+        contract_string(self, PlayerName::East).alignment(Alignment::Right).render(area, buf);
+    }
 
-    fn render_bottom_status_bar(
-        &self,
-        _area: Rect,
-        _buf: &mut Buffer,
-        _context: &mut RenderContext,
-    ) {
+    fn render_bottom_status_bar(&self, area: Rect, buf: &mut Buffer, _: &mut RenderContext) {
+        contract_string(self, PlayerName::User).alignment(Alignment::Center).render(area, buf);
     }
 
     fn center_content(&self, card_size: Size) -> impl StatefulWidget<State = RenderContext> {
         TrickView::new().trick(self.current_trick.clone()).card_size(card_size).build()
     }
+}
+
+fn contract_string(data: &PlayPhaseData, name: PlayerName) -> Line {
+    Line::from(
+        format!(
+            "{name}: {}/{}",
+            play_phase_queries::tricks_won(data, name),
+            data.contracts.contract_number(name)
+        )
+        .fg(colors::white()),
+    )
 }

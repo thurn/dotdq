@@ -14,6 +14,7 @@
 
 use data::contract_phase_data::{ContractPhaseAction, ContractPhaseData, ContractPhaseStep};
 use data::primitives::PlayerName;
+use data::round_data::RoundData;
 
 use crate::contract_phase::contract_phase_queries;
 
@@ -21,7 +22,7 @@ pub fn handle_action(
     data: &mut ContractPhaseData,
     player: PlayerName,
     action: ContractPhaseAction,
-) {
+) -> Option<RoundData> {
     assert!(
         contract_phase_queries::can_perform_action(data, player, action),
         "Cannot perform action {action:?}"
@@ -39,6 +40,10 @@ pub fn handle_action(
             *data.contracts.contract_number_mut(PlayerName::East) = east;
             data.step = ContractPhaseStep::ReadyToStart;
         }
-        ContractPhaseAction::StartPlayPhase => {}
+        ContractPhaseAction::StartPlayPhase => {
+            return Some(RoundData::PlayPhase(data.clone().to_play_phase()))
+        }
     }
+
+    None
 }

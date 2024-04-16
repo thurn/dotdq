@@ -64,6 +64,8 @@ remove-unused-deps: machete
     xattr -w com.dropbox.ignored 1 target/
 
 internal_clean:
-  cargo clean
+  rm -r target/debug
+  rm -r target/release
+  rm -r target/tmp
 
 clean: internal_clean dropbox

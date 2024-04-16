@@ -68,6 +68,12 @@ impl PlayAreaDelegate for PlayPhaseData {
 
     fn render_bottom_status_bar(&self, area: Rect, buf: &mut Buffer, _: &mut RenderContext) {
         contract_string(self, PlayerName::User).alignment(Alignment::Center).render(area, buf);
+        Line::from(
+            format!("Trump: {}", self.trump.map_or("NT".to_string(), |s| s.to_string()))
+                .fg(colors::trump(self.trump)),
+        )
+        .alignment(Alignment::Right)
+        .render(area, buf);
     }
 
     fn center_content(&self, card_size: Size) -> impl StatefulWidget<State = RenderContext> {

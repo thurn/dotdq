@@ -37,7 +37,7 @@ fn play_card(data: &mut PlayPhaseData, hand: PlayerName, card: Card) {
     data.current_trick.cards.push(PlayedCard { played_by: hand, card });
     if data.current_trick.cards.len() == 4 {
         let trick = data.current_trick.clone();
-        let winner = play_phase_queries::trick_winner(&trick);
+        let winner = play_phase_queries::trick_winner(data, &trick);
         data.completed_tricks.push(CompletedTrick { trick, winner });
     }
 }

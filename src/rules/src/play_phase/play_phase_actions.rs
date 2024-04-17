@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::delegate_data::HasPrograms;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::PlayerName;
 
@@ -25,5 +26,6 @@ pub fn handle_action(data: &mut PlayPhaseData, player: PlayerName, action: PlayP
     );
     match action {
         PlayPhaseAction::PlayCard(card) => cards::play_card(data, player, card),
+        PlayPhaseAction::ActivateProgram(program) => data.activate(program),
     }
 }

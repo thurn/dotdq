@@ -63,7 +63,7 @@ fn text_style(text: &str, hovered: bool, pressed: bool) -> Span {
     result = if pressed { result.underlined() } else { result };
 
     if hovered {
-        result.bg(colors::dark_gray())
+        result.bg(colors::selected())
     } else {
         result
     }

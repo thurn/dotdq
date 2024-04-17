@@ -39,15 +39,23 @@ impl HasPrograms for PlayPhaseData {
         self.programs.program_state.get(id).copied()
     }
 
+    fn set_state(&mut self, id: ProgramId, state: Option<ProgramState>) {
+        if let Some(s) = state {
+            self.programs.program_state.insert(id, s);
+        } else {
+            self.programs.program_state.remove(&id);
+        }
+    }
+
     fn can_activate(&self, program: ProgramId) -> bool {
         self.programs.current_delegates.can_activate.run_query(self, program, false)
     }
 
     fn activate(&mut self, program: ProgramId) {
-        if let Some(function) = self.programs.current_delegates.activated.get_mutation_fn(program) {
-            let mut context = Context { id: program, state: self.get_state(&program) };
-            function(self, &mut context);
-        }
+        let function = self.programs.current_delegates.activated.get_mutation_fn(program);
+        let mut context = Context { id: program, state: self.get_state(&program) };
+        function(self, &mut context);
+        self.set_state(program, context.state);
     }
 }
 
@@ -128,6 +136,7 @@ pub struct PlayedCard {
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 pub enum PlayPhaseAction {
     PlayCard(Card),
+    ActivateProgram(ProgramId),
 }
 
 impl From<PlayPhaseAction> for GameAction {
@@ -141,6 +150,9 @@ impl Debug for PlayPhaseAction {
         match self {
             PlayPhaseAction::PlayCard(card) => {
                 write!(f, "Play {:?}", card)
+            }
+            PlayPhaseAction::ActivateProgram(program) => {
+                write!(f, "Activate {:?}", program.name)
             }
         }
     }

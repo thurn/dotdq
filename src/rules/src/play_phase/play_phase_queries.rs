@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::delegate_data::HasPrograms;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::{Card, PlayerName, Suit};
 
@@ -25,6 +26,7 @@ pub fn can_perform_action(
 ) -> bool {
     match action {
         PlayPhaseAction::PlayCard(card) => can_play_card(data, player, card),
+        PlayPhaseAction::ActivateProgram(program) => data.can_activate(program),
     }
 }
 
@@ -56,13 +58,12 @@ pub fn next_to_play(data: &PlayPhaseData) -> PlayerName {
     match data.current_trick.cards.len() {
         0 => {
             if let Some(last) = data.completed_tricks.last() {
-                tricks::winner(data, &last.trick)
+                last.winner
             } else {
                 PlayerName::User
             }
         }
         1..=3 => data.current_trick.cards.last().unwrap().played_by.next(),
-        4 => tricks::winner(data, &data.current_trick),
         _ => panic!("Invalid trick size"),
     }
 }

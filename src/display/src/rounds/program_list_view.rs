@@ -16,6 +16,8 @@ use std::iter;
 
 use data::delegate_data::{HasPrograms, ProgramId};
 use data::design::colors;
+use data::play_phase_data::PlayPhaseAction;
+use data::widget_id::WidgetId;
 use ratatui::prelude::*;
 use typed_builder::TypedBuilder;
 
@@ -60,14 +62,27 @@ pub struct ProgramNameView {
 impl StatefulWidget for ProgramNameView {
     type State = RenderContext;
 
-    fn render(self, area: Rect, buf: &mut Buffer, _: &mut RenderContext) {
-        let style = if self.can_activate {
-            Style::new()
-                .fg(colors::can_activate())
-                .add_modifier(Modifier::BOLD | Modifier::UNDERLINED)
+    fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
+        let widget_id = WidgetId::Program(self.id);
+        let hovered = self.can_activate && context.hovered(widget_id, area);
+        let pressed = self.can_activate && context.mouse_down(widget_id, area);
+        if self.can_activate {
+            context.clicked(widget_id, area, PlayPhaseAction::ActivateProgram(self.id));
+        }
+
+        let mut style = if self.can_activate {
+            Style::new().fg(colors::can_activate()).add_modifier(if pressed {
+                Modifier::BOLD
+            } else {
+                Modifier::BOLD | Modifier::UNDERLINED
+            })
         } else {
             Style::new().fg(colors::white()).add_modifier(Modifier::BOLD)
         };
+
+        if hovered {
+            style = style.bg(colors::selected());
+        }
         Line::styled(self.id.name.to_string(), style).render(area, buf);
     }
 }

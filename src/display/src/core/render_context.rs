@@ -100,14 +100,14 @@ impl RenderContext {
         current
     }
 
-    pub fn clicked(&mut self, id: WidgetId, area: Rect, action: GameAction) {
+    pub fn clicked(&mut self, id: WidgetId, area: Rect, action: impl Into<GameAction>) {
         if matches!(self.event, Some(Event::Mouse(e))
             if e.kind == MouseEventKind::Up(MouseButton::Left)
                && area.contains(Position::new(e.column, e.row))
                && self.current_mouse_down == Some(id))
         {
             info!(?id, "Widget clicked");
-            self.action = Some(action);
+            self.action = Some(action.into());
         }
     }
 }

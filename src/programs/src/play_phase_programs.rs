@@ -24,13 +24,14 @@ pub fn linkme() {}
 pub fn starfall() -> ProgramDefinition {
     ProgramDefinition::new()
         .name(ProgramName::Starfall)
-        .text("↳Lead: Win this trick.")
+        .text("↳Lead: Win the next trick.")
         .play_phase(|on, id| {
             on.can_activate.this(id, |data, context| {
                 context.state.is_none() && tricks::has_lead(data, context.id.owner)
             });
             on.activated.this(id, |data, context| {
-                context.set_state(ProgramState::ActivatedForTrick(tricks::current_number(data)));
+                let n = tricks::current_number(data);
+                context.set_state(ProgramState::ActivatedForTrick(n));
             });
             on.trick_winner.queried(id, |_, context, &number, current| {
                 if context.activated_for_trick(number) {

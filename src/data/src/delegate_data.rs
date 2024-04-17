@@ -21,6 +21,8 @@ use crate::program_name::ProgramName;
 pub trait HasPrograms {
     fn get_state(&self, id: &ProgramId) -> Option<ProgramState>;
 
+    fn set_state(&mut self, id: ProgramId, state: Option<ProgramState>);
+
     fn can_activate(&self, program: ProgramId) -> bool;
 
     fn activate(&mut self, program: ProgramId);
@@ -31,7 +33,7 @@ pub enum ProgramState {
     ActivatedForTrick(TrickNumber),
 }
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub struct ProgramId {
     pub name: ProgramName,
     pub owner: PlayerName,
@@ -137,8 +139,11 @@ impl<TData: HasPrograms> ProgramMutation<TData> {
         self.delegates.insert(id, value);
     }
 
-    pub fn get_mutation_fn(&mut self, program_id: ProgramId) -> Option<SingleMutationFn<TData>> {
-        self.delegates.get(&program_id).copied()
+    pub fn get_mutation_fn(&mut self, program_id: ProgramId) -> SingleMutationFn<TData> {
+        *self
+            .delegates
+            .get(&program_id)
+            .unwrap_or_else(|| panic!("Program not found {program_id:?}"))
     }
 }
 

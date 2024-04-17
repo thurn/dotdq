@@ -36,6 +36,10 @@ pub fn can_activate() -> Color {
     yellow()
 }
 
+pub fn selected() -> Color {
+    dark_gray()
+}
+
 pub fn black() -> Color {
     color("#140C1C")
 }

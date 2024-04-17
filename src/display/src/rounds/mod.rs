@@ -19,5 +19,6 @@ pub mod horizontal_hand_view;
 pub mod play_area_delegate;
 pub mod play_area_view;
 pub mod play_phase_view;
+pub mod program_list_view;
 pub mod trick_view;
 pub mod vertical_hand_view;

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::delegate_data::ProgramId;
 use data::design::colors;
 use data::game_action::GameAction;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
@@ -26,6 +27,8 @@ use typed_builder::TypedBuilder;
 use crate::core::render_context::RenderContext;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;
+use crate::rounds::program_list_view;
+use crate::rounds::program_list_view::ProgramListView;
 use crate::rounds::trick_view::TrickView;
 
 #[derive(TypedBuilder)]
@@ -84,6 +87,22 @@ impl PlayAreaDelegate for PlayPhaseData {
         buf: &mut Buffer,
         context: &mut RenderContext,
     ) {
+        let [program_list, tricks, _] = Layout::horizontal([
+            Constraint::Length(program_list_view::WIDTH),
+            Constraint::Fill(1),
+            Constraint::Length(program_list_view::WIDTH),
+        ])
+        .areas(area);
+        let programs = self
+            .programs
+            .all_programs
+            .get(&PlayerName::User)
+            .unwrap_or(&vec![])
+            .iter()
+            .map(|&name| ProgramId::new(name, PlayerName::User))
+            .collect();
+        ProgramListView::new().programs(programs).build().render(program_list, buf, context);
+
         let trick = if self.current_trick.is_started() {
             Some(self.current_trick.clone())
         } else {
@@ -91,7 +110,7 @@ impl PlayAreaDelegate for PlayPhaseData {
         };
 
         if let Some(t) = trick {
-            TrickView::new().trick(t).card_size(card_size).build().render(area, buf, context)
+            TrickView::new().trick(t).card_size(card_size).build().render(tricks, buf, context)
         }
     }
 }

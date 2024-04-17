@@ -16,7 +16,6 @@ use std::collections::HashMap;
 
 use linkme::distributed_slice;
 use once_cell::sync::Lazy;
-use ratatui::style::Color;
 use typed_builder::TypedBuilder;
 
 use crate::delegate_data::{
@@ -52,8 +51,6 @@ pub struct ProgramData<TDelegates> {
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
 pub struct ProgramDefinition {
-    pub symbol: char,
-    pub color: Color,
     pub name: ProgramName,
     #[builder(setter(into))]
     pub text: String,

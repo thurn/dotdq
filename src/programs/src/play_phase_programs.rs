@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use data::delegate_data::ProgramState;
-use data::design::colors;
 use data::program_name::ProgramName;
 use data::programs::{ProgramDefinition, PROGRAMS};
 use linkme::distributed_slice;
@@ -22,11 +21,9 @@ use rules::rounds::tricks;
 pub fn linkme() {}
 
 #[distributed_slice(PROGRAMS)]
-pub fn redstar() -> ProgramDefinition {
+pub fn starfall() -> ProgramDefinition {
     ProgramDefinition::new()
-        .symbol('★')
-        .color(colors::red())
-        .name(ProgramName::Redstar)
+        .name(ProgramName::Starfall)
         .text("↳Lead: Win this trick.")
         .play_phase(|on, id| {
             on.can_activate.this(id, |data, context| {

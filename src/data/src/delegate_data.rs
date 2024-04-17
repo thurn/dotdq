@@ -33,6 +33,12 @@ pub struct ProgramId {
     pub owner: PlayerName,
 }
 
+impl ProgramId {
+    pub fn new(name: ProgramName, owner: PlayerName) -> Self {
+        Self { name, owner }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct Context {
     pub id: ProgramId,

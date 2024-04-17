@@ -17,7 +17,7 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub enum ProgramName {
-    Redstar,
+    Starfall,
 }
 
 impl Display for ProgramName {

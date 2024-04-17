@@ -59,7 +59,7 @@ pub fn populate_agent_contracts(data: ContractPhaseData) {
             AgentName::Uct1MaxTricks,
             AgentName::Uct1MaxTricks,
             &mut play_phase_data,
-            100,
+            1,
             Verbosity::None,
             false,
         );

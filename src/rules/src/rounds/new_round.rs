@@ -16,9 +16,11 @@ use std::collections::HashMap;
 use std::slice::ChunksExact;
 
 use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep, Contracts};
-use data::delegate_data::PlayPhaseDelegates;
+use data::delegate_data::{ContractPhaseDelegates, PlayPhaseDelegates};
 use data::play_phase_data::{Hands, PlayPhaseData, Trick};
-use data::primitives::{Card, Rank, Suit};
+use data::primitives::{Card, PlayerName, Rank, Suit};
+use data::program_name::ProgramName;
+use data::programs::ProgramData;
 use data::round_data::RoundData;
 use enumset::EnumSet;
 use rand::prelude::SliceRandom;
@@ -48,6 +50,11 @@ pub fn create(rng: &mut impl Rng) -> RoundData {
         contracts: Contracts::default(),
         hands: Hands::new(north, east, south, west),
         step: ContractPhaseStep::AwaitingUserContact,
+        programs: ProgramData {
+            current_delegates: ContractPhaseDelegates::default(),
+            program_state: HashMap::default(),
+            all_programs: HashMap::from([(PlayerName::User, vec![ProgramName::Redstar])]),
+        },
     })
 }
 
@@ -76,8 +83,11 @@ pub fn create_play_phase(rng: &mut impl Rng) -> PlayPhaseData {
         trump,
         contracts: Contracts::default(),
         hands: Hands::new(north, east, south, west),
-        delegates: PlayPhaseDelegates::default(),
-        program_state: HashMap::new(),
+        programs: ProgramData {
+            current_delegates: PlayPhaseDelegates::default(),
+            program_state: HashMap::default(),
+            all_programs: HashMap::default(),
+        },
     }
 }
 

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 
 use enumset::EnumSet;
@@ -21,6 +20,7 @@ use crate::contract_phase_data::Contracts;
 use crate::delegate_data::{HasProgramState, PlayPhaseDelegates, ProgramId, ProgramState};
 use crate::game_action::GameAction;
 use crate::primitives::{Card, PlayerName, Suit};
+use crate::programs::ProgramData;
 
 pub type TrickNumber = usize;
 
@@ -31,13 +31,12 @@ pub struct PlayPhaseData {
     pub trump: Option<Suit>,
     pub contracts: Contracts,
     pub hands: Hands,
-    pub delegates: PlayPhaseDelegates,
-    pub program_state: HashMap<ProgramId, ProgramState>,
+    pub programs: ProgramData<PlayPhaseDelegates>,
 }
 
 impl HasProgramState for PlayPhaseData {
     fn get_state(&self, id: &ProgramId) -> Option<ProgramState> {
-        self.program_state.get(id).copied()
+        self.programs.program_state.get(id).copied()
     }
 }
 
@@ -97,6 +96,13 @@ pub struct CompletedTrick {
 pub struct Trick {
     /// Cards played in this trick, in sequence
     pub cards: Vec<PlayedCard>,
+}
+
+impl Trick {
+    /// Returns true if cards have started being played to this trick
+    pub fn is_started(&self) -> bool {
+        !self.cards.is_empty()
+    }
 }
 
 /// Represents a card played to a trick

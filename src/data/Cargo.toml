@@ -9,9 +9,11 @@ doctest = false
 bench = false
 
 [dependencies]
+dashmap = "5.5.3"
 enum-iterator = "2.0.0"
 enum-kinds = "0.5.1"
 enumset = "1.1.3"
 linkme = "0.3.25"
+once_cell = "1.19.0"
 ratatui = { version = "0.26.0", features = ["serde", "macros", "unstable-widget-ref"] }
 typed-builder = "0.18.1"

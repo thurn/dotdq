@@ -67,8 +67,14 @@ impl PlayAreaDelegate for ContractPhaseData {
         }
     }
 
-    fn center_content(&self, _card_size: Size) -> impl StatefulWidget<State = RenderContext> {
-        ContractView::new().data(self).build()
+    fn render_center_content(
+        &self,
+        _: Size,
+        area: Rect,
+        buf: &mut Buffer,
+        context: &mut RenderContext,
+    ) {
+        ContractView::new().data(self).build().render(area, buf, context)
     }
 }
 

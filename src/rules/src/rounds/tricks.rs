@@ -51,7 +51,7 @@ pub fn winner(data: &PlayPhaseData, trick: &Trick) -> PlayerName {
         .max_by(|a, b| card_ordering(data, suit, a.card, b.card))
         .expect("Trick was empty")
         .played_by;
-    data.delegates.trick_winner.run_query(data, &current_number(data), winner)
+    data.programs.current_delegates.trick_winner.run_query(data, &current_number(data), winner)
 }
 
 pub fn card_ordering(data: &PlayPhaseData, trick_suit: Suit, left: Card, right: Card) -> Ordering {

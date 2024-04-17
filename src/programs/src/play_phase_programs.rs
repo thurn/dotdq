@@ -14,10 +14,12 @@
 
 use data::delegate_data::ProgramState;
 use data::design::colors;
-use data::program_data::{ProgramDefinition, PROGRAMS};
 use data::program_name::ProgramName;
+use data::programs::{ProgramDefinition, PROGRAMS};
 use linkme::distributed_slice;
 use rules::rounds::tricks;
+
+pub fn linkme() {}
 
 #[distributed_slice(PROGRAMS)]
 pub fn redstar() -> ProgramDefinition {

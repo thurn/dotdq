@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::play_phase_data::{CompletedTrick, PlayPhaseAction, PlayPhaseData, PlayedCard};
-use data::primitives::{Card, PlayerName};
+use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
+use data::primitives::PlayerName;
 
 use crate::play_phase::play_phase_queries;
-use crate::rounds::tricks;
+use crate::rounds::cards;
 
 pub fn handle_action(data: &mut PlayPhaseData, player: PlayerName, action: PlayPhaseAction) {
     assert!(
@@ -24,21 +24,6 @@ pub fn handle_action(data: &mut PlayPhaseData, player: PlayerName, action: PlayP
         "Cannot perform action {action:?}"
     );
     match action {
-        PlayPhaseAction::PlayCard(card) => play_card(data, player, card),
-    }
-}
-
-/// Plays the indicated [Card] from the hand identified by [PlayerName] if
-/// it is currently legal to do so.
-fn play_card(data: &mut PlayPhaseData, hand: PlayerName, card: Card) {
-    data.hands.hand_mut(hand).remove(card);
-    if data.current_trick.cards.len() >= 4 {
-        data.current_trick.cards.clear();
-    }
-    data.current_trick.cards.push(PlayedCard { played_by: hand, card });
-    if data.current_trick.cards.len() == 4 {
-        let trick = data.current_trick.clone();
-        let winner = tricks::winner(data, &trick);
-        data.completed_tricks.push(CompletedTrick { trick, winner });
+        PlayPhaseAction::PlayCard(card) => cards::play_card(data, player, card),
     }
 }

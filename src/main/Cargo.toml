@@ -10,6 +10,7 @@ default-run = "dotdq"
 ai = { path = "../ai", version = "0.0.0" }
 data = { path = "../data", version = "0.0.0" }
 display = { path = "../display", version = "0.0.0" }
+programs = { path = "../programs", version = "0.0.0" }
 rules = { path = "../rules", version = "0.0.0" }
 
 better-panic = "0.3.0"

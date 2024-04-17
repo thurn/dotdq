@@ -15,10 +15,11 @@
 use std::collections::HashMap;
 use std::fmt::Debug;
 
-use crate::delegate_data::PlayPhaseDelegates;
+use crate::delegate_data::{ContractPhaseDelegates, PlayPhaseDelegates};
 use crate::game_action::GameAction;
 use crate::play_phase_data::{Hands, PlayPhaseData, Trick};
 use crate::primitives::{PlayerName, Suit};
+use crate::programs::ProgramData;
 
 pub type ContractNumber = usize;
 
@@ -29,7 +30,7 @@ pub enum ContractPhaseStep {
     ReadyToStart,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ContractPhaseData {
     /// Trump suit to use for this round
     pub trump: Option<Suit>,
@@ -40,18 +41,25 @@ pub struct ContractPhaseData {
     pub hands: Hands,
     /// Current step within the contract phase
     pub step: ContractPhaseStep,
+    /// Data about programs for the players in this round
+    pub programs: ProgramData<ContractPhaseDelegates>,
 }
 
 impl ContractPhaseData {
     pub fn to_play_phase(self) -> PlayPhaseData {
+        let programs = ProgramData {
+            current_delegates: PlayPhaseDelegates::default(),
+            program_state: HashMap::new(),
+            all_programs: self.programs.all_programs,
+        };
+
         PlayPhaseData {
             current_trick: Trick::default(),
             completed_tricks: vec![],
             trump: self.trump,
             contracts: self.contracts,
             hands: self.hands,
-            delegates: PlayPhaseDelegates::default(),
-            program_state: HashMap::new(),
+            programs,
         }
     }
 }

@@ -15,6 +15,7 @@
 use clap::Parser;
 use cli::Cli;
 use color_eyre::eyre::Result;
+use programs::play_phase_programs;
 use tracing::info;
 
 pub mod app;
@@ -26,6 +27,11 @@ fn main() -> Result<()> {
     utils::initialize_logging()?;
     utils::initialize_panic_handler()?;
     Cli::parse();
+
+    // Required to make the linker not discard programs under OSX, see
+    // https://github.com/dtolnay/linkme/issues/61
+    play_phase_programs::linkme();
+
     let mut tui = tui::enter()?;
     let commit = env!("VERGEN_GIT_SHA");
     info!(commit, "Starting game");

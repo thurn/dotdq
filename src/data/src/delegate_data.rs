@@ -111,7 +111,7 @@ impl<T> Default for EventDelegateList<T> {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct ContractPhaseDelegates {}
 
 #[derive(Default, Clone)]

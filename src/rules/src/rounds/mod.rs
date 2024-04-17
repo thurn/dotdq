@@ -12,5 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod cards;
 pub mod new_round;
+pub mod start_play_phase;
 pub mod tricks;

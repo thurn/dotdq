@@ -16,7 +16,6 @@ use data::game_action::GameAction;
 use data::primitives::{Card, PlayerName};
 use ratatui::layout::Size;
 use ratatui::prelude::*;
-use ratatui::widgets::StatefulWidget;
 
 use crate::core::render_context::RenderContext;
 
@@ -29,5 +28,11 @@ pub trait PlayAreaDelegate {
 
     fn render_bottom_status_bar(&self, area: Rect, buf: &mut Buffer, context: &mut RenderContext);
 
-    fn center_content(&self, card_size: Size) -> impl StatefulWidget<State = RenderContext>;
+    fn render_center_content(
+        &self,
+        card_size: Size,
+        area: Rect,
+        buf: &mut Buffer,
+        context: &mut RenderContext,
+    );
 }

@@ -18,7 +18,7 @@ pub mod design;
 pub mod game_action;
 pub mod play_phase_data;
 pub mod primitives;
-pub mod program_data;
 pub mod program_name;
+pub mod programs;
 pub mod round_data;
 pub mod widget_id;

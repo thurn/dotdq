@@ -95,6 +95,6 @@ where
             .build()
             .render(west, buf, context);
 
-        self.delegate.center_content(card_size).render(tricks, buf, context);
+        self.delegate.render_center_content(card_size, tricks, buf, context);
     }
 }

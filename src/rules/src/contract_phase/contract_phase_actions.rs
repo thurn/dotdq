@@ -17,6 +17,7 @@ use data::primitives::PlayerName;
 use data::round_data::RoundData;
 
 use crate::contract_phase::contract_phase_queries;
+use crate::rounds::start_play_phase;
 
 pub fn handle_action(
     data: &mut ContractPhaseData,
@@ -41,7 +42,7 @@ pub fn handle_action(
             data.step = ContractPhaseStep::ReadyToStart;
         }
         ContractPhaseAction::StartPlayPhase => {
-            return Some(RoundData::PlayPhase(data.clone().to_play_phase()))
+            return Some(RoundData::PlayPhase(start_play_phase::run(data.clone())))
         }
     }
 

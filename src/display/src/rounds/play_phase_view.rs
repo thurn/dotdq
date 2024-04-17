@@ -77,8 +77,22 @@ impl PlayAreaDelegate for PlayPhaseData {
         .render(area, buf);
     }
 
-    fn center_content(&self, card_size: Size) -> impl StatefulWidget<State = RenderContext> {
-        TrickView::new().trick(self.current_trick.clone()).card_size(card_size).build()
+    fn render_center_content(
+        &self,
+        card_size: Size,
+        area: Rect,
+        buf: &mut Buffer,
+        context: &mut RenderContext,
+    ) {
+        let trick = if self.current_trick.is_started() {
+            Some(self.current_trick.clone())
+        } else {
+            self.completed_tricks.last().map(|t| t.trick.clone())
+        };
+
+        if let Some(t) = trick {
+            TrickView::new().trick(t).card_size(card_size).build().render(area, buf, context)
+        }
     }
 }
 

@@ -55,7 +55,11 @@ pub fn create(rng: &mut impl Rng) -> RoundData {
         programs: ProgramData {
             current_delegates: ContractPhaseDelegates::default(),
             program_state: HashMap::default(),
-            all_programs: HashMap::from([(PlayerName::User, vec![ProgramName::Starfall])]),
+            all_programs: HashMap::from([(PlayerName::User, vec![
+                ProgramName::Starfall,
+                ProgramName::Obsidian,
+                ProgramName::Excavate,
+            ])]),
         },
     })
 }

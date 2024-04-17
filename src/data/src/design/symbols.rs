@@ -12,27 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use clap::Parser;
-use cli::Cli;
-use color_eyre::eyre::Result;
-use tracing::info;
+use ratatui::prelude::*;
 
-pub mod app;
-pub mod cli;
-pub mod tui;
-pub mod utils;
+use crate::design::colors;
+use crate::primitive::primitives::Suit;
 
-fn main() -> Result<()> {
-    utils::initialize_logging()?;
-    // utils::initialize_panic_handler()?;
-    Cli::parse();
-
-    programs::linkme();
-
-    let mut tui = tui::enter()?;
-    let commit = env!("VERGEN_GIT_SHA");
-    info!(commit, "Starting game");
-    app::run(&mut tui)?;
-    tui::exit()?;
-    Ok(())
+pub fn suit(suit: Suit) -> Span<'static> {
+    suit.to_string().fg(colors::suit(suit))
 }

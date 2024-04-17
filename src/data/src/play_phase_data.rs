@@ -27,11 +27,20 @@ pub type TrickNumber = usize;
 #[derive(Clone)]
 pub struct PlayPhaseData {
     pub current_trick: Trick,
+    /// Player who is next to play, or None if this game has ended.
+    pub turn: Option<PlayerName>,
     pub completed_tricks: Vec<CompletedTrick>,
     pub trump: Option<Suit>,
     pub contracts: Contracts,
     pub hands: Hands,
     pub programs: ProgramData<PlayPhaseDelegates>,
+}
+
+impl PlayPhaseData {
+    /// Returns true if it is this player's turn in the round
+    pub fn is_turn(&self, turn: PlayerName) -> bool {
+        self.turn == Some(turn)
+    }
 }
 
 impl HasPrograms for PlayPhaseData {

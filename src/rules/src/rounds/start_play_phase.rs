@@ -35,6 +35,7 @@ pub fn run(data: ContractPhaseData) -> PlayPhaseData {
 
     PlayPhaseData {
         current_trick: Trick::default(),
+        turn: Some(PlayerName::User),
         completed_tricks: vec![],
         trump: data.trump,
         contracts: data.contracts,

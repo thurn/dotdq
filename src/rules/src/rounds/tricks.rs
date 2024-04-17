@@ -19,7 +19,7 @@ use data::primitive::primitives::{Card, PlayerName, Suit};
 
 /// Returns true if the [PlayerName] player is currently able to lead a card.
 pub fn has_lead(data: &PlayPhaseData, player_name: PlayerName) -> bool {
-    if !data.current_trick.cards.is_empty() {
+    if !data.is_turn(player_name) || !data.current_trick.cards.is_empty() {
         return false;
     }
 

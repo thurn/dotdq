@@ -49,17 +49,11 @@ impl StatefulWidget for VerticalHandView {
         };
 
         for (i, card) in self.hand.iter().sorted().enumerate() {
-            CardView::new()
-                .card(card)
-                .visible(false)
-                .debug_visible(true)
-                .on_click(None)
-                .build()
-                .render(
-                    card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
-                    buf,
-                    context,
-                );
+            CardView::new().card(card).visible(false).on_click(None).build().render(
+                card_rect.offset(Offset { x: 0, y: i as i32 * card_offset as i32 }),
+                buf,
+                context,
+            );
         }
     }
 }

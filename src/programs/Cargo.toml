@@ -13,3 +13,4 @@ data = { path = "../data", version = "0.0.0" }
 rules = { path = "../rules", version = "0.0.0" }
 
 linkme = "0.3.25"
+ratatui = { version = "0.26.0", features = ["serde", "macros", "unstable-widget-ref"] }

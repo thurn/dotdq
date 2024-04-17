@@ -27,7 +27,7 @@ use display::rounds::play_phase_view::PlayPhaseView;
 use ratatui::prelude::*;
 use ratatui::widgets::{Paragraph, Wrap};
 use rules::contract_phase::contract_phase_actions;
-use rules::play_phase::{play_phase_actions, play_phase_queries};
+use rules::play_phase::play_phase_actions;
 use rules::rounds::new_round;
 use tracing::info;
 
@@ -57,11 +57,11 @@ pub fn run(tui: &mut Tui) -> Result<()> {
             match (&mut data, action) {
                 (RoundData::PlayPhase(play_data), GameAction::PlayAction(a)) => {
                     info!(?a, "Handling PlayPhaseAction");
-                    let Some(current_player) = play_phase_queries::current_turn(play_data) else {
+                    let Some(current_player) = play_data.turn else {
                         break;
                     };
                     play_phase_actions::handle_action(play_data, current_player, a);
-                    let Some(next_player) = play_phase_queries::current_turn(play_data) else {
+                    let Some(next_player) = play_data.turn else {
                         continue;
                     };
                     if next_player.is_agent() && !ai_search_running {

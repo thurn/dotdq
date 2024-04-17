@@ -56,7 +56,7 @@ where
             for card in group {
                 CardView::new()
                     .card(card)
-                    .visible(true)
+                    .visible(self.player_name.is_user())
                     .on_click(self.delegate.card_action(self.player_name, card))
                     .build()
                     .render(card_rect.offset(Offset { x: offset, y: 0 }), buf, context);

@@ -55,6 +55,7 @@ impl ContractPhaseData {
 
         PlayPhaseData {
             current_trick: Trick::default(),
+            turn: Some(PlayerName::User),
             completed_tricks: vec![],
             trump: self.trump,
             contracts: self.contracts,

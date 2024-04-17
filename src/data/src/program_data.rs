@@ -15,6 +15,7 @@
 use std::collections::HashMap;
 
 use linkme::distributed_slice;
+use ratatui::prelude::*;
 use typed_builder::TypedBuilder;
 
 use crate::delegate_data::{
@@ -43,8 +44,7 @@ impl<T> ProgramData<T> {
 #[builder(builder_method(name = new))]
 pub struct ProgramDefinition {
     pub name: ProgramName,
-    #[builder(setter(into))]
-    pub text: String,
+    pub text: Vec<Span<'static>>,
     #[builder(default, setter(strip_option))]
     pub contract_phase: Option<fn(&mut ContractPhaseDelegates)>,
     #[builder(default, setter(strip_option))]

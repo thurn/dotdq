@@ -29,12 +29,12 @@ pub enum Suit {
     Spades,
 }
 
-impl fmt::Display for Suit {
+impl Display for Suit {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match self {
             Suit::Clubs => "♣",
             Suit::Diamonds => "♦",
-            Suit::Hearts => "♥︎",
+            Suit::Hearts => "♥",
             Suit::Spades => "♠",
         })
     }
@@ -341,6 +341,12 @@ pub enum PlayerName {
     West,
     North,
     East,
+}
+
+impl PlayerName {
+    pub fn is_user(&self) -> bool {
+        *self == Self::User
+    }
 }
 
 impl Debug for PlayerName {

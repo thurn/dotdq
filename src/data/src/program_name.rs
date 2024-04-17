@@ -18,6 +18,8 @@ use std::fmt::{Display, Formatter};
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub enum ProgramName {
     Starfall,
+    Obsidian,
+    Excavate,
 }
 
 impl Display for ProgramName {

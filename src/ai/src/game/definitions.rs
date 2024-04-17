@@ -28,7 +28,7 @@ impl GameStateNode for PlayPhaseData {
     }
 
     fn status(&self) -> GameStatus<Self::PlayerName> {
-        if let Some(p) = play_phase_queries::current_turn(self) {
+        if let Some(p) = self.turn {
             GameStatus::InProgress { current_turn: p }
         } else {
             GameStatus::Completed {

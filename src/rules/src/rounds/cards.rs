@@ -15,6 +15,7 @@
 use data::play_phase_data::{CompletedTrick, PlayPhaseData, PlayedCard};
 use data::primitive::primitives::{Card, PlayerName};
 
+use crate::play_phase::play_phase_queries;
 use crate::rounds::tricks;
 
 /// Plays the indicated [Card] from the hand identified by [PlayerName] if
@@ -28,4 +29,42 @@ pub fn play_card(data: &mut PlayPhaseData, hand: PlayerName, card: Card) {
         data.completed_tricks.push(CompletedTrick { trick, winner });
         data.current_trick.cards.clear();
     }
+    data.turn = next_to_play(data);
+}
+
+pub fn can_play(data: &PlayPhaseData, player: PlayerName, card: Card) -> bool {
+    let follows_suit = if let Some(suit) = tricks::suit(&data.current_trick) {
+        suit == card.suit() || play_phase_queries::suit_count(data, player, suit) == 0
+    } else {
+        true
+    };
+
+    let must_follow_suit = data.programs.current_delegates.must_follow_suit.run_query(
+        data,
+        &tricks::current_number(data),
+        true,
+    );
+
+    data.is_turn(player)
+        && data.hands.hand(player).contains(card)
+        && (data.current_trick.cards.len() == 4 || follows_suit || !must_follow_suit)
+}
+
+/// Returns the [PlayerName] to next play a card during a round.
+fn next_to_play(data: &PlayPhaseData) -> Option<PlayerName> {
+    if data.hands.all_empty() {
+        return None;
+    }
+
+    Some(match data.current_trick.cards.len() {
+        0 => {
+            if let Some(last) = data.completed_tricks.last() {
+                last.winner
+            } else {
+                PlayerName::User
+            }
+        }
+        1..=3 => data.current_trick.cards.last().unwrap().played_by.next(),
+        _ => panic!("Invalid trick size"),
+    })
 }

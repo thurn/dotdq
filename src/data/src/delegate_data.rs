@@ -31,6 +31,7 @@ pub trait HasPrograms {
 #[derive(Eq, PartialEq, Clone, Copy)]
 pub enum ProgramState {
     ActivatedForTrick(TrickNumber),
+    Activated,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -54,6 +55,10 @@ pub struct Context {
 impl Context {
     pub fn new(id: ProgramId, state: Option<ProgramState>) -> Self {
         Self { id, state }
+    }
+
+    pub fn owner(&self) -> PlayerName {
+        self.id.owner
     }
 
     pub fn set_state(&mut self, state: ProgramState) {
@@ -170,6 +175,7 @@ pub struct PlayPhaseDelegates {
     pub can_activate: ProgramQuery<PlayPhaseData, bool>,
     pub activated: ProgramMutation<PlayPhaseData>,
     pub trick_winner: QueryDelegateList<PlayPhaseData, TrickNumber, PlayerName>,
+    pub must_follow_suit: QueryDelegateList<PlayPhaseData, TrickNumber, bool>,
 }
 
 #[derive(Default)]

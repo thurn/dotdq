@@ -14,9 +14,9 @@
 
 use data::delegate_data::{HasPrograms, ProgramId};
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitive::primitives::{Card, PlayerName, Suit};
+use data::primitive::primitives::{PlayerName, Suit};
 
-use crate::rounds::tricks;
+use crate::rounds::cards;
 
 /// Returns true if the indicated [PlayPhaseAction] is currently legal to take
 pub fn can_perform_action(
@@ -25,7 +25,7 @@ pub fn can_perform_action(
     action: PlayPhaseAction,
 ) -> bool {
     match action {
-        PlayPhaseAction::PlayCard(card) => can_play_card(data, player, card),
+        PlayPhaseAction::PlayCard(card) => cards::can_play(data, player, card),
         PlayPhaseAction::ActivateProgram(program) => data.can_activate(program),
     }
 }
@@ -47,44 +47,7 @@ pub fn legal_actions(
         }))
 }
 
-/// Returns the [PlayerName] whose turn to act it currently is, or None if
-/// the game has ended
-pub fn current_turn(data: &PlayPhaseData) -> Option<PlayerName> {
-    if data.hands.all_empty() {
-        None
-    } else {
-        Some(next_to_play(data))
-    }
-}
-
-/// Returns the [PlayerName] to next play a card during a round.
-pub fn next_to_play(data: &PlayPhaseData) -> PlayerName {
-    match data.current_trick.cards.len() {
-        0 => {
-            if let Some(last) = data.completed_tricks.last() {
-                last.winner
-            } else {
-                PlayerName::User
-            }
-        }
-        1..=3 => data.current_trick.cards.last().unwrap().played_by.next(),
-        _ => panic!("Invalid trick size"),
-    }
-}
-
 /// Returns the number of cards of the given [Suit] in the indicated hand.
-fn suit_count(data: &PlayPhaseData, hand: PlayerName, suit: Suit) -> usize {
+pub fn suit_count(data: &PlayPhaseData, hand: PlayerName, suit: Suit) -> usize {
     data.hands.hand(hand).iter().filter(|card| card.suit() == suit).count()
-}
-
-fn can_play_card(data: &PlayPhaseData, player: PlayerName, card: Card) -> bool {
-    let follows_suit = if let Some(suit) = tricks::suit(&data.current_trick) {
-        suit == card.suit() || suit_count(data, player, suit) == 0
-    } else {
-        true
-    };
-
-    next_to_play(data) == player
-        && data.hands.hand(player).contains(card)
-        && (data.current_trick.cards.len() == 4 || follows_suit)
 }

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::PlayerName;
-use enumset::EnumSet;
+use data::primitive::primitives::PlayerName;
 use rules::play_phase::{play_phase_actions, play_phase_queries};
+use rules::rounds::scoring;
 
 use crate::core::game_state_node::{GameStateNode, GameStatus};
 
@@ -32,9 +32,9 @@ impl GameStateNode for PlayPhaseData {
             GameStatus::InProgress { current_turn: p }
         } else {
             GameStatus::Completed {
-                winners: enum_iterator::all::<PlayerName>()
-                    .filter(|&name| play_phase_queries::met_contract(self, name))
-                    .collect::<EnumSet<_>>(),
+                scores: enum_iterator::all::<PlayerName>()
+                    .map(|player| (player, scoring::score(self, player).as_i32()))
+                    .collect(),
             }
         }
     }

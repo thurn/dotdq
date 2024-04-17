@@ -14,5 +14,6 @@
 
 pub mod cards;
 pub mod new_round;
+pub mod scoring;
 pub mod start_play_phase;
 pub mod tricks;

@@ -16,7 +16,7 @@ use data::delegate_data::ProgramId;
 use data::design::colors;
 use data::game_action::GameAction;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::{Card, PlayerName};
+use data::primitive::primitives::{Card, PlayerName};
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Rect, Size};
 use ratatui::prelude::*;

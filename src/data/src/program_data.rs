@@ -20,7 +20,7 @@ use typed_builder::TypedBuilder;
 use crate::delegate_data::{
     ContractPhaseDelegates, PlayPhaseDelegates, ProgramId, ProgramState, RunPhaseDelegates,
 };
-use crate::primitives::PlayerName;
+use crate::primitive::primitives::PlayerName;
 use crate::program_name::ProgramName;
 
 #[distributed_slice]

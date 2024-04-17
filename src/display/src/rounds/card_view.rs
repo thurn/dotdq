@@ -14,7 +14,7 @@
 
 use data::design::colors;
 use data::game_action::GameAction;
-use data::primitives::Card;
+use data::primitive::primitives::Card;
 use data::widget_id::WidgetId;
 use ratatui::layout::Offset;
 use ratatui::prelude::*;

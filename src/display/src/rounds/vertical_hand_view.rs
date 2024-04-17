@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::primitives::Card;
+use data::primitive::primitives::Card;
 use enumset::EnumSet;
 use itertools::Itertools;
 use ratatui::buffer::Buffer;

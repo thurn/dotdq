@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::{PlayedCard, Trick};
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use ratatui::layout::{Offset, Size};
 use ratatui::prelude::*;
 use typed_builder::TypedBuilder;

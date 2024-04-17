@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::contract_phase_data::{ContractPhaseAction, ContractPhaseData, ContractPhaseStep};
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use data::round_data::RoundData;
 
 use crate::contract_phase::contract_phase_queries;

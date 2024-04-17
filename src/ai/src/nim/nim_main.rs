@@ -73,7 +73,7 @@ fn run_game_loop(
         let p1_action = player_one.pick_action(AgentConfig::with_deadline(move_time), &nim);
         println!("<<{}>> takes {} from {}", player_one.name(), p1_action.amount, p1_action.pile);
         nim.execute_action(NimPlayer::One, p1_action);
-        check_game_over(&nim, player_one.name(), player_two.name());
+        check_game_over(&nim);
 
         print_optimal_action(&nim, player_two.name());
         println!("{}", nim);
@@ -81,7 +81,7 @@ fn run_game_loop(
         let p2_action = player_two.pick_action(AgentConfig::with_deadline(move_time), &nim);
         println!("<<{}>> takes {} from {}", player_two.name(), p2_action.amount, p2_action.pile);
         nim.execute_action(NimPlayer::Two, p2_action);
-        check_game_over(&nim, player_one.name(), player_two.name());
+        check_game_over(&nim);
     }
 }
 
@@ -94,12 +94,9 @@ fn print_optimal_action(state: &NimState, player_name: &str) {
     }
 }
 
-fn check_game_over(game: &NimState, p1_name: &str, p2_name: &str) {
-    if let GameStatus::Completed { winners } = game.status() {
-        println!(
-            "Game Over. {} wins!",
-            if winners.contains(NimPlayer::One) { p1_name } else { p2_name }
-        );
+fn check_game_over(game: &NimState) {
+    if let GameStatus::Completed { scores } = game.status() {
+        println!("Game Over. Scores: {:?}", scores);
         std::process::exit(0)
     }
 }

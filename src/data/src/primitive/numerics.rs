@@ -12,20 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::delegate_data::HasPrograms;
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitive::primitives::PlayerName;
+use derive_more::{
+    Add, AddAssign, Display, Div, DivAssign, From, Into, Mul, MulAssign, Sub, SubAssign, Sum,
+};
+use serde::{Deserialize, Serialize};
 
-use crate::play_phase::play_phase_queries;
-use crate::rounds::cards;
+/// Reward given for successfully completing contracts
+#[derive(
+    Debug,
+    Display,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    Ord,
+    PartialOrd,
+    Hash,
+    From,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Sum,
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
+    Into,
+    Serialize,
+    Deserialize,
+)]
+pub struct Intel(pub u32);
 
-pub fn handle_action(data: &mut PlayPhaseData, player: PlayerName, action: PlayPhaseAction) {
-    assert!(
-        play_phase_queries::can_perform_action(data, player, action),
-        "Cannot perform action {action:?}"
-    );
-    match action {
-        PlayPhaseAction::PlayCard(card) => cards::play_card(data, player, card),
-        PlayPhaseAction::ActivateProgram(program) => data.activate(program),
+impl Intel {
+    pub fn as_i32(&self) -> i32 {
+        i32::try_from(self.0).expect("Error converting to i32")
     }
 }

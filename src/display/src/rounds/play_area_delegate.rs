@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::game_action::GameAction;
-use data::primitives::{Card, PlayerName};
+use data::primitive::primitives::{Card, PlayerName};
 use ratatui::layout::Size;
 use ratatui::prelude::*;
 

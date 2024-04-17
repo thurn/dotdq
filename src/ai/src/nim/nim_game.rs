@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
-use enumset::{EnumSet, EnumSetType};
+use enumset::EnumSetType;
 
 use crate::core::agent::{Agent, AgentConfig};
 use crate::core::game_state_node::{GameStateNode, GameStatus};
@@ -144,9 +144,9 @@ impl GameStateNode for NimState {
     fn status(&self) -> GameStatus<NimPlayer> {
         if all_piles().iter().all(|pile| self.piles[pile] == 0) {
             GameStatus::Completed {
-                winners: match self.turn {
-                    NimPlayer::One => EnumSet::only(NimPlayer::Two),
-                    NimPlayer::Two => EnumSet::only(NimPlayer::One),
+                scores: match self.turn {
+                    NimPlayer::One => HashMap::from([(NimPlayer::Two, 1), (NimPlayer::One, -1)]),
+                    NimPlayer::Two => HashMap::from([(NimPlayer::One, 1), (NimPlayer::Two, -1)]),
                 },
             }
         } else {

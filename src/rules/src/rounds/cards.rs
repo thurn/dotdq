@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::{CompletedTrick, PlayPhaseData, PlayedCard};
-use data::primitives::{Card, PlayerName};
+use data::primitive::primitives::{Card, PlayerName};
 
 use crate::rounds::tricks;
 

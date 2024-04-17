@@ -19,7 +19,7 @@ use enumset::EnumSet;
 use crate::contract_phase_data::Contracts;
 use crate::delegate_data::{Context, HasPrograms, PlayPhaseDelegates, ProgramId, ProgramState};
 use crate::game_action::GameAction;
-use crate::primitives::{Card, PlayerName, Suit};
+use crate::primitive::primitives::{Card, PlayerName, Suit};
 use crate::program_data::ProgramData;
 
 pub type TrickNumber = usize;

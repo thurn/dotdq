@@ -14,7 +14,7 @@
 
 use data::delegate_data::HasPrograms;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
-use data::primitives::{Card, PlayerName, Suit};
+use data::primitive::primitives::{Card, PlayerName, Suit};
 
 use crate::rounds::tricks;
 
@@ -66,11 +66,6 @@ pub fn next_to_play(data: &PlayPhaseData) -> PlayerName {
         1..=3 => data.current_trick.cards.last().unwrap().played_by.next(),
         _ => panic!("Invalid trick size"),
     }
-}
-
-/// Returns true if the [PlayerName] player completed their assigned contract
-pub fn met_contract(data: &PlayPhaseData, player: PlayerName) -> bool {
-    data.contracts.contract_number(player) == tricks::won(data, player)
 }
 
 /// Returns the number of cards of the given [Suit] in the indicated hand.

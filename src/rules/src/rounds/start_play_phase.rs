@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use data::contract_phase_data::ContractPhaseData;
 use data::delegate_data::{PlayPhaseDelegates, ProgramId};
 use data::play_phase_data::{PlayPhaseData, Trick};
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use data::program_data::ProgramData;
 
 use crate::program::programs;

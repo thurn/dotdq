@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::Hands;
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use ratatui::prelude::*;
 use typed_builder::TypedBuilder;
 

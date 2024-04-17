@@ -18,7 +18,7 @@ use std::fmt::Debug;
 use crate::delegate_data::{ContractPhaseDelegates, PlayPhaseDelegates};
 use crate::game_action::GameAction;
 use crate::play_phase_data::{Hands, PlayPhaseData, Trick};
-use crate::primitives::{PlayerName, Suit};
+use crate::primitive::primitives::{PlayerName, Suit};
 use crate::program_data::ProgramData;
 
 pub type ContractNumber = usize;

@@ -18,8 +18,7 @@ use crossbeam::atomic::AtomicCell;
 use data::contract_phase_data::{ContractPhaseAction, ContractPhaseData};
 use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseData;
-use data::primitives::PlayerName;
-use rand::Rng;
+use data::primitive::primitives::PlayerName;
 use rules::rounds::tricks;
 use tracing::info;
 
@@ -59,31 +58,14 @@ pub fn populate_agent_contracts(data: ContractPhaseData) {
             AgentName::Uct1MaxTricks,
             AgentName::Uct1MaxTricks,
             &mut play_phase_data,
-            1,
+            100,
             Verbosity::None,
             false,
         );
 
-        let mut west = tricks::won(&play_phase_data, PlayerName::West);
-        let mut north = tricks::won(&play_phase_data, PlayerName::North);
-        let mut east = tricks::won(&play_phase_data, PlayerName::East);
-
-        while play_phase_data.contracts.contract_number(PlayerName::User) + west + north + east
-            == 13
-        {
-            // Sum of contracts cannot be 13. Randomly vary bids until this is no longer the
-            // case.
-            let roll = rand::thread_rng().gen_range(1..=6);
-            match roll {
-                1 => west += 1,
-                2 => west = west.saturating_sub(1),
-                3 => north += 1,
-                4 => north = north.saturating_sub(1),
-                5 => east += 1,
-                6 => east = east.saturating_sub(1),
-                _ => panic!("Out of range"),
-            }
-        }
+        let west = tricks::won(&play_phase_data, PlayerName::West);
+        let north = tricks::won(&play_phase_data, PlayerName::North);
+        let east = tricks::won(&play_phase_data, PlayerName::East);
 
         AGENT_ACTION.store(Some(GameAction::ContractAction(
             ContractPhaseAction::SetAgentContracts { west, north, east },

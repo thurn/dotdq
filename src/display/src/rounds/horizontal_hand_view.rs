@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::primitives::{Card, PlayerName};
+use data::primitive::primitives::{Card, PlayerName};
 use enumset::EnumSet;
 use itertools::Itertools;
 use ratatui::layout::{Offset, Size};

@@ -48,7 +48,7 @@ pub fn main() {
 
 fn run_tournament_match(
     args: &TournamentArgs,
-    scores: &mut HashMap<AgentName, u32>,
+    scores: &mut HashMap<AgentName, i32>,
     p1: AgentName,
     p2: AgentName,
 ) {
@@ -67,11 +67,13 @@ fn run_tournament_match(
     }
 }
 
-fn add_winner(scores: &mut HashMap<AgentName, u32>, winner: AgentName) {
-    scores.entry(winner).and_modify(|score| *score += 1).or_insert(1);
+fn add_winner(current: &mut HashMap<AgentName, i32>, update: HashMap<AgentName, i32>) {
+    for (agent, score) in update {
+        current.entry(agent).and_modify(|s| *s += score).or_insert(score);
+    }
 }
 
-fn print_scores(scores: &HashMap<AgentName, u32>) {
+fn print_scores(scores: &HashMap<AgentName, i32>) {
     let mut result = scores.iter().collect::<Vec<_>>();
     result.sort_by_key(|(_, score)| *score);
     result.reverse();

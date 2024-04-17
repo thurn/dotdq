@@ -15,15 +15,14 @@
 use crate::core::game_state_node::{GameStateNode, GameStatus};
 use crate::core::state_evaluator::StateEvaluator;
 
-/// Evaluator which returns -1 for a loss, 1 for a win, and 0 otherwise
+/// Evaluator which returns the scores for a completed game and 0 otherwise
 pub struct WinLossEvaluator;
 
 impl<TNode: GameStateNode> StateEvaluator<TNode> for WinLossEvaluator {
     fn evaluate(&self, state: &TNode, player: TNode::PlayerName) -> i32 {
         match state.status() {
             GameStatus::InProgress { .. } => 0,
-            GameStatus::Completed { winners } if winners.contains(player) => 1,
-            _ => -1,
+            GameStatus::Completed { scores } => scores[&player],
         }
     }
 }

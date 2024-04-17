@@ -14,7 +14,7 @@
 
 use ratatui::style::Color;
 
-use crate::primitives::Suit;
+use crate::primitive::primitives::Suit;
 
 pub fn suit(suit: Suit) -> Color {
     match suit {

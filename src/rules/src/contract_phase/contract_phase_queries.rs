@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::contract_phase_data::{ContractPhaseAction, ContractPhaseData, ContractPhaseStep};
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 
 /// Returns true if the indicated [ContractPhaseAction] is currently legal to
 /// take
@@ -32,10 +32,8 @@ pub fn can_perform_action(
         ContractPhaseAction::SetUserContract(_) => {
             data.step == ContractPhaseStep::AwaitingUserContact
         }
-        ContractPhaseAction::SetAgentContracts { west, north, east } => {
+        ContractPhaseAction::SetAgentContracts { .. } => {
             data.step == ContractPhaseStep::AwaitingAgentContracts
-                // Contract numbers cannot sum to 13
-                && west + north + east + data.contracts.contract_number(PlayerName::User) != 13
         }
         ContractPhaseAction::StartPlayPhase => data.step == ContractPhaseStep::ReadyToStart,
     }

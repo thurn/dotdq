@@ -15,7 +15,7 @@
 use std::cmp::Ordering;
 
 use data::play_phase_data::{PlayPhaseData, Trick, TrickNumber};
-use data::primitives::{Card, PlayerName, Suit};
+use data::primitive::primitives::{Card, PlayerName, Suit};
 
 /// Returns true if the [PlayerName] player is currently able to lead a card.
 pub fn has_lead(data: &PlayPhaseData, player_name: PlayerName) -> bool {

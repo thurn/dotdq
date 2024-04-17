@@ -15,7 +15,7 @@
 use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep};
 use data::design::colors;
 use data::game_action::GameAction;
-use data::primitives::{Card, PlayerName};
+use data::primitive::primitives::{Card, PlayerName};
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Rect, Size};
 use ratatui::prelude::*;

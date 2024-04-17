@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use data::play_phase_data::PlayPhaseData;
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use rules::rounds::tricks;
 
 use crate::core::game_state_node::{GameStateNode, GameStatus};
@@ -24,17 +24,8 @@ pub struct TrickEvaluator;
 impl StateEvaluator<PlayPhaseData> for TrickEvaluator {
     fn evaluate(&self, data: &PlayPhaseData, player: PlayerName) -> i32 {
         match data.status() {
-            GameStatus::InProgress { .. } => {
-                if tricks::won(data, player) > data.contracts.contract_number(player) {
-                    -1
-                } else {
-                    tricks::won(data, player) as i32
-                }
-            }
-            GameStatus::Completed { winners } if winners.contains(player) => {
-                data.contracts.contract_number(player) as i32
-            }
-            _ => -1,
+            GameStatus::InProgress { .. } => tricks::won(data, player) as i32,
+            GameStatus::Completed { scores } => scores[&player],
         }
     }
 }

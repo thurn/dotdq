@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use enumset::{EnumSet, EnumSetType};
-
 #[derive(Debug, PartialEq, Eq)]
-pub enum GameStatus<TPlayer: EnumSetType> {
+pub enum GameStatus<TPlayer: PartialEq + Eq + Copy + Hash + Debug> {
     /// Game is still ongoing, it is TPlayer's turn.
     InProgress { current_turn: TPlayer },
-    /// Game has ended, the indicated set of players have won.
-    Completed { winners: EnumSet<TPlayer> },
+    /// Game has ended, the players have earned the indicated scores
+    Completed { scores: HashMap<TPlayer, i32> },
 }
 
 /// A generic game state used by an AI algorithm.
@@ -36,7 +35,7 @@ pub trait GameStateNode {
     type Action: Eq + Copy + Hash + Debug;
 
     /// A player in the game.
-    type PlayerName: EnumSetType;
+    type PlayerName: PartialEq + Eq + Copy + Hash + Debug;
 
     /// Create a copy of this search node to be mutated by selection algorithms.
     /// A basic implementation of this would be to simply call `.clone()`, but

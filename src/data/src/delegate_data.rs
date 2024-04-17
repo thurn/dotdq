@@ -15,7 +15,7 @@
 use std::collections::HashMap;
 
 use crate::play_phase_data::{PlayPhaseData, TrickNumber};
-use crate::primitives::PlayerName;
+use crate::primitive::primitives::PlayerName;
 use crate::program_name::ProgramName;
 
 pub trait HasPrograms {

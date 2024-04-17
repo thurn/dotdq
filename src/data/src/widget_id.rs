@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::delegate_data::ProgramId;
-use crate::primitives::Card;
+use crate::primitive::primitives::Card;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum WidgetId {

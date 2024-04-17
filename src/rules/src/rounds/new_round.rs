@@ -18,7 +18,7 @@ use std::slice::ChunksExact;
 use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep, Contracts};
 use data::delegate_data::{ContractPhaseDelegates, PlayPhaseDelegates};
 use data::play_phase_data::{Hands, PlayPhaseData, Trick};
-use data::primitives::{Card, PlayerName, Rank, Suit};
+use data::primitive::primitives::{Card, PlayerName, Rank, Suit};
 use data::program_data::ProgramData;
 use data::program_name::ProgramName;
 use data::round_data::RoundData;

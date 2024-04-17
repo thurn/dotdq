@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
 use clap::{Parser, ValueEnum};
 use data::play_phase_data::PlayPhaseData;
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use rules::rounds::new_round;
 
 use crate::core::agent::AgentConfig;
@@ -79,7 +80,7 @@ pub fn run_match(
     move_time_ms: u64,
     verbosity: Verbosity,
     panic_on_search_timeout: bool,
-) -> AgentName {
+) -> HashMap<AgentName, i32> {
     let user = agents::get_agent(user_agent);
     let opponent = agents::get_agent(opponent_agent);
     if verbosity > Verbosity::None {
@@ -101,14 +102,20 @@ pub fn run_match(
                     println!("{} performs action {:?}", agent.name(), action);
                 }
             }
-            GameStatus::Completed { winners } => {
-                let user_won = winners.contains(PlayerName::User);
-                let agent = if user_won { &user } else { &opponent };
+            GameStatus::Completed { scores } => {
                 if verbosity >= Verbosity::Matches {
                     clear_action_line(verbosity);
-                    println!("{} wins", agent.name(),);
+                    println!("Match ended with scores {:?}", scores);
                 }
-                return if user_won { user_agent } else { opponent_agent };
+                return scores
+                    .iter()
+                    .map(|(&player, &score)| {
+                        (
+                            if player == PlayerName::User { user_agent } else { opponent_agent },
+                            score,
+                        )
+                    })
+                    .collect();
             }
         }
     }

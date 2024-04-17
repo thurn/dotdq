@@ -16,13 +16,14 @@ use std::cmp;
 
 use data::contract_phase_data::{ContractPhaseAction, ContractPhaseData, ContractPhaseStep};
 use data::design::colors;
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use data::widget_id::WidgetId;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Rect, Size};
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Paragraph, StatefulWidget};
+use rules::rounds::scoring;
 use typed_builder::TypedBuilder;
 
 use crate::core::button::Button;
@@ -59,7 +60,12 @@ impl<'a> StatefulWidget for ContractView<'a> {
         )];
         if self.data.step != ContractPhaseStep::ReadyToStart {
             lines.push(Line::from(
-                format!("Current Contract: {}", contract_number).fg(colors::white()),
+                format!(
+                    "Current Contract: {} ({}✦)",
+                    contract_number,
+                    scoring::contract_value(contract_number)
+                )
+                .fg(colors::white()),
             ));
         }
 

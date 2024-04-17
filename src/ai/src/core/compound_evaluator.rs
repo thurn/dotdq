@@ -18,16 +18,16 @@ use crate::core::state_evaluator::StateEvaluator;
 /// A StateEvaluator which combines together the results of a list of child
 /// evaluators, multiplying each result by the associated weight.
 ///
-/// Automatically handles the 'game over' state by returning i32::MAX/i32::MIN
-/// if the player won/lost the game.
+/// Automatically handles the 'game over' state by returning the score for each
+/// player.
 pub struct CompoundEvaluator<TNode: GameStateNode> {
     pub evaluators: Vec<(i32, Box<dyn StateEvaluator<TNode>>)>,
 }
 
 impl<TNode: GameStateNode> StateEvaluator<TNode> for CompoundEvaluator<TNode> {
     fn evaluate(&self, node: &TNode, player: TNode::PlayerName) -> i32 {
-        if let GameStatus::Completed { winners } = node.status() {
-            return if winners.contains(player) { i32::MAX } else { i32::MIN };
+        if let GameStatus::Completed { scores } = node.status() {
+            return scores[&player];
         }
 
         let mut score = 0;

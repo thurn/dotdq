@@ -19,7 +19,7 @@ use color_eyre::Result;
 use crossterm::event;
 use data::contract_phase_data::ContractPhaseStep;
 use data::game_action::GameAction;
-use data::primitives::PlayerName;
+use data::primitive::primitives::PlayerName;
 use data::round_data::RoundData;
 use display::core::render_context::RenderContext;
 use display::rounds::contract_phase_view::ContractPhaseView;

@@ -18,8 +18,9 @@ use data::contract_phase_data::ContractPhaseData;
 use data::delegate_data::{PlayPhaseDelegates, ProgramId};
 use data::play_phase_data::{PlayPhaseData, Trick};
 use data::primitives::PlayerName;
-use data::programs;
-use data::programs::ProgramData;
+use data::program_data::ProgramData;
+
+use crate::program::programs;
 
 pub fn run(data: ContractPhaseData) -> PlayPhaseData {
     let mut delegates = PlayPhaseDelegates::default();

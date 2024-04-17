@@ -28,7 +28,7 @@ fn main() -> Result<()> {
     utils::initialize_panic_handler()?;
     Cli::parse();
 
-    // Required to make the linker not discard programs under OSX, see
+    // Required to make the linker not discard program under OSX, see
     // https://github.com/dtolnay/linkme/issues/61
     play_phase_programs::linkme();
 

@@ -44,7 +44,7 @@ impl StatefulWidget for CardView {
             .borders(Borders::ALL)
             .border_set(border::ROUNDED)
             .border_style(Style::new().fg(if self.on_click.is_some() {
-                colors::yellow()
+                colors::can_activate()
             } else {
                 colors::white()
             }));

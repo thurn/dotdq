@@ -18,8 +18,12 @@ use crate::play_phase_data::{PlayPhaseData, TrickNumber};
 use crate::primitives::PlayerName;
 use crate::program_name::ProgramName;
 
-pub trait HasProgramState {
+pub trait HasPrograms {
     fn get_state(&self, id: &ProgramId) -> Option<ProgramState>;
+
+    fn can_activate(&self, program: ProgramId) -> bool;
+
+    fn activate(&mut self, program: ProgramId);
 }
 
 #[derive(Eq, PartialEq, Clone, Copy)]
@@ -46,6 +50,10 @@ pub struct Context {
 }
 
 impl Context {
+    pub fn new(id: ProgramId, state: Option<ProgramState>) -> Self {
+        Self { id, state }
+    }
+
     pub fn set_state(&mut self, state: ProgramState) {
         self.state = Some(state);
     }
@@ -55,14 +63,17 @@ impl Context {
     }
 }
 
+pub type SingleQueryFn<TData, TResult> = fn(&TData, &Context) -> TResult;
 pub type QueryFn<TData, TArg, TResult> = fn(&TData, &Context, &TArg, TResult) -> TResult;
+pub type SingleMutationFn<TData> = fn(&mut TData, &mut Context);
+pub type MutationFn<TData, TArg> = fn(&mut TData, &mut Context, &TArg);
 
 #[derive(Clone)]
-pub struct QueryDelegateList<TData: HasProgramState, TArg, TResult> {
+pub struct QueryDelegateList<TData: HasPrograms, TArg, TResult> {
     delegates: Vec<(ProgramId, QueryFn<TData, TArg, TResult>)>,
 }
 
-impl<TData: HasProgramState, TArg, TResult> QueryDelegateList<TData, TArg, TResult> {
+impl<TData: HasPrograms, TArg, TResult> QueryDelegateList<TData, TArg, TResult> {
     pub fn queried(&mut self, id: ProgramId, value: QueryFn<TData, TArg, TResult>) {
         self.delegates.push((id, value));
     }
@@ -77,7 +88,7 @@ impl<TData: HasProgramState, TArg, TResult> QueryDelegateList<TData, TArg, TResu
     }
 }
 
-impl<TData: HasProgramState, TContext, TResult> Default
+impl<TData: HasPrograms, TContext, TResult> Default
     for QueryDelegateList<TData, TContext, TResult>
 {
     fn default() -> Self {
@@ -86,19 +97,48 @@ impl<TData: HasProgramState, TContext, TResult> Default
 }
 
 #[derive(Clone)]
-pub struct SingleDelegateMap<T> {
-    delegates: HashMap<ProgramId, T>,
+pub struct ProgramQuery<TData: HasPrograms, TResult> {
+    delegates: HashMap<ProgramId, SingleQueryFn<TData, TResult>>,
 }
 
-impl<T> Default for SingleDelegateMap<T> {
+impl<TData: HasPrograms, TResult> Default for ProgramQuery<TData, TResult> {
     fn default() -> Self {
         Self { delegates: HashMap::default() }
     }
 }
 
-impl<T> SingleDelegateMap<T> {
-    pub fn this(&mut self, id: ProgramId, value: T) {
+impl<TData: HasPrograms, TResult> ProgramQuery<TData, TResult> {
+    pub fn this(&mut self, id: ProgramId, value: SingleQueryFn<TData, TResult>) {
         self.delegates.insert(id, value);
+    }
+
+    pub fn run_query(&self, data: &TData, program_id: ProgramId, current: TResult) -> TResult {
+        let Some(function) = self.delegates.get(&program_id) else {
+            return current;
+        };
+        let context = Context { id: program_id, state: data.get_state(&program_id) };
+        function(data, &context)
+    }
+}
+
+#[derive(Clone)]
+pub struct ProgramMutation<TData: HasPrograms> {
+    delegates: HashMap<ProgramId, SingleMutationFn<TData>>,
+}
+
+impl<TData: HasPrograms> Default for ProgramMutation<TData> {
+    fn default() -> Self {
+        Self { delegates: HashMap::default() }
+    }
+}
+
+impl<TData: HasPrograms> ProgramMutation<TData> {
+    pub fn this(&mut self, id: ProgramId, value: SingleMutationFn<TData>) {
+        self.delegates.insert(id, value);
+    }
+
+    pub fn get_mutation_fn(&mut self, program_id: ProgramId) -> Option<SingleMutationFn<TData>> {
+        self.delegates.get(&program_id).copied()
     }
 }
 
@@ -122,8 +162,8 @@ pub struct ContractPhaseDelegates {}
 
 #[derive(Default, Clone)]
 pub struct PlayPhaseDelegates {
-    pub can_activate: SingleDelegateMap<fn(&PlayPhaseData, &Context) -> bool>,
-    pub activated: SingleDelegateMap<fn(&mut PlayPhaseData, &mut Context)>,
+    pub can_activate: ProgramQuery<PlayPhaseData, bool>,
+    pub activated: ProgramMutation<PlayPhaseData>,
     pub trick_winner: QueryDelegateList<PlayPhaseData, TrickNumber, PlayerName>,
 }
 

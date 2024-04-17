@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use data::delegate_data::ProgramState;
+use data::program_data::{ProgramDefinition, PROGRAMS};
 use data::program_name::ProgramName;
-use data::programs::{ProgramDefinition, PROGRAMS};
 use linkme::distributed_slice;
 use rules::rounds::tricks;
 

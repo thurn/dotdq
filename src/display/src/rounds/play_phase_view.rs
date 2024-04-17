@@ -101,7 +101,11 @@ impl PlayAreaDelegate for PlayPhaseData {
             .iter()
             .map(|&name| ProgramId::new(name, PlayerName::User))
             .collect();
-        ProgramListView::new().programs(programs).build().render(program_list, buf, context);
+        ProgramListView::new().data(self).programs(programs).build().render(
+            program_list,
+            buf,
+            context,
+        );
 
         let trick = if self.current_trick.is_started() {
             Some(self.current_trick.clone())

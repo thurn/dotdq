@@ -19,7 +19,7 @@ use crate::delegate_data::{ContractPhaseDelegates, PlayPhaseDelegates};
 use crate::game_action::GameAction;
 use crate::play_phase_data::{Hands, PlayPhaseData, Trick};
 use crate::primitives::{PlayerName, Suit};
-use crate::programs::ProgramData;
+use crate::program_data::ProgramData;
 
 pub type ContractNumber = usize;
 
@@ -41,7 +41,7 @@ pub struct ContractPhaseData {
     pub hands: Hands,
     /// Current step within the contract phase
     pub step: ContractPhaseStep,
-    /// Data about programs for the players in this round
+    /// Data about program for the players in this round
     pub programs: ProgramData<ContractPhaseDelegates>,
 }
 

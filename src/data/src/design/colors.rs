@@ -32,6 +32,10 @@ pub fn trump(trump_suit: Option<Suit>) -> Color {
     }
 }
 
+pub fn can_activate() -> Color {
+    yellow()
+}
+
 pub fn black() -> Color {
     color("#140C1C")
 }

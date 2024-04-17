@@ -17,10 +17,10 @@ use std::fmt::{Debug, Formatter};
 use enumset::EnumSet;
 
 use crate::contract_phase_data::Contracts;
-use crate::delegate_data::{HasProgramState, PlayPhaseDelegates, ProgramId, ProgramState};
+use crate::delegate_data::{Context, HasPrograms, PlayPhaseDelegates, ProgramId, ProgramState};
 use crate::game_action::GameAction;
 use crate::primitives::{Card, PlayerName, Suit};
-use crate::programs::ProgramData;
+use crate::program_data::ProgramData;
 
 pub type TrickNumber = usize;
 
@@ -34,9 +34,20 @@ pub struct PlayPhaseData {
     pub programs: ProgramData<PlayPhaseDelegates>,
 }
 
-impl HasProgramState for PlayPhaseData {
+impl HasPrograms for PlayPhaseData {
     fn get_state(&self, id: &ProgramId) -> Option<ProgramState> {
         self.programs.program_state.get(id).copied()
+    }
+
+    fn can_activate(&self, program: ProgramId) -> bool {
+        self.programs.current_delegates.can_activate.run_query(self, program, false)
+    }
+
+    fn activate(&mut self, program: ProgramId) {
+        if let Some(function) = self.programs.current_delegates.activated.get_mutation_fn(program) {
+            let mut context = Context { id: program, state: self.get_state(&program) };
+            function(self, &mut context);
+        }
     }
 }
 

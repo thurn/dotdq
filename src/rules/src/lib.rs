@@ -14,4 +14,5 @@
 
 pub mod contract_phase;
 pub mod play_phase;
+pub mod program;
 pub mod rounds;

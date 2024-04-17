@@ -15,7 +15,6 @@
 use std::collections::HashMap;
 
 use linkme::distributed_slice;
-use once_cell::sync::Lazy;
 use typed_builder::TypedBuilder;
 
 use crate::delegate_data::{
@@ -27,23 +26,9 @@ use crate::program_name::ProgramName;
 #[distributed_slice]
 pub static PROGRAMS: [fn() -> ProgramDefinition];
 
-static DEFINITIONS: Lazy<HashMap<ProgramName, ProgramDefinition>> = Lazy::new(|| {
-    let mut result = HashMap::new();
-    for function in PROGRAMS {
-        let definition = function();
-        assert!(!result.contains_key(&definition.name), "Duplicate program {:?}", definition.name);
-        result.insert(definition.name, definition);
-    }
-    result
-});
-
-pub fn get(name: ProgramName) -> &'static ProgramDefinition {
-    DEFINITIONS.get(&name).unwrap_or_else(|| panic!("Program not found {name}"))
-}
-
 #[derive(Clone)]
-pub struct ProgramData<TDelegates> {
-    pub current_delegates: TDelegates,
+pub struct ProgramData<T> {
+    pub current_delegates: T,
     pub program_state: HashMap<ProgramId, ProgramState>,
     pub all_programs: HashMap<PlayerName, Vec<ProgramName>>,
 }

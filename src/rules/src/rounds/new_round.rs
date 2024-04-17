@@ -19,8 +19,8 @@ use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep, Contracts}
 use data::delegate_data::{ContractPhaseDelegates, PlayPhaseDelegates};
 use data::play_phase_data::{Hands, PlayPhaseData, Trick};
 use data::primitives::{Card, PlayerName, Rank, Suit};
+use data::program_data::ProgramData;
 use data::program_name::ProgramName;
-use data::programs::ProgramData;
 use data::round_data::RoundData;
 use enumset::EnumSet;
 use rand::prelude::SliceRandom;

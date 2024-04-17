@@ -14,7 +14,7 @@
 
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::PlayerName;
-use rules::play_phase::play_phase_queries;
+use rules::rounds::tricks;
 
 use crate::core::game_state_node::{GameStateNode, GameStatus};
 use crate::core::state_evaluator::StateEvaluator;
@@ -25,12 +25,10 @@ impl StateEvaluator<PlayPhaseData> for TrickEvaluator {
     fn evaluate(&self, data: &PlayPhaseData, player: PlayerName) -> i32 {
         match data.status() {
             GameStatus::InProgress { .. } => {
-                if play_phase_queries::tricks_won(data, player)
-                    > data.contracts.contract_number(player)
-                {
+                if tricks::won(data, player) > data.contracts.contract_number(player) {
                     -1
                 } else {
-                    play_phase_queries::tricks_won(data, player) as i32
+                    tricks::won(data, player) as i32
                 }
             }
             GameStatus::Completed { winners } if winners.contains(player) => {
@@ -45,6 +43,6 @@ pub struct MaxTricksEvaluator;
 
 impl StateEvaluator<PlayPhaseData> for MaxTricksEvaluator {
     fn evaluate(&self, data: &PlayPhaseData, player: PlayerName) -> i32 {
-        play_phase_queries::tricks_won(data, player) as i32
+        tricks::won(data, player) as i32
     }
 }

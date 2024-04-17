@@ -12,21 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 
 use enumset::EnumSet;
 
 use crate::contract_phase_data::Contracts;
+use crate::delegate_data::{HasProgramState, PlayPhaseDelegates, ProgramId, ProgramState};
 use crate::game_action::GameAction;
 use crate::primitives::{Card, PlayerName, Suit};
 
-#[derive(Debug, Clone)]
+pub type TrickNumber = usize;
+
+#[derive(Clone)]
 pub struct PlayPhaseData {
     pub current_trick: Trick,
     pub completed_tricks: Vec<CompletedTrick>,
     pub trump: Option<Suit>,
     pub contracts: Contracts,
     pub hands: Hands,
+    pub delegates: PlayPhaseDelegates,
+    pub program_state: HashMap<ProgramId, ProgramState>,
+}
+
+impl HasProgramState for PlayPhaseData {
+    fn get_state(&self, id: &ProgramId) -> Option<ProgramState> {
+        self.program_state.get(id).copied()
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -15,7 +15,7 @@
 use crate::contract_phase_data::ContractPhaseData;
 use crate::play_phase_data::PlayPhaseData;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum RoundData {
     ContractPhase(ContractPhaseData),
     PlayPhase(PlayPhaseData),

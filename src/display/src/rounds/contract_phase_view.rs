@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep};
+use data::design::colors;
 use data::game_action::GameAction;
 use data::primitives::{Card, PlayerName};
 use ratatui::buffer::Buffer;
@@ -20,7 +21,6 @@ use ratatui::layout::{Rect, Size};
 use ratatui::prelude::*;
 use typed_builder::TypedBuilder;
 
-use crate::core::colors;
 use crate::core::render_context::RenderContext;
 use crate::rounds::contract_view::ContractView;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;

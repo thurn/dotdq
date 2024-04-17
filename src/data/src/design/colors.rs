@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::primitives::Suit;
 use ratatui::style::Color;
+
+use crate::primitives::Suit;
 
 pub fn suit(suit: Suit) -> Color {
     match suit {

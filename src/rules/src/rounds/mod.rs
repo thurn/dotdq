@@ -13,3 +13,4 @@
 // limitations under the License.
 
 pub mod new_round;
+pub mod tricks;

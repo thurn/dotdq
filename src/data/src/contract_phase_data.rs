@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::collections::HashMap;
 use std::fmt::Debug;
 
+use crate::delegate_data::PlayPhaseDelegates;
 use crate::game_action::GameAction;
 use crate::play_phase_data::{Hands, PlayPhaseData, Trick};
 use crate::primitives::{PlayerName, Suit};
@@ -48,6 +50,8 @@ impl ContractPhaseData {
             trump: self.trump,
             contracts: self.contracts,
             hands: self.hands,
+            delegates: PlayPhaseDelegates::default(),
+            program_state: HashMap::new(),
         }
     }
 }

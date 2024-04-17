@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::design::colors;
 use data::game_action::GameAction;
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::{Card, PlayerName};
@@ -19,9 +20,9 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::{Rect, Size};
 use ratatui::prelude::*;
 use rules::play_phase::play_phase_queries;
+use rules::rounds::tricks;
 use typed_builder::TypedBuilder;
 
-use crate::core::colors;
 use crate::core::render_context::RenderContext;
 use crate::rounds::play_area_delegate::PlayAreaDelegate;
 use crate::rounds::play_area_view::PlayAreaView;
@@ -83,11 +84,7 @@ impl PlayAreaDelegate for PlayPhaseData {
 
 fn contract_string(data: &PlayPhaseData, name: PlayerName) -> Line {
     Line::from(
-        format!(
-            "{name}: {}/{}",
-            play_phase_queries::tricks_won(data, name),
-            data.contracts.contract_number(name)
-        )
-        .fg(colors::white()),
+        format!("{name}: {}/{}", tricks::won(data, name), data.contracts.contract_number(name))
+            .fg(colors::white()),
     )
 }

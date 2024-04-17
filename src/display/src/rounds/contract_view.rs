@@ -15,6 +15,7 @@
 use std::cmp;
 
 use data::contract_phase_data::{ContractPhaseAction, ContractPhaseData, ContractPhaseStep};
+use data::design::colors;
 use data::primitives::PlayerName;
 use data::widget_id::WidgetId;
 use ratatui::buffer::Buffer;
@@ -25,8 +26,8 @@ use ratatui::widgets::{Block, Borders, Paragraph, StatefulWidget};
 use typed_builder::TypedBuilder;
 
 use crate::core::button::Button;
+use crate::core::layout;
 use crate::core::render_context::RenderContext;
-use crate::core::{colors, layout};
 
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]

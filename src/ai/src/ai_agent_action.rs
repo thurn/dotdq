@@ -20,7 +20,7 @@ use data::game_action::GameAction;
 use data::play_phase_data::PlayPhaseData;
 use data::primitives::PlayerName;
 use rand::Rng;
-use rules::play_phase::play_phase_queries;
+use rules::rounds::tricks;
 use tracing::info;
 
 use crate::core::agent::AgentConfig;
@@ -42,7 +42,7 @@ pub fn initiate_selection(data: PlayPhaseData) {
         let agent = agents::get_agent(AgentName::Uct1);
         let action = agent.pick_action(
             AgentConfig {
-                deadline: Instant::now() + Duration::from_secs(2),
+                deadline: Instant::now() + Duration::from_secs(1),
                 panic_on_search_timeout: false,
             },
             &data,
@@ -64,9 +64,9 @@ pub fn populate_agent_contracts(data: ContractPhaseData) {
             false,
         );
 
-        let mut west = play_phase_queries::tricks_won(&play_phase_data, PlayerName::West);
-        let mut north = play_phase_queries::tricks_won(&play_phase_data, PlayerName::North);
-        let mut east = play_phase_queries::tricks_won(&play_phase_data, PlayerName::East);
+        let mut west = tricks::won(&play_phase_data, PlayerName::West);
+        let mut north = tricks::won(&play_phase_data, PlayerName::North);
+        let mut east = tricks::won(&play_phase_data, PlayerName::East);
 
         while play_phase_data.contracts.contract_number(PlayerName::User) + west + north + east
             == 13

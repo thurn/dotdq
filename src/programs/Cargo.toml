@@ -1,0 +1,15 @@
+[package]
+name = "programs"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+data = { path = "../data", version = "0.0.0" }
+rules = { path = "../rules", version = "0.0.0" }
+
+linkme = "0.3.25"

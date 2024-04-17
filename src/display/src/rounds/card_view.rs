@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::design::colors;
 use data::game_action::GameAction;
 use data::primitives::Card;
 use data::widget_id::WidgetId;
@@ -21,7 +22,6 @@ use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use typed_builder::TypedBuilder;
 
-use crate::core::colors;
 use crate::core::render_context::RenderContext;
 
 #[derive(TypedBuilder)]

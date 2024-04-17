@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::collections::HashMap;
 use std::slice::ChunksExact;
 
 use data::contract_phase_data::{ContractPhaseData, ContractPhaseStep, Contracts};
+use data::delegate_data::PlayPhaseDelegates;
 use data::play_phase_data::{Hands, PlayPhaseData, Trick};
 use data::primitives::{Card, Rank, Suit};
 use data::round_data::RoundData;
@@ -74,6 +76,8 @@ pub fn create_play_phase(rng: &mut impl Rng) -> PlayPhaseData {
         trump,
         contracts: Contracts::default(),
         hands: Hands::new(north, east, south, west),
+        delegates: PlayPhaseDelegates::default(),
+        program_state: HashMap::new(),
     }
 }
 

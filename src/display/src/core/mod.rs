@@ -13,6 +13,5 @@
 // limitations under the License.
 
 pub mod button;
-pub mod colors;
 pub mod layout;
 pub mod render_context;

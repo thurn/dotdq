@@ -12,13 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod contract_phase_data;
-pub mod delegate_data;
-pub mod design;
-pub mod game_action;
-pub mod play_phase_data;
-pub mod primitives;
-pub mod program_data;
-pub mod program_name;
-pub mod round_data;
-pub mod widget_id;
+pub mod play_phase_programs;

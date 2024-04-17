@@ -16,6 +16,7 @@ use data::play_phase_data::{CompletedTrick, PlayPhaseAction, PlayPhaseData, Play
 use data::primitives::{Card, PlayerName};
 
 use crate::play_phase::play_phase_queries;
+use crate::rounds::tricks;
 
 pub fn handle_action(data: &mut PlayPhaseData, player: PlayerName, action: PlayPhaseAction) {
     assert!(
@@ -37,7 +38,7 @@ fn play_card(data: &mut PlayPhaseData, hand: PlayerName, card: Card) {
     data.current_trick.cards.push(PlayedCard { played_by: hand, card });
     if data.current_trick.cards.len() == 4 {
         let trick = data.current_trick.clone();
-        let winner = play_phase_queries::trick_winner(data, &trick);
+        let winner = tricks::winner(data, &trick);
         data.completed_tricks.push(CompletedTrick { trick, winner });
     }
 }

@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod contract_phase_data;
-pub mod delegate_data;
-pub mod design;
-pub mod game_action;
-pub mod play_phase_data;
-pub mod primitives;
-pub mod program_data;
-pub mod program_name;
-pub mod round_data;
-pub mod widget_id;
+use std::fmt;
+use std::fmt::{Display, Formatter};
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+pub enum ProgramName {
+    Redstar,
+}
+
+impl Display for ProgramName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let mut result = format!("{:?}", self);
+        result.make_ascii_uppercase();
+        assert!(result.len() <= 8, "Program name {result} cannot exceed 8 bytes");
+        write!(f, "{}", result)
+    }
+}

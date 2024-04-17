@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::cmp::Ordering;
-
-use data::play_phase_data::{PlayPhaseAction, PlayPhaseData, Trick};
+use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitives::{Card, PlayerName, Suit};
+
+use crate::rounds::tricks;
 
 /// Returns true if the indicated [PlayPhaseAction] is currently legal to take
 pub fn can_perform_action(
@@ -56,55 +56,20 @@ pub fn next_to_play(data: &PlayPhaseData) -> PlayerName {
     match data.current_trick.cards.len() {
         0 => {
             if let Some(last) = data.completed_tricks.last() {
-                trick_winner(data, &last.trick)
+                tricks::winner(data, &last.trick)
             } else {
                 PlayerName::User
             }
         }
         1..=3 => data.current_trick.cards.last().unwrap().played_by.next(),
-        4 => trick_winner(data, &data.current_trick),
+        4 => tricks::winner(data, &data.current_trick),
         _ => panic!("Invalid trick size"),
     }
 }
 
-/// Returns the number of tricks the [PlayerName] player has won in the
-/// provided game so far.
-pub fn tricks_won(data: &PlayPhaseData, player: PlayerName) -> usize {
-    data.completed_tricks.iter().filter(|t| t.winner == player).count()
-}
-
 /// Returns true if the [PlayerName] player completed their assigned contract
 pub fn met_contract(data: &PlayPhaseData, player: PlayerName) -> bool {
-    data.contracts.contract_number(player) == tricks_won(data, player)
-}
-
-/// Returns the [PlayerName] which won a given trick.
-///
-/// Panics if the provided trick is empty.
-pub fn trick_winner(data: &PlayPhaseData, trick: &Trick) -> PlayerName {
-    let suit = trick_suit(trick).expect("Trick was empty");
-    trick
-        .cards
-        .iter()
-        .max_by(|a, b| card_ordering(data, suit, a.card, b.card))
-        .expect("Trick was empty")
-        .played_by
-}
-
-pub fn card_ordering(data: &PlayPhaseData, trick_suit: Suit, left: Card, right: Card) -> Ordering {
-    match data.trump {
-        Some(trump) if left.suit() != right.suit() && left.suit() == trump => Ordering::Greater,
-        Some(trump) if left.suit() != right.suit() && right.suit() == trump => Ordering::Less,
-        _ if left.suit() != right.suit() && left.suit() == trick_suit => Ordering::Greater,
-        _ if left.suit() != right.suit() && right.suit() == trick_suit => Ordering::Less,
-        _ => left.cmp(&right),
-    }
-}
-
-/// Returns the [Suit] being used for the provided trick, or None if the trick
-/// is empty.
-fn trick_suit(trick: &Trick) -> Option<Suit> {
-    Some(trick.cards.first()?.card.suit())
+    data.contracts.contract_number(player) == tricks::won(data, player)
 }
 
 /// Returns the number of cards of the given [Suit] in the indicated hand.
@@ -113,7 +78,7 @@ fn suit_count(data: &PlayPhaseData, hand: PlayerName, suit: Suit) -> usize {
 }
 
 fn can_play_card(data: &PlayPhaseData, player: PlayerName, card: Card) -> bool {
-    let follows_suit = if let Some(suit) = trick_suit(&data.current_trick) {
+    let follows_suit = if let Some(suit) = tricks::suit(&data.current_trick) {
         suit == card.suit() || suit_count(data, player, suit) == 0
     } else {
         true

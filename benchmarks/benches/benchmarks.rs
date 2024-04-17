@@ -21,24 +21,7 @@ use criterion::measurement::WallTime;
 use criterion::{criterion_group, criterion_main, BenchmarkGroup, Criterion};
 
 criterion_main!(benches);
-criterion_group!(benches, alpha_beta, uct1);
-
-pub fn alpha_beta(c: &mut Criterion) {
-    let mut group = start(c, "alpha_beta");
-    group.measurement_time(Duration::from_secs(60));
-    group.bench_function("Alpha Beta", |b| {
-        b.iter(|| {
-            run_matchup::run_with_args(&MatchupArgs {
-                user: AgentName::AlphaBetaDepth10,
-                opponent: AgentName::AlphaBetaDepth10,
-                move_time_ms: 1000,
-                matches: 1,
-                verbosity: Verbosity::None,
-                panic_on_search_timeout: false,
-            })
-        })
-    });
-}
+criterion_group!(benches, uct1);
 
 pub fn uct1(c: &mut Criterion) {
     let mut group = start(c, "uct1");
@@ -57,7 +40,7 @@ pub fn uct1(c: &mut Criterion) {
     });
 }
 
-fn start<'a>(c: &'a mut criterion::Criterion, s: &'static str) -> BenchmarkGroup<'a, WallTime> {
+fn start<'a>(c: &'a mut Criterion, s: &'static str) -> BenchmarkGroup<'a, WallTime> {
     programs::linkme();
     c.benchmark_group(s)
 }

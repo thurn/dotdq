@@ -33,6 +33,12 @@ pub struct ProgramData<T> {
     pub all_programs: HashMap<PlayerName, Vec<ProgramName>>,
 }
 
+impl<T> ProgramData<T> {
+    pub fn for_player(&self, player: PlayerName) -> impl Iterator<Item = ProgramName> + '_ {
+        self.all_programs.get(&player).into_iter().flatten().copied()
+    }
+}
+
 #[derive(TypedBuilder)]
 #[builder(builder_method(name = new))]
 pub struct ProgramDefinition {

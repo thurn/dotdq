@@ -17,6 +17,7 @@ use ai::testing::run_matchup::MatchupArgs;
 use clap::Parser;
 
 pub fn main() {
+    programs::linkme();
     let args = MatchupArgs::parse();
     run_matchup::run_with_args(&args)
 }

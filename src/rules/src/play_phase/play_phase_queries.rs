@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::delegate_data::HasPrograms;
+use data::delegate_data::{HasPrograms, ProgramId};
 use data::play_phase_data::{PlayPhaseAction, PlayPhaseData};
 use data::primitive::primitives::{Card, PlayerName, Suit};
 
@@ -41,6 +41,10 @@ pub fn legal_actions(
         .iter()
         .map(PlayPhaseAction::PlayCard)
         .filter(move |&action| can_perform_action(data, player, action))
+        .chain(data.programs.for_player(player).filter_map(move |p| {
+            let id = ProgramId::new(p, player);
+            data.can_activate(id).then_some(PlayPhaseAction::ActivateProgram(id))
+        }))
 }
 
 /// Returns the [PlayerName] whose turn to act it currently is, or None if

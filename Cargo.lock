@@ -49,6 +49,7 @@ dependencies = [
  "enumset",
  "itertools 0.12.1",
  "petgraph",
+ "programs",
  "rand",
  "rayon",
  "rules",
@@ -172,6 +173,7 @@ dependencies = [
  "ai",
  "criterion",
  "data",
+ "programs",
 ]
 
 [[package]]

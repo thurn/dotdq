@@ -13,3 +13,9 @@
 // limitations under the License.
 
 pub mod play_phase_programs;
+
+// Required to make the linker not discard program under OSX, see
+// https://github.com/dtolnay/linkme/issues/61
+pub fn linkme() {
+    play_phase_programs::linkme();
+}

@@ -32,6 +32,7 @@ pub struct TournamentArgs {
 }
 
 pub fn main() {
+    programs::linkme();
     let args = TournamentArgs::parse();
     println!("Running Tournament: {:?}", args.players);
     let mut scores = HashMap::new();
@@ -54,7 +55,7 @@ fn run_tournament_match(
 ) {
     for _ in 0..5 {
         // Players play the game from both sides in order to ensure fairness
-        let mut game1 = new_round::create_play_phase(&mut rand::thread_rng());
+        let mut game1 = new_round::create_play_phase(&mut rand::thread_rng(), 3);
         let mut game2 = game1.clone();
         add_winner(
             scores,

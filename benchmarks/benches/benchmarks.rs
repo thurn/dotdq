@@ -17,13 +17,14 @@ use std::time::Duration;
 use ai::game::agents::AgentName;
 use ai::testing::run_matchup;
 use ai::testing::run_matchup::{MatchupArgs, Verbosity};
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::measurement::WallTime;
+use criterion::{criterion_group, criterion_main, BenchmarkGroup, Criterion};
 
 criterion_main!(benches);
 criterion_group!(benches, alpha_beta, uct1);
 
 pub fn alpha_beta(c: &mut Criterion) {
-    let mut group = c.benchmark_group("alpha_beta");
+    let mut group = start(c, "alpha_beta");
     group.measurement_time(Duration::from_secs(60));
     group.bench_function("Alpha Beta", |b| {
         b.iter(|| {
@@ -40,7 +41,7 @@ pub fn alpha_beta(c: &mut Criterion) {
 }
 
 pub fn uct1(c: &mut Criterion) {
-    let mut group = c.benchmark_group("uct1");
+    let mut group = start(c, "uct1");
     group.measurement_time(Duration::from_secs(30));
     group.bench_function("UCT1", |b| {
         b.iter(|| {
@@ -54,4 +55,9 @@ pub fn uct1(c: &mut Criterion) {
             })
         })
     });
+}
+
+fn start<'a>(c: &'a mut criterion::Criterion, s: &'static str) -> BenchmarkGroup<'a, WallTime> {
+    programs::linkme();
+    c.benchmark_group(s)
 }

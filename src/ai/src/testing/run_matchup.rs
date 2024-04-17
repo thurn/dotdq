@@ -61,7 +61,7 @@ pub fn run_with_args(args: &MatchupArgs) {
         if args.verbosity >= Verbosity::Matches {
             println!(">>> Running match {} between {} and {}", i, user.name(), opponent.name());
         }
-        let mut game = new_round::create_play_phase(&mut rand::thread_rng());
+        let mut game = new_round::create_play_phase(&mut rand::thread_rng(), 3);
         run_match(
             args.user,
             args.opponent,

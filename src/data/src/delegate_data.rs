@@ -18,12 +18,26 @@ use crate::play_phase_data::{PlayPhaseData, TrickNumber};
 use crate::primitive::primitives::PlayerName;
 use crate::program_name::ProgramName;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+pub enum ActivationState {
+    CannotActivate,
+    CanActivate,
+    CurrentlyActive,
+    PreviouslyActivated,
+}
+
+impl ActivationState {
+    pub fn can_activate(&self) -> bool {
+        *self == Self::CanActivate
+    }
+}
+
 pub trait HasPrograms {
     fn get_state(&self, id: &ProgramId) -> Option<ProgramState>;
 
     fn set_state(&mut self, id: ProgramId, state: Option<ProgramState>);
 
-    fn can_activate(&self, program: ProgramId) -> bool;
+    fn activation_state(&self, program: ProgramId) -> ActivationState;
 
     fn activate(&mut self, program: ProgramId);
 }
@@ -116,6 +130,7 @@ impl<TData: HasPrograms, TResult> Default for ProgramQuery<TData, TResult> {
 
 impl<TData: HasPrograms, TResult> ProgramQuery<TData, TResult> {
     pub fn this(&mut self, id: ProgramId, value: SingleQueryFn<TData, TResult>) {
+        assert!(!self.delegates.contains_key(&id), "Delegate already registered for {id:?}");
         self.delegates.insert(id, value);
     }
 
@@ -141,6 +156,7 @@ impl<TData: HasPrograms> Default for ProgramMutation<TData> {
 
 impl<TData: HasPrograms> ProgramMutation<TData> {
     pub fn this(&mut self, id: ProgramId, value: SingleMutationFn<TData>) {
+        assert!(!self.delegates.contains_key(&id), "Delegate already registered for {id:?}");
         self.delegates.insert(id, value);
     }
 
@@ -170,12 +186,25 @@ impl<T> Default for EventDelegateList<T> {
 #[derive(Default, Clone)]
 pub struct ContractPhaseDelegates {}
 
+#[derive(Clone)]
+pub struct PlayerTrickNumber {
+    pub player_name: PlayerName,
+    pub trick_number: TrickNumber,
+}
+
+impl PlayerTrickNumber {
+    pub fn new(player_name: PlayerName, trick_number: TrickNumber) -> Self {
+        Self { player_name, trick_number }
+    }
+}
+
 #[derive(Default, Clone)]
 pub struct PlayPhaseDelegates {
     pub can_activate: ProgramQuery<PlayPhaseData, bool>,
+    pub currently_active: ProgramQuery<PlayPhaseData, bool>,
     pub activated: ProgramMutation<PlayPhaseData>,
     pub trick_winner: QueryDelegateList<PlayPhaseData, TrickNumber, PlayerName>,
-    pub must_follow_suit: QueryDelegateList<PlayPhaseData, TrickNumber, bool>,
+    pub must_follow_suit: QueryDelegateList<PlayPhaseData, PlayerTrickNumber, bool>,
 }
 
 #[derive(Default)]

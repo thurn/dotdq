@@ -19,7 +19,7 @@ use std::fmt::{Display, Formatter};
 pub enum ProgramName {
     Starfall,
     Obsidian,
-    Excavate,
+    Eviction,
 }
 
 impl Display for ProgramName {

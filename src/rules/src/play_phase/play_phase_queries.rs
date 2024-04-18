@@ -26,7 +26,7 @@ pub fn can_perform_action(
 ) -> bool {
     match action {
         PlayPhaseAction::PlayCard(card) => cards::can_play(data, player, card),
-        PlayPhaseAction::ActivateProgram(program) => data.can_activate(program),
+        PlayPhaseAction::ActivateProgram(program) => data.activation_state(program).can_activate(),
     }
 }
 
@@ -40,11 +40,12 @@ pub fn legal_actions(
         .hand(player)
         .iter()
         .map(PlayPhaseAction::PlayCard)
+        .chain(
+            data.programs
+                .for_player(player)
+                .map(move |p| PlayPhaseAction::ActivateProgram(ProgramId::new(p, player))),
+        )
         .filter(move |&action| can_perform_action(data, player, action))
-        .chain(data.programs.for_player(player).filter_map(move |p| {
-            let id = ProgramId::new(p, player);
-            data.can_activate(id).then_some(PlayPhaseAction::ActivateProgram(id))
-        }))
 }
 
 /// Returns the number of cards of the given [Suit] in the indicated hand.

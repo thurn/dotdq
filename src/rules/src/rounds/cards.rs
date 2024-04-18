@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use data::delegate_data::PlayerTrickNumber;
 use data::play_phase_data::{CompletedTrick, PlayPhaseData, PlayedCard};
 use data::primitive::primitives::{Card, PlayerName};
 
@@ -41,7 +42,7 @@ pub fn can_play(data: &PlayPhaseData, player: PlayerName, card: Card) -> bool {
 
     let must_follow_suit = data.programs.current_delegates.must_follow_suit.run_query(
         data,
-        &tricks::current_number(data),
+        &PlayerTrickNumber::new(player, tricks::current_number(data)),
         true,
     );
 

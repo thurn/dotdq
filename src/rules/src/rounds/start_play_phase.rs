@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use data::contract_phase_data::ContractPhaseData;
 use data::delegate_data::{PlayPhaseDelegates, ProgramId};
@@ -44,6 +44,7 @@ pub fn run(data: ContractPhaseData) -> PlayPhaseData {
             current_delegates: delegates,
             program_state: HashMap::new(),
             all_programs: data.programs.all_programs,
+            activated: HashSet::new(),
         },
     }
 }

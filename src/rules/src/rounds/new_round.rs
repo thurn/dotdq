@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::slice::ChunksExact;
 
 use data::contract_phase_data::{ContractNumber, ContractPhaseData, ContractPhaseStep, Contracts};
@@ -58,8 +58,9 @@ pub fn create(rng: &mut impl Rng) -> RoundData {
             all_programs: HashMap::from([(PlayerName::User, vec![
                 ProgramName::Starfall,
                 ProgramName::Obsidian,
-                ProgramName::Excavate,
+                ProgramName::Eviction,
             ])]),
+            activated: HashSet::new(),
         },
     })
 }

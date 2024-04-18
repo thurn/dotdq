@@ -16,6 +16,7 @@ use crate::contract_phase_data::ContractPhaseData;
 use crate::play_phase_data::PlayPhaseData;
 
 #[derive(Clone)]
+#[allow(clippy::large_enum_variant)]
 pub enum RoundData {
     ContractPhase(ContractPhaseData),
     PlayPhase(PlayPhaseData),

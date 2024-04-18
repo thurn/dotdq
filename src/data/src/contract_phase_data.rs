@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 
 use crate::delegate_data::{ContractPhaseDelegates, PlayPhaseDelegates};
@@ -51,6 +51,7 @@ impl ContractPhaseData {
             current_delegates: PlayPhaseDelegates::default(),
             program_state: HashMap::new(),
             all_programs: self.programs.all_programs,
+            activated: HashSet::new(),
         };
 
         PlayPhaseData {

@@ -12,27 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::delegate_data::ProgramState;
 use data::design::symbols;
 use data::primitive::primitives::Suit;
 use data::program_data::{ProgramDefinition, PROGRAMS};
 use data::program_name::ProgramName;
 use linkme::distributed_slice;
 use ratatui::prelude::*;
-use rules::rounds::tricks;
+use rules::program::activation;
+use rules::program::activation::DuringTurn;
 
 #[distributed_slice(PROGRAMS)]
 pub fn starfall() -> ProgramDefinition {
     ProgramDefinition::new()
         .name(ProgramName::Starfall)
-        .text(vec![Span::raw("↳Lead: Win the next trick.")])
+        .text(vec![Span::raw("↳Round: Win this trick.")])
         .play_phase(|on, id| {
-            on.can_activate.this(id, |data, context| {
-                context.state.is_none() && tricks::has_lead(data, context.id.owner)
-            });
-            on.activated.this(id, |data, context| {
-                context.set_state(ProgramState::ActivatedForTrick(tricks::current_number(data)));
-            });
+            activation::activate_for_trick::<DuringTurn>(on, id);
             on.trick_winner.queried(id, |_, context, &number, current| {
                 if context.activated_for_trick(number) {
                     context.id.owner
@@ -50,29 +45,23 @@ pub fn obsidian() -> ProgramDefinition {
         .name(ProgramName::Obsidian)
         .text(vec![Span::raw("↳Round: Change the trump suit to "), symbols::suit(Suit::Spades)])
         .play_phase(|on, id| {
-            on.can_activate
-                .this(id, |data, context| context.state.is_none() && data.is_turn(context.owner()));
-            on.activated.this(id, |data, context| {
+            activation::can_activate::<DuringTurn>(on, id);
+            on.activated.this(id, |data, _| {
                 data.trump = Some(Suit::Spades);
-                context.set_state(ProgramState::Activated);
             });
         })
         .build()
 }
 
 #[distributed_slice(PROGRAMS)]
-pub fn excavate() -> ProgramDefinition {
+pub fn eviction() -> ProgramDefinition {
     ProgramDefinition::new()
-        .name(ProgramName::Excavate)
+        .name(ProgramName::Eviction)
         .text(vec![Span::raw("↳Round: You do not need to follow suit this trick.")])
         .play_phase(|on, id| {
-            on.can_activate
-                .this(id, |data, context| context.state.is_none() && data.is_turn(context.owner()));
-            on.activated.this(id, |data, context| {
-                context.set_state(ProgramState::ActivatedForTrick(tricks::current_number(data)));
-            });
-            on.must_follow_suit.queried(id, |_, context, &number, current| {
-                if context.activated_for_trick(number) {
+            activation::activate_for_trick::<DuringTurn>(on, id);
+            on.must_follow_suit.queried(id, |_, context, p, current| {
+                if context.owner() == p.player_name && context.activated_for_trick(p.trick_number) {
                     false
                 } else {
                     current

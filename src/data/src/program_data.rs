@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use linkme::distributed_slice;
 use ratatui::prelude::*;
@@ -32,6 +32,9 @@ pub struct ProgramData<T> {
     pub current_delegates: T,
     pub program_state: HashMap<ProgramId, ProgramState>,
     pub all_programs: HashMap<PlayerName, Vec<ProgramName>>,
+
+    /// Programs which have been activated in the current scope.
+    pub activated: HashSet<ProgramId>,
 }
 
 impl<T> ProgramData<T> {

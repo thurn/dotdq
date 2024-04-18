@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::env;
+
 use clap::Parser;
 use cli::Cli;
 use color_eyre::eyre::Result;
@@ -24,7 +26,9 @@ pub mod utils;
 
 fn main() -> Result<()> {
     utils::initialize_logging()?;
-    // utils::initialize_panic_handler()?;
+    if env::var("DISABLE_PANIC_HANDLER").is_err() {
+        utils::initialize_panic_handler()?;
+    }
     Cli::parse();
 
     programs::linkme();

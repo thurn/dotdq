@@ -14,7 +14,7 @@
 
 use std::iter;
 
-use data::delegate_data::{HasPrograms, ProgramId};
+use data::delegate_data::{ActivationState, HasPrograms, ProgramId};
 use data::design::colors;
 use data::play_phase_data::PlayPhaseAction;
 use data::widget_id::WidgetId;
@@ -45,7 +45,7 @@ impl<'a, T: HasPrograms> StatefulWidget for ProgramListView<'a, T> {
         for (i, &program) in self.programs.iter().enumerate() {
             ProgramNameView::new()
                 .id(program)
-                .can_activate(self.data.can_activate(program))
+                .activation(self.data.activation_state(program))
                 .build()
                 .render(split[i + 1], buf, context);
         }
@@ -56,7 +56,7 @@ impl<'a, T: HasPrograms> StatefulWidget for ProgramListView<'a, T> {
 #[builder(builder_method(name = new))]
 pub struct ProgramNameView {
     id: ProgramId,
-    can_activate: bool,
+    activation: ActivationState,
 }
 
 impl StatefulWidget for ProgramNameView {
@@ -64,25 +64,29 @@ impl StatefulWidget for ProgramNameView {
 
     fn render(self, area: Rect, buf: &mut Buffer, context: &mut RenderContext) {
         let widget_id = WidgetId::Program(self.id);
-        let hovered = self.can_activate && context.hovered(widget_id, area);
-        let pressed = self.can_activate && context.mouse_down(widget_id, area);
-        if self.can_activate {
+        let hovered = self.activation.can_activate() && context.hovered(widget_id, area);
+        let pressed = self.activation.can_activate() && context.mouse_down(widget_id, area);
+        if self.activation.can_activate() {
             context.clicked(widget_id, area, PlayPhaseAction::ActivateProgram(self.id));
         }
 
-        let mut style = if self.can_activate {
-            Style::new().fg(colors::can_activate()).add_modifier(if pressed {
-                Modifier::BOLD
-            } else {
-                Modifier::BOLD | Modifier::UNDERLINED
-            })
-        } else {
-            Style::new().fg(colors::white()).add_modifier(Modifier::BOLD)
+        let mut style = match self.activation {
+            ActivationState::CannotActivate => Style::new().fg(colors::white()).bold(),
+            ActivationState::CanActivate => {
+                Style::new().fg(colors::can_activate()).bold().underlined()
+            }
+            ActivationState::CurrentlyActive => Style::new().fg(colors::light_blue()).bold(),
+            ActivationState::PreviouslyActivated => Style::new().fg(colors::white()).crossed_out(),
         };
+
+        if pressed {
+            style = style.remove_modifier(Modifier::UNDERLINED);
+        }
 
         if hovered {
             style = style.bg(colors::selected());
         }
+
         Line::styled(self.id.name.to_string(), style).render(area, buf);
     }
 }

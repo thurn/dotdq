@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use data::delegate_data::{Context, PlayPhaseDelegates, ProgramId, ProgramState};
+use data::delegate_data::{Context, PlayPhaseDelegates, ProgramState};
 use data::play_phase_data::PlayPhaseData;
 
 use crate::rounds::tricks;
@@ -35,15 +35,15 @@ impl CanActivate for WithLead {
     }
 }
 
-pub fn can_activate<TActivate: CanActivate>(on: &mut PlayPhaseDelegates, id: ProgramId) {
-    on.can_activate.this(id, |data, context| TActivate::can_activate(data, context));
+pub fn can_activate<TActivate: CanActivate>(on: &mut PlayPhaseDelegates) {
+    on.can_activate.this(|data, context| TActivate::can_activate(data, context));
 }
 
-pub fn activate_for_trick<TActivate: CanActivate>(on: &mut PlayPhaseDelegates, id: ProgramId) {
-    can_activate::<TActivate>(on, id);
+pub fn activate_for_trick<TActivate: CanActivate>(on: &mut PlayPhaseDelegates) {
+    can_activate::<TActivate>(on);
     on.currently_active
-        .this(id, |data, context| context.activated_for_trick(tricks::current_number(data)));
-    on.activated.this(id, |data, context| {
+        .this(|data, context| context.activated_for_trick(tricks::current_number(data)));
+    on.activated.this(|data, context| {
         context.set_state(ProgramState::ActivatedForTrick(tricks::current_number(data)));
     });
 }

@@ -28,7 +28,9 @@ pub fn run(data: ContractPhaseData) -> PlayPhaseData {
         for program in data.programs.all_programs.get(&player).unwrap_or(&vec![]) {
             let definition = programs::get(*program);
             if let Some(play_phase) = definition.play_phase {
-                play_phase(&mut delegates, ProgramId { name: *program, owner: player });
+                let id = ProgramId::new(*program, player);
+                play_phase(&mut delegates);
+                delegates.set_current_id(id);
             }
         }
     }

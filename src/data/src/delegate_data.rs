@@ -91,12 +91,19 @@ pub type MutationFn<TData, TArg> = fn(&mut TData, &mut Context, &TArg);
 
 #[derive(Clone)]
 pub struct QueryDelegateList<TData: HasPrograms, TArg, TResult> {
+    current: Vec<QueryFn<TData, TArg, TResult>>,
     delegates: Vec<(ProgramId, QueryFn<TData, TArg, TResult>)>,
 }
 
 impl<TData: HasPrograms, TArg, TResult> QueryDelegateList<TData, TArg, TResult> {
-    pub fn queried(&mut self, id: ProgramId, value: QueryFn<TData, TArg, TResult>) {
-        self.delegates.push((id, value));
+    pub fn queried(&mut self, value: QueryFn<TData, TArg, TResult>) {
+        self.current.push(value);
+    }
+
+    pub fn set_current_id(&mut self, id: ProgramId) {
+        for function in self.current.drain(..) {
+            self.delegates.push((id, function));
+        }
     }
 
     pub fn run_query(&self, data: &TData, arg: &TArg, current: TResult) -> TResult {
@@ -113,25 +120,32 @@ impl<TData: HasPrograms, TContext, TResult> Default
     for QueryDelegateList<TData, TContext, TResult>
 {
     fn default() -> Self {
-        Self { delegates: vec![] }
+        Self { current: vec![], delegates: vec![] }
     }
 }
 
 #[derive(Clone)]
 pub struct ProgramQuery<TData: HasPrograms, TResult> {
+    current: Option<SingleQueryFn<TData, TResult>>,
     delegates: HashMap<ProgramId, SingleQueryFn<TData, TResult>>,
 }
 
 impl<TData: HasPrograms, TResult> Default for ProgramQuery<TData, TResult> {
     fn default() -> Self {
-        Self { delegates: HashMap::default() }
+        Self { current: None, delegates: HashMap::default() }
     }
 }
 
 impl<TData: HasPrograms, TResult> ProgramQuery<TData, TResult> {
-    pub fn this(&mut self, id: ProgramId, value: SingleQueryFn<TData, TResult>) {
+    pub fn this(&mut self, value: SingleQueryFn<TData, TResult>) {
+        self.current = Some(value);
+    }
+
+    pub fn set_current_id(&mut self, id: ProgramId) {
         assert!(!self.delegates.contains_key(&id), "Delegate already registered for {id:?}");
-        self.delegates.insert(id, value);
+        if let Some(function) = self.current.take() {
+            self.delegates.insert(id, function);
+        }
     }
 
     pub fn run_query(&self, data: &TData, program_id: ProgramId, current: TResult) -> TResult {
@@ -145,19 +159,26 @@ impl<TData: HasPrograms, TResult> ProgramQuery<TData, TResult> {
 
 #[derive(Clone)]
 pub struct ProgramMutation<TData: HasPrograms> {
+    current: Option<SingleMutationFn<TData>>,
     delegates: HashMap<ProgramId, SingleMutationFn<TData>>,
 }
 
 impl<TData: HasPrograms> Default for ProgramMutation<TData> {
     fn default() -> Self {
-        Self { delegates: HashMap::default() }
+        Self { current: None, delegates: HashMap::default() }
     }
 }
 
 impl<TData: HasPrograms> ProgramMutation<TData> {
-    pub fn this(&mut self, id: ProgramId, value: SingleMutationFn<TData>) {
+    pub fn this(&mut self, value: SingleMutationFn<TData>) {
+        self.current = Some(value);
+    }
+
+    pub fn set_current_id(&mut self, id: ProgramId) {
         assert!(!self.delegates.contains_key(&id), "Delegate already registered for {id:?}");
-        self.delegates.insert(id, value);
+        if let Some(function) = self.current.take() {
+            self.delegates.insert(id, function);
+        }
     }
 
     pub fn get_mutation_fn(&mut self, program_id: ProgramId) -> SingleMutationFn<TData> {
@@ -205,6 +226,16 @@ pub struct PlayPhaseDelegates {
     pub activated: ProgramMutation<PlayPhaseData>,
     pub trick_winner: QueryDelegateList<PlayPhaseData, TrickNumber, PlayerName>,
     pub must_follow_suit: QueryDelegateList<PlayPhaseData, PlayerTrickNumber, bool>,
+}
+
+impl PlayPhaseDelegates {
+    pub fn set_current_id(&mut self, id: ProgramId) {
+        self.can_activate.set_current_id(id);
+        self.currently_active.set_current_id(id);
+        self.activated.set_current_id(id);
+        self.trick_winner.set_current_id(id);
+        self.must_follow_suit.set_current_id(id);
+    }
 }
 
 #[derive(Default)]

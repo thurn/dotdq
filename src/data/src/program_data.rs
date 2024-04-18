@@ -51,7 +51,7 @@ pub struct ProgramDefinition {
     #[builder(default, setter(strip_option))]
     pub contract_phase: Option<fn(&mut ContractPhaseDelegates)>,
     #[builder(default, setter(strip_option))]
-    pub play_phase: Option<fn(&mut PlayPhaseDelegates, ProgramId)>,
+    pub play_phase: Option<fn(&mut PlayPhaseDelegates)>,
     #[builder(default, setter(strip_option))]
     pub run_phase: Option<fn(&mut RunPhaseDelegates)>,
 }

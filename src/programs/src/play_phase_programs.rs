@@ -26,9 +26,9 @@ pub fn starfall() -> ProgramDefinition {
     ProgramDefinition::new()
         .name(ProgramName::Starfall)
         .text(vec![Span::raw("↳Round: Win this trick.")])
-        .play_phase(|on, id| {
-            activation::activate_for_trick::<DuringTurn>(on, id);
-            on.trick_winner.queried(id, |_, context, &number, current| {
+        .play_phase(|on| {
+            activation::activate_for_trick::<DuringTurn>(on);
+            on.trick_winner.queried(|_, context, &number, current| {
                 if context.activated_for_trick(number) {
                     context.id.owner
                 } else {
@@ -44,9 +44,9 @@ pub fn obsidian() -> ProgramDefinition {
     ProgramDefinition::new()
         .name(ProgramName::Obsidian)
         .text(vec![Span::raw("↳Round: Change the trump suit to "), symbols::suit(Suit::Spades)])
-        .play_phase(|on, id| {
-            activation::can_activate::<DuringTurn>(on, id);
-            on.activated.this(id, |data, _| {
+        .play_phase(|on| {
+            activation::can_activate::<DuringTurn>(on);
+            on.activated.this(|data, _| {
                 data.trump = Some(Suit::Spades);
             });
         })
@@ -58,10 +58,10 @@ pub fn eviction() -> ProgramDefinition {
     ProgramDefinition::new()
         .name(ProgramName::Eviction)
         .text(vec![Span::raw("↳Round: You do not need to follow suit this trick.")])
-        .play_phase(|on, id| {
-            activation::activate_for_trick::<DuringTurn>(on, id);
-            on.must_follow_suit.queried(id, |_, context, p, current| {
-                if context.owner() == p.player_name && context.activated_for_trick(p.trick_number) {
+        .play_phase(|on| {
+            activation::activate_for_trick::<DuringTurn>(on);
+            on.must_follow_suit.queried(|_, context, p, current| {
+                if p.player_name == context.owner() && context.activated_for_trick(p.trick_number) {
                     false
                 } else {
                     current
